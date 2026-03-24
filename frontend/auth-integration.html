@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth Integration Sample</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 16px;
+      line-height: 1.5;
+    }
+
+    .card {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      background: #ffffff;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #0f172a;
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Frontend to Backend Auth Integration</h1>
+  <p>This page uses your deployed backend on Vercel for register and login.</p>
+
+  <div class="card">
+    <h2>Register Form</h2>
+
+    <label for="name">Name</label>
+    <input id="name" type="text" placeholder="Enter full name" />
+
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="Enter email" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Enter password" />
+
+    <label>
+      <input type="radio" name="role" value="student" checked /> Student
+    </label>
+    <label>
+      <input type="radio" name="role" value="admin" /> Admin
+    </label>
+
+    <button id="registerBtn" onclick="registerUser()">Register</button>
+    <div id="registerStatus" class="status"></div>
+  </div>
+
+  <div class="card">
+    <h2>Login Form</h2>
+
+    <label for="loginEmail">Email</label>
+    <input id="loginEmail" type="email" placeholder="Enter email" />
+
+    <label for="loginPassword">Password</label>
+    <input id="loginPassword" type="password" placeholder="Enter password" />
+
+    <button id="loginBtn" onclick="loginUser()">Login</button>
+    <div id="loginStatus" class="status"></div>
+  </div>
+
+  <script type="module" src="./js/register.js"></script>
+  <script type="module" src="./js/login.js"></script>
+</body>
+</html>

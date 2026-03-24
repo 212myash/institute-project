@@ -1,4 +1,12 @@
-const BASE_URL = 'https://your-backend.vercel.app';
+const BASE_URL = 'https://institute-project-five.vercel.app';
+
+function normalizeApiError(error) {
+  if (error.name === 'TypeError') {
+    return 'Network error. Please check your internet connection and try again.';
+  }
+
+  return error.message || 'Something went wrong. Please try again.';
+}
 
 async function apiRequest(path, options = {}) {
   const url = `${BASE_URL}${path}`;
@@ -8,22 +16,26 @@ async function apiRequest(path, options = {}) {
       'Content-Type': 'application/json',
       ...(options.headers || {}),
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
   };
 
-  console.log(`[API] ${config.method} ${url} - loading...`);
+  if (options.body !== undefined) {
+    config.body = JSON.stringify(options.body);
+  }
 
-  const response = await fetch(url, config);
+  let response;
+  try {
+    response = await fetch(url, config);
+  } catch (error) {
+    throw new Error(normalizeApiError(error));
+  }
+
   const data = await response.json().catch(() => ({}));
-
   if (!response.ok) {
     const message = data.message || `Request failed with status ${response.status}`;
-    console.error(`[API] ${config.method} ${url} - error: ${message}`);
     throw new Error(message);
   }
 
-  console.log(`[API] ${config.method} ${url} - success`);
   return data;
 }
 
-export { BASE_URL, apiRequest };
+export { BASE_URL, apiRequest, normalizeApiError };
