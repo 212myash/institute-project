@@ -4,7 +4,6 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const mongoose = require('mongoose');
 
 let isConnected = false;
-let connectPromise = null;
 
 mongoose.connection.on('connected', () => {
   console.log('MongoDB Connected');
@@ -17,10 +16,6 @@ mongoose.connection.on('error', (err) => {
 const connectDB = async () => {
   if (isConnected && mongoose.connection.readyState === 1) {
     return mongoose.connection;
-  }
-
-  if (connectPromise) {
-    return connectPromise;
   }
 
   const mongoURI = process.env.MONGO_URI;
@@ -38,17 +33,15 @@ const connectDB = async () => {
       throw new Error('Invalid MONGO_URI format. It must start with mongodb:// or mongodb+srv://');
     }
 
-    connectPromise = mongoose.connect(mongoURI, {
+    await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    await connectPromise;
     isConnected = true;
     return mongoose.connection;
   } catch (error) {
     console.error('Connection failed:', error.message);
-    connectPromise = null;
     isConnected = false;
     throw error;
   }

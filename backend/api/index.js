@@ -15,26 +15,23 @@ const attendanceRoutes = require('./routes/attendance');
 // Initialize Express app
 const app = express();
 
-const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
-requiredEnvVars.forEach((name) => {
-  if (!process.env[name]) {
-    throw new Error(`${name} environment variable is not set`);
-  }
-  console.log(`${name} loaded: YES`);
-});
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI environment variable is not set');
+}
 
-let dbReadyPromise = connectDB();
-dbReadyPromise.catch((error) => {
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set');
+}
+
+console.log('MONGO_URI loaded: YES');
+console.log('JWT_SECRET loaded: YES');
+
+connectDB().catch((error) => {
   console.error('Initial DB connection failed:', error.message);
 });
 
 // Middleware
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -44,24 +41,6 @@ app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   }
   next();
-});
-
-// Ensure DB is ready before handling routes to prevent buffering timeouts.
-app.use(async (req, res, next) => {
-  try {
-    await dbReadyPromise;
-    next();
-  } catch (error) {
-    dbReadyPromise = connectDB();
-    dbReadyPromise.catch((err) => {
-      console.error('DB reconnection failed:', err.message);
-    });
-
-    res.status(503).json({
-      success: false,
-      message: 'Database connection unavailable',
-    });
-  }
 });
 
 // Health check endpoint
