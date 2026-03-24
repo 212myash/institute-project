@@ -15,20 +15,7 @@ const attendanceRoutes = require('./routes/attendance');
 // Initialize Express app
 const app = express();
 
-if (!process.env.MONGO_URI) {
-  throw new Error('MONGO_URI environment variable is not set');
-}
-
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not set');
-}
-
-console.log('MONGO_URI loaded: YES');
-console.log('JWT_SECRET loaded: YES');
-
-connectDB().catch((error) => {
-  console.error('Initial DB connection failed:', error.message);
-});
+connectDB();
 
 // Middleware
 app.use(cors());
