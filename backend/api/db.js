@@ -3,15 +3,11 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const mongoose = require('mongoose');
 
-let cachedConnection = null;
-let cachedConnectionPromise = null;
+let isConnected = false;
+let connectPromise = null;
 
 mongoose.connection.on('connected', () => {
   console.log('MongoDB Connected');
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.warn('MongoDB Disconnected');
 });
 
 mongoose.connection.on('error', (err) => {
@@ -19,12 +15,12 @@ mongoose.connection.on('error', (err) => {
 });
 
 const connectDB = async () => {
-  if (cachedConnection && mongoose.connection.readyState === 1) {
-    return cachedConnection;
+  if (isConnected && mongoose.connection.readyState === 1) {
+    return mongoose.connection;
   }
 
-  if (cachedConnectionPromise) {
-    return cachedConnectionPromise;
+  if (connectPromise) {
+    return connectPromise;
   }
 
   const mongoURI = process.env.MONGO_URI;
@@ -42,23 +38,18 @@ const connectDB = async () => {
       throw new Error('Invalid MONGO_URI format. It must start with mongodb:// or mongodb+srv://');
     }
 
-    cachedConnectionPromise = mongoose.connect(mongoURI, {
+    connectPromise = mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
-      minPoolSize: 1,
-      retryWrites: true,
-      w: 'majority',
     });
 
-    await cachedConnectionPromise;
-    cachedConnection = mongoose.connection;
-    return cachedConnection;
+    await connectPromise;
+    isConnected = true;
+    return mongoose.connection;
   } catch (error) {
     console.error('Connection failed:', error.message);
-    cachedConnectionPromise = null;
+    connectPromise = null;
+    isConnected = false;
     throw error;
   }
 };
