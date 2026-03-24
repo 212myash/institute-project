@@ -15,7 +15,10 @@ const attendanceRoutes = require('./routes/attendance');
 // Initialize Express app
 const app = express();
 
-connectDB();
+let dbReadyPromise = connectDB();
+dbReadyPromise.catch((error) => {
+  console.error('Initial DB connection failed:', error.message);
+});
 
 // Middleware
 app.use(cors());
@@ -28,6 +31,23 @@ app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   }
   next();
+});
+
+app.use(async (req, res, next) => {
+  try {
+    await dbReadyPromise;
+    next();
+  } catch (error) {
+    dbReadyPromise = connectDB();
+    dbReadyPromise.catch((err) => {
+      console.error('DB reconnection failed:', err.message);
+    });
+
+    res.status(503).json({
+      success: false,
+      message: 'Database connection unavailable',
+    });
+  }
 });
 
 // Health check endpoint
