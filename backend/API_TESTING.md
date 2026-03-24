@@ -20,9 +20,9 @@ Expected:
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Demo User",
-    "email": "demo@example.com",
-    "password": "123456",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
+    "password": "test123",
     "role": "student"
   }'
 ```
@@ -41,8 +41,8 @@ Error examples:
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "demo@example.com",
-    "password": "123456"
+    "email": "212myashraj@gmail.com",
+    "password": "test123"
   }'
 ```
 

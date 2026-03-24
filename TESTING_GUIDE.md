@@ -62,7 +62,7 @@ curl http://localhost:5000/api/invalid
 
 ## Phase 2: Authentication Tests (2 tests)
 
-### 2.1 Register Admin User
+### 2.1 Register Yash Raj
 **What it tests:** User registration, password hashing, role assignment
 
 **Using curl:**
@@ -70,8 +70,8 @@ curl http://localhost:5000/api/invalid
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Admin User",
-    "email": "admin@test.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "password": "admin123",
     "role": "admin"
   }'
@@ -85,8 +85,8 @@ curl -X POST http://localhost:5000/api/auth/register \
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "507f1f77bcf86cd799439011",
-    "name": "Admin User",
-    "email": "admin@test.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "role": "admin"
   }
 }
@@ -109,7 +109,7 @@ ADMIN_TOKEN=<token_from_response>
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@test.com",
+    "email": "212myashraj@gmail.com",
     "password": "admin123"
   }'
 ```
@@ -122,8 +122,8 @@ curl -X POST http://localhost:5000/api/auth/login \
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "507f1f77bcf86cd799439011",
-    "name": "Admin User",
-    "email": "admin@test.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "role": "admin"
   }
 }
@@ -296,8 +296,8 @@ curl -X PUT "http://localhost:5000/api/courses/$COURSE_ID" \
 curl -X POST http://localhost:5000/api/contact \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "John Smith",
-    "email": "john@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "I am interested in the Web Development course. Can you provide more details?"
   }'
 ```
@@ -309,8 +309,8 @@ curl -X POST http://localhost:5000/api/contact \
   "message": "Your message has been received. We will contact you soon!",
   "data": {
     "_id": "507f1f77bcf86cd799439014",
-    "name": "John Smith",
-    "email": "john@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "I am interested in the Web Development course...",
     "status": "new",
     "createdAt": "2024-03-24T10:00:00.000Z"
@@ -335,8 +335,8 @@ CONTACT_ID=<_id_from_response>
 curl -X POST http://localhost:5000/api/contact \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Jane Doe",
-    "email": "jane@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "What is the schedule for Python course?"
   }'
 ```
@@ -456,8 +456,8 @@ curl "http://localhost:5000/api/admin/users?page=1&limit=10" \
   "data": [
     {
       "_id": "507f1f77bcf86cd799439011",
-      "name": "Admin User",
-      "email": "admin@test.com",
+      "name": "Yash Raj",
+      "email": "212myashraj@gmail.com",
       "role": "admin"
     }
   ]
@@ -559,7 +559,7 @@ curl -X POST http://localhost:5000/api/auth/register \
   -d '{
     "name": "Test",
     "email": "invalid-email",
-    "password": "123456"
+    "password": "test123"
   }'
 ```
 
@@ -608,8 +608,8 @@ curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Admin 2",
-    "email": "admin@test.com",
-    "password": "123456"
+    "email": "212myashraj@gmail.com",
+    "password": "test123"
   }'
 ```
 
@@ -633,7 +633,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@test.com",
+    "email": "212myashraj@gmail.com",
     "password": "wrongpassword"
   }'
 ```

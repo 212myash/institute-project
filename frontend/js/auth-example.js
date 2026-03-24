@@ -36,5 +36,5 @@ export async function loginUser({ email, password }) {
 }
 
 // Example usage:
-// registerUser({ name: 'Aryan', email: 'aryan@example.com', password: '123456', role: 'student' });
-// loginUser({ email: 'aryan@example.com', password: '123456' });
+// registerUser({ name: 'Yash Raj', email: '212myashraj@gmail.com', password: 'test123', role: 'student' });
+// loginUser({ email: '212myashraj@gmail.com', password: 'test123' });

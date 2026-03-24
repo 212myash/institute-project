@@ -20,7 +20,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"student\"\n}"
+              "raw": "{\n  \"name\": \"Yash Raj\",\n  \"email\": \"212myashraj@gmail.com\",\n  \"password\": \"test123\",\n  \"role\": \"student\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/auth/register",
@@ -41,7 +41,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"212myashraj@gmail.com\",\n  \"password\": \"test123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/auth/login",
@@ -171,7 +171,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane@example.com\",\n  \"message\": \"I have a question about the Python course\"\n}"
+              "raw": "{\n  \"name\": \"Yash Raj\",\n  \"email\": \"212myashraj@gmail.com\",\n  \"message\": \"I have a question about the Python course\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/contact",

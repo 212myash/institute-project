@@ -33,8 +33,8 @@ curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Name",
-    "email": "email@example.com",
-    "password": "password123",
+    "email": "212myashraj@gmail.com",
+    "password": "test123",
     "role": "student"
   }'
 ```
@@ -44,8 +44,8 @@ curl -X POST http://localhost:5000/api/auth/register \
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "email@example.com",
-    "password": "password123"
+    "email": "212myashraj@gmail.com",
+    "password": "test123"
   }'
 ```
 
@@ -94,7 +94,7 @@ curl -X POST http://localhost:5000/api/contact \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Name",
-    "email": "email@example.com",
+    "email": "212myashraj@gmail.com",
     "message": "Message"
   }'
 ```
@@ -218,7 +218,7 @@ curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Admin",
-    "email": "admin@test.com",
+    "email": "212myashraj@gmail.com",
     "password": "admin123",
     "role": "admin"
   }'

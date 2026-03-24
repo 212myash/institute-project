@@ -294,7 +294,7 @@ NODE_ENV=development
 # Register
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"Admin","email":"admin@test.com","password":"123456","role":"admin"}'
+  -d '{"name":"Admin","email":"212myashraj@gmail.com","password":"test123","role":"admin"}'
 
 # Get courses
 curl http://localhost:5000/api/courses

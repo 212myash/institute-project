@@ -7,15 +7,15 @@ async function runExamples() {
   // Example register
   // await registerUser({
   //   name: 'New Student',
-  //   email: 'student1@example.com',
-  //   password: '123456',
+  //   email: '212myashraj@gmail.com',
+  //   password: 'test123',
   //   role: 'student',
   // });
 
   // Example login
   // await loginUser({
-  //   email: 'student1@example.com',
-  //   password: '123456',
+  //   email: '212myashraj@gmail.com',
+  //   password: 'test123',
   // });
 
   // Example admin polling for new contact requests

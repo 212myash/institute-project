@@ -179,9 +179,9 @@ curl http://localhost:5000/api/health
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "password123"
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
+    "password": "test123"
   }'
 ```
 
@@ -198,8 +198,8 @@ Or use [Postman](https://www.postman.com) to test the API endpoints.
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Admin User",
-    "email": "admin@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "password": "adminpass123",
     "role": "admin"
   }'
@@ -212,7 +212,7 @@ Save the returned token for next tests.
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@example.com",
+    "email": "212myashraj@gmail.com",
     "password": "adminpass123"
   }'
 ```
@@ -243,8 +243,8 @@ Submit contact:
 curl -X POST http://localhost:5000/api/contact \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Jane Smith",
-    "email": "jane@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "I have a question about the Python course"
   }'
 ```
@@ -353,8 +353,8 @@ curl -X POST https://institute-api.vercel.app/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test User",
-    "email": "test@example.com",
-    "password": "password123"
+    "email": "212myashraj@gmail.com",
+    "password": "test123"
   }'
 ```
 

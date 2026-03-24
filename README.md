@@ -181,8 +181,8 @@ Add screenshots here before client handover:
 
 For support, implementation transfer, or maintenance:
 
-- Author: Shivam Computer Institute Engineering Team
-- Contact: shivaminstitute317@gmail.com
+- Author: Yash Raj
+- Contact: [212myashraj@gmail.com](mailto:212myashraj@gmail.com)
 
 ## License
 

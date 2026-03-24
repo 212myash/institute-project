@@ -69,9 +69,9 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "securePassword123",
+  "name": "Yash Raj",
+  "email": "212myashraj@gmail.com",
+  "password": "test123",
   "role": "student"
 }
 ```
@@ -92,8 +92,8 @@ Content-Type: application/json
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "507f1f77bcf86cd799439011",
-    "name": "John Doe",
-    "email": "john@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "role": "student"
   }
 }
@@ -105,9 +105,9 @@ Content-Type: application/json
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "securePassword123"
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
+    "password": "test123"
   }'
 ```
 
@@ -126,8 +126,8 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "email": "john@example.com",
-  "password": "securePassword123"
+  "email": "212myashraj@gmail.com",
+  "password": "test123"
 }
 ```
 
@@ -145,8 +145,8 @@ Content-Type: application/json
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "507f1f77bcf86cd799439011",
-    "name": "John Doe",
-    "email": "john@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "role": "student"
   }
 }
@@ -183,8 +183,8 @@ Retrieves all available courses with pagination.
       "price": 5000,
       "createdBy": {
         "_id": "507f1f77bcf86cd799439012",
-        "name": "Admin User",
-        "email": "admin@example.com"
+        "name": "Yash Raj",
+        "email": "212myashraj@gmail.com"
       },
       "createdAt": "2024-03-24T10:00:00.000Z",
       "updatedAt": "2024-03-24T10:00:00.000Z"
@@ -225,8 +225,8 @@ Retrieves details of a specific course.
     "price": 5000,
     "createdBy": {
       "_id": "507f1f77bcf86cd799439012",
-      "name": "Admin User",
-      "email": "admin@example.com"
+      "name": "Yash Raj",
+      "email": "212myashraj@gmail.com"
     },
     "createdAt": "2024-03-24T10:00:00.000Z",
     "updatedAt": "2024-03-24T10:00:00.000Z"
@@ -370,8 +370,8 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "name": "Jane Smith",
-  "email": "jane@example.com",
+  "name": "Yash Raj",
+  "email": "212myashraj@gmail.com",
   "message": "I have a question about Python course"
 }
 ```
@@ -390,8 +390,8 @@ Content-Type: application/json
   "message": "Your message has been received. We will contact you soon!",
   "data": {
     "_id": "507f1f77bcf86cd799439014",
-    "name": "Jane Smith",
-    "email": "jane@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "I have a question about Python course",
     "status": "new",
     "createdAt": "2024-03-24T10:00:00.000Z"
@@ -423,8 +423,8 @@ Retrieves all contact submissions with pagination.
   "data": [
     {
       "_id": "507f1f77bcf86cd799439014",
-      "name": "Jane Smith",
-      "email": "jane@example.com",
+      "name": "Yash Raj",
+      "email": "212myashraj@gmail.com",
       "message": "I have a question",
       "status": "new",
       "createdAt": "2024-03-24T10:00:00.000Z"
@@ -451,8 +451,8 @@ Retrieves a specific contact submission.
   "success": true,
   "data": {
     "_id": "507f1f77bcf86cd799439014",
-    "name": "Jane Smith",
-    "email": "jane@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "I have a question",
     "status": "new",
     "createdAt": "2024-03-24T10:00:00.000Z"
@@ -575,8 +575,8 @@ Retrieves all users with pagination and optional role filtering.
   "data": [
     {
       "_id": "507f1f77bcf86cd799439011",
-      "name": "John Doe",
-      "email": "john@example.com",
+      "name": "Yash Raj",
+      "email": "212myashraj@gmail.com",
       "role": "student",
       "createdAt": "2024-03-24T10:00:00.000Z"
     }
@@ -602,8 +602,8 @@ Retrieves details of a specific user.
   "success": true,
   "data": {
     "_id": "507f1f77bcf86cd799439011",
-    "name": "John Doe",
-    "email": "john@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "role": "student",
     "createdAt": "2024-03-24T10:00:00.000Z",
     "updatedAt": "2024-03-24T10:00:00.000Z"
@@ -693,8 +693,8 @@ Retrieves all contact requests with pagination and optional status filtering.
   "data": [
     {
       "_id": "507f1f77bcf86cd799439014",
-      "name": "Jane Smith",
-      "email": "jane@example.com",
+      "name": "Yash Raj",
+      "email": "212myashraj@gmail.com",
       "message": "Question about courses",
       "status": "new",
       "createdAt": "2024-03-24T10:00:00.000Z"
@@ -721,8 +721,8 @@ Retrieves a specific contact request and marks it as read.
   "success": true,
   "data": {
     "_id": "507f1f77bcf86cd799439014",
-    "name": "Jane Smith",
-    "email": "jane@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "Question about courses",
     "status": "read",
     "createdAt": "2024-03-24T10:00:00.000Z"

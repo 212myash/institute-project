@@ -41,14 +41,14 @@ You should see:
 
 ## 3. Test API (2 minutes)
 
-### Register Admin User
+### Register Yash Raj
 
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Admin",
-    "email": "admin@example.com",
+    "email": "212myashraj@gmail.com",
     "password": "admin123",
     "role": "admin"
   }'
@@ -81,8 +81,8 @@ curl http://localhost:5000/api/courses
 curl -X POST http://localhost:5000/api/contact \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "John",
-    "email": "john@example.com",
+    "name": "Yash Raj",
+    "email": "212myashraj@gmail.com",
     "message": "I have a question"
   }'
 ```
