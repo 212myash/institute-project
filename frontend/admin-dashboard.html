@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard | Shivam Computer Institute</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#08152e",
+          "primary-container": "#1e2a44",
+          "background": "#f8f9fa",
+          "surface-container-low": "#f3f4f5",
+          "surface-container-lowest": "#ffffff",
+          "surface-variant": "#e1e3e4",
+          "on-background": "#191c1d",
+          "on-surface-variant": "#45464d",
+          "tertiary-fixed": "#ffddb4",
+          "tertiary-fixed-dim": "#ffb955",
+          "on-tertiary-container": "#c78300",
+          "secondary-fixed": "#d1e4fb"
+        },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] },
+        borderRadius: { "xl": "1.5rem" }
+      }
+    }
+  }
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body class="bg-background font-body text-on-background antialiased" data-page="admin-dashboard">
+<aside class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 py-8 px-4 space-y-2 z-40">
+  <div class="px-4 mb-8">
+    <h2 class="text-lg font-bold text-slate-900 font-headline">Academic Atelier</h2>
+    <p class="text-xs text-on-surface-variant font-medium">Premium Learning</p>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="#"> <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>Dashboard</a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">school</span>My Courses</a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined">calendar_month</span>Attendance</a>
+  </nav>
+  <div class="mt-auto pt-6 border-t border-slate-200 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#"><span class="material-symbols-outlined">help</span>Help Center</a>
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-logout><span class="material-symbols-outlined">logout</span>Logout</a>
+  </div>
+</aside>
+
+<header class="fixed top-0 w-full z-30 flex justify-between items-center px-6 h-20 bg-white/70 backdrop-blur-md shadow-sm md:pl-72">
+  <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline">Shivam Computer Institute</span>
+  <div class="flex items-center gap-3">
+    <span class="text-sm font-semibold text-on-surface-variant">Admin: <span data-user-name>Admin</span></span>
+    <button class="p-1 border-2 border-primary rounded-full"><img alt="Admin" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeK0B2shUNAnFZfZ5nJk5wl5kez394IrOZnS-rp6sscJdv6dwmZ8OYsrzRRxvJd8LZQlpIqBV8deso7UmVk1Bg25C_cSjKJB6VneL9LVOZRb-R_8BKVg1qi_Y5Mych_B1GhR57avoI32Vi-tYwA3vSy6katM1EPeqLZyBC4KqhN_odlFpJ8oCdt4klY_VceYmYx0hjzNqjuvTaC66Gm1PHf0GMMgUFELeAs0RQXT0W2CUAbnVhgG21lfXFy1NwENIElYvUloL1Ju0Z"/></button>
+  </div>
+</header>
+
+<main class="pt-24 pb-24 md:pb-8 md:pl-72 px-6 min-h-screen">
+  <section class="mb-10">
+    <h1 class="text-3xl font-extrabold font-headline tracking-tight text-primary">Academic Analytics</h1>
+    <p class="text-on-surface-variant font-medium mt-1">Detailed performance overview for March 2024</p>
+  </section>
+
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Total Users</p>
+      <h3 id="totalUsersStat" class="mt-4 text-4xl font-headline font-extrabold text-primary">0</h3>
+    </div>
+    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Contact Requests</p>
+      <h3 id="totalRequestsStat" class="mt-4 text-4xl font-headline font-extrabold text-primary">0</h3>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-auto">
+      <h3 class="text-xl font-headline font-bold text-primary mb-4">Users</h3>
+      <table class="w-full text-left">
+        <thead>
+          <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
+            <th class="py-2 px-4">#</th>
+            <th class="py-2 px-4">Name</th>
+            <th class="py-2 px-4">Email</th>
+            <th class="py-2 px-4">Role</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-auto">
+      <h3 class="text-xl font-headline font-bold text-primary mb-4">Contact Requests</h3>
+      <table class="w-full text-left">
+        <thead>
+          <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
+            <th class="py-2 px-4">#</th>
+            <th class="py-2 px-4">Name</th>
+            <th class="py-2 px-4">Email</th>
+            <th class="py-2 px-4">Message</th>
+            <th class="py-2 px-4">Status</th>
+          </tr>
+        </thead>
+        <tbody id="requestsTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 w-full rounded-t-3xl md:hidden bg-white/80 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
+  <div class="flex justify-around items-center h-20 px-4 pb-safe">
+    <a class="flex flex-col items-center justify-center bg-amber-100 text-blue-900 rounded-2xl px-5 py-2 scale-110 transition-transform" href="#"><span class="material-symbols-outlined">home</span><span class="text-[10px] font-manrope font-medium mt-1">Home</span></a>
+    <a class="flex flex-col items-center justify-center text-slate-400" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">local_library</span><span class="text-[10px] font-manrope font-medium mt-1">Courses</span></a>
+    <a class="flex flex-col items-center justify-center text-slate-400" href="#" data-logout><span class="material-symbols-outlined">logout</span><span class="text-[10px] font-manrope font-medium mt-1">Logout</span></a>
+  </div>
+</nav>
+<script src="./js/app.js"></script>
+</body></html>

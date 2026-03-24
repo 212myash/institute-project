@@ -1,55 +1,41 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-// Generate JWT Token
-const generateToken = (user) => {
-  return jwt.sign(
-    { id: user._id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'your_jwt_secret_key_change_in_production',
-    { expiresIn: '7d' }
-  );
-};
-
-// Register Route
+// POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, email, and password',
+        message: 'name, email and password are required',
       });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: 'Email already registered',
+        message: 'User already exists with this email',
       });
     }
 
-    // Create user
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       name,
       email,
-      password,
+      password: hashedPassword,
       role: role || 'student',
     });
-
-    // Generate token
-    const token = generateToken(user);
 
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -65,21 +51,19 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login Route
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password',
+        message: 'email and password are required',
       });
     }
 
-    // Find user and get password field
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -87,22 +71,17 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Compare password
-    const isPasswordMatch = await user.comparePassword(password);
-    if (!isPasswordMatch) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password',
       });
     }
 
-    // Generate token
-    const token = generateToken(user);
-
     res.status(200).json({
       success: true,
       message: 'Login successful',
-      token,
       user: {
         id: user._id,
         name: user.name,

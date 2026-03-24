@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Shivam Computer Institute</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#08152e",
+          "primary-container": "#1e2a44",
+          surface: "#f8f9fa",
+          "surface-container-low": "#f3f4f5",
+          "surface-container-lowest": "#ffffff",
+          "on-surface": "#191c1d",
+          "on-surface-variant": "#45464d",
+          "outline": "#75777e",
+          "outline-variant": "#c5c6ce",
+          "tertiary-fixed-dim": "#ffb955",
+          "on-tertiary-container": "#c78300"
+        },
+        fontFamily: {
+          headline: ["Manrope", "sans-serif"],
+          body: ["Inter", "sans-serif"]
+        },
+        borderRadius: { xl: "0.75rem", full: "9999px" }
+      }
+    }
+  }
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+.academic-pattern { background-color: #f8f9fa; background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e2a44' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.glass-effect { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.85); }
+</style>
+</head>
+<body class="font-body bg-surface text-on-surface min-h-screen flex flex-col" data-page="login">
+<main class="flex-grow flex items-center justify-center p-6 academic-pattern relative overflow-hidden">
+  <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-container/5 rounded-full blur-[120px]"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-200/20 rounded-full blur-[120px]"></div>
+  <div class="w-full max-w-md z-10">
+    <div class="text-center mb-10">
+      <h1 class="font-headline text-3xl font-extrabold text-primary tracking-tight mb-2">Shivam Computer Institute</h1>
+      <p class="text-on-surface-variant font-medium">Empowering Academic Excellence</p>
+    </div>
+
+    <div class="bg-surface-container-lowest glass-effect rounded-xl shadow-[0_32px_64px_-15px_rgba(8,21,46,0.08)] p-8 border border-white/20">
+      <div class="flex p-1 bg-surface-container-low rounded-lg mb-8">
+        <button data-role="student" class="flex-1 py-2 px-4 rounded-lg bg-surface-container-lowest shadow-sm text-primary font-bold transition-all duration-300 flex items-center justify-center gap-2" type="button">
+          <span class="material-symbols-outlined">school</span> Student
+        </button>
+        <button data-role="admin" class="flex-1 py-2 px-4 rounded-lg text-on-surface-variant font-medium hover:text-primary transition-all duration-300 flex items-center justify-center gap-2" type="button">
+          <span class="material-symbols-outlined">admin_panel_settings</span> Admin
+        </button>
+      </div>
+
+      <form id="loginForm" class="space-y-6" method="POST">
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-on-surface ml-1" for="email">Email Address</label>
+          <div class="relative group">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant"><span class="material-symbols-outlined">mail</span></span>
+            <input id="email" name="email" class="block w-full pl-10 pr-4 py-3 bg-surface-container-low border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest focus:border-primary transition-all duration-200 outline-none placeholder:text-outline" placeholder="name@institute.com" required type="email"/>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between items-center ml-1">
+            <label class="block text-sm font-semibold text-on-surface" for="password">Password</label>
+            <a class="text-xs font-bold text-on-tertiary-container hover:underline" href="#">Forgot password?</a>
+          </div>
+          <div class="relative group">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant"><span class="material-symbols-outlined">lock</span></span>
+            <input id="password" name="password" class="block w-full pl-10 pr-4 py-3 bg-surface-container-low border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest focus:border-primary transition-all duration-200 outline-none placeholder:text-outline" placeholder="••••••••" required type="password"/>
+          </div>
+        </div>
+
+        <div class="flex items-center ml-1">
+          <input class="h-4 w-4 text-primary focus:ring-primary border-outline-variant rounded" id="remember-me" name="remember-me" type="checkbox"/>
+          <label class="ml-2 block text-sm text-on-surface-variant" for="remember-me">Remember me for 30 days</label>
+        </div>
+
+        <button class="w-full py-4 px-6 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-lg hover:shadow-primary/20 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group" type="submit">
+          Login <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </button>
+      </form>
+
+      <div class="mt-8 text-center">
+        <p class="text-on-surface-variant text-sm">Don't have an account?
+          <a class="text-primary font-bold hover:underline decoration-tertiary-fixed-dim decoration-2 underline-offset-4 ml-1" href="./register.html">Sign up</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="w-full py-8 bg-slate-50 border-t border-slate-200 mt-auto">
+  <div class="flex flex-col md:flex-row justify-between items-center px-8 w-full max-w-7xl mx-auto gap-4">
+    <div class="text-lg font-bold text-slate-800">Shivam Computer Institute</div>
+    <p class="text-sm text-slate-500 text-center">© 2024 Shivam Computer Institute. Empowering Academic Excellence.</p>
+    <div class="flex gap-6">
+      <a class="text-sm text-slate-500 hover:text-slate-900 underline transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+      <a class="text-sm text-slate-500 hover:text-slate-900 underline transition-opacity opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+      <a class="text-sm text-slate-500 hover:text-slate-900 underline transition-opacity opacity-80 hover:opacity-100" href="#">Contact Us</a>
+    </div>
+  </div>
+</footer>
+<script src="./js/app.js"></script>
+</body>
+</html>

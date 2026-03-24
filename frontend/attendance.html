@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Attendance System | Shivam Computer Institute</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#08152e",
+          "background": "#f8f9fa",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f3f4f5",
+          "surface-container": "#edeeef",
+          "on-surface-variant": "#45464d"
+        },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+        borderRadius: { "3xl": "1.5rem" }
+      }
+    }
+  }
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+body { font-family: 'Inter', sans-serif; }
+h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen" data-page="attendance">
+<header class="fixed top-0 w-full z-30 flex justify-between items-center px-6 h-20 bg-white/70 backdrop-blur-md md:pl-72 shadow-sm">
+  <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 brand-font">Shivam Computer Institute</span>
+  <div class="flex items-center gap-3">
+    <span class="text-sm font-semibold text-on-surface-variant"><span data-user-name>Student</span></span>
+    <button class="p-2 rounded-full hover:bg-slate-100 transition-all text-slate-500" data-logout><span class="material-symbols-outlined">logout</span></button>
+  </div>
+</header>
+
+<aside class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 py-8 px-4 space-y-2 z-40">
+  <div class="mb-10 px-4"><h1 class="text-lg font-bold text-slate-900 brand-font">Academic Atelier</h1><p class="text-xs text-on-surface-variant">Premium Learning</p></div>
+  <nav class="flex-1 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 font-semibold text-sm transition-colors duration-200" href="./student-dashboard.html" data-route="./student-dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm transition-colors duration-200" href="#"><span class="material-symbols-outlined">event_available</span><span>Attendance</span></a>
+  </nav>
+</aside>
+
+<main class="md:ml-64 pt-28 pb-24 md:pb-8 px-4 md:px-8">
+  <div class="max-w-7xl mx-auto space-y-8">
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div>
+        <h2 class="text-4xl font-extrabold tracking-tight brand-font text-primary">Attendance Tracker</h2>
+        <p class="text-on-surface-variant mt-2 text-lg">Maintaining consistency is the first step to excellence.</p>
+      </div>
+      <button class="bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>Mark Attendance</button>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-8 bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50">
+        <div class="flex items-center justify-between mb-8">
+          <h3 class="text-xl font-bold brand-font">October 2023</h3>
+          <div class="flex gap-4 text-xs font-semibold">
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Present</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500"></span> Absent</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400"></span> Holiday</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-7 gap-4">
+          <div class="h-24 rounded-2xl bg-emerald-50 text-emerald-800 p-2 text-right font-bold text-sm border-2 border-emerald-500/20">1</div>
+          <div class="h-24 rounded-2xl bg-emerald-50 text-emerald-800 p-2 text-right font-bold text-sm border-2 border-emerald-500/20">2</div>
+          <div class="h-24 rounded-2xl bg-rose-50 text-rose-800 p-2 text-right font-bold text-sm border-2 border-rose-500/20">3</div>
+          <div class="h-24 rounded-2xl bg-emerald-50 text-emerald-800 p-2 text-right font-bold text-sm border-2 border-emerald-500/20">4</div>
+          <div class="h-24 rounded-2xl bg-emerald-50 text-emerald-800 p-2 text-right font-bold text-sm border-2 border-emerald-500/20">5</div>
+          <div class="h-24 rounded-2xl bg-amber-50 text-amber-800 p-2 text-right font-bold text-sm border-2 border-amber-500/20">6</div>
+          <div class="h-24 rounded-2xl bg-emerald-50 text-emerald-800 p-2 text-right font-bold text-sm border-2 border-emerald-500/20">7</div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-4 space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-primary text-white p-6 rounded-3xl shadow-lg"><p class="text-xs font-medium uppercase tracking-widest opacity-70">Attendance</p><h4 class="text-4xl font-extrabold mt-1 brand-font">94%</h4></div>
+          <div class="bg-surface-container-lowest p-6 rounded-3xl border border-surface-container shadow-sm"><p class="text-xs font-medium uppercase tracking-widest text-on-surface-variant">Rank</p><div class="flex items-baseline gap-1 mt-1"><h4 class="text-4xl font-extrabold text-amber-700 brand-font">04</h4><span class="text-sm font-bold text-on-surface-variant">/ 85</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="./js/app.js"></script>
+</body></html>

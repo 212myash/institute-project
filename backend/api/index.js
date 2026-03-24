@@ -1,3 +1,6 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./db');
@@ -7,16 +10,41 @@ const authRoutes = require('./routes/auth');
 const courseRoutes = require('./routes/courses');
 const contactRoutes = require('./routes/contact');
 const adminRoutes = require('./routes/admin');
+const attendanceRoutes = require('./routes/attendance');
 
 // Initialize Express app
 const app = express();
+
+// Debug env loading (do not print full secret values)
+if (process.env.MONGO_URI) {
+  console.log('MONGO_URI loaded: YES');
+} else {
+  console.error('MONGO_URI loaded: NO');
+}
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Basic request logger for debugging in development
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  }
+  next();
+});
+
+// Connect DB once per runtime (works for local + Vercel serverless)
+connectDB().catch((error) => {
+  console.error('Connection failed:', error.message);
+});
+
 // Health check endpoint
+app.get('/', (req, res) => {
+  res.status(200).send('API Running');
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -24,27 +52,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Connect to database
-app.use(async (req, res, next) => {
-  try {
-    // Only connect if not already connected
-    if (!global.dbConnected) {
-      await connectDB();
-      global.dbConnected = true;
-    }
-    next();
-  } catch (error) {
-    console.error('Database connection error:', error);
-    // Continue even if DB connection fails (useful for Vercel serverless)
-    next();
-  }
-});
-
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 // 404 handler
 app.use((req, res) => {

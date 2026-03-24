@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Dashboard - Shivam Computer Institute</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#08152e",
+          "primary-container": "#1e2a44",
+          "background": "#f8f9fa",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f3f4f5",
+          "surface-container": "#edeeef",
+          "secondary-container": "#cfe2f9",
+          "on-surface": "#191c1d",
+          "on-surface-variant": "#45464d",
+          "tertiary-fixed": "#ffddb4",
+          "tertiary-fixed-dim": "#ffb955",
+          "on-tertiary-container": "#c78300"
+        },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+        borderRadius: { xl: "0.75rem", full: "9999px" }
+      }
+    }
+  }
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+body { font-family: 'Inter', sans-serif; }
+h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+</style>
+</head>
+<body class="bg-background text-on-surface min-h-screen" data-page="student-dashboard">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-white/70 backdrop-blur-md shadow-sm">
+  <div class="flex items-center gap-8"><span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline tracking-tight">Shivam Computer Institute</span></div>
+  <div class="flex items-center gap-4">
+    <span class="text-sm font-semibold text-on-surface-variant">Student: <span data-user-name>Aryan</span></span>
+    <button class="p-2 rounded-full hover:bg-slate-100 transition-all duration-300" data-logout><span class="material-symbols-outlined text-slate-900">logout</span></button>
+  </div>
+</header>
+
+<aside class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 py-8 px-4 space-y-2 pt-24">
+  <div class="px-4 mb-8"><h2 class="text-lg font-bold text-slate-900 font-headline">Academic Atelier</h2><p class="text-xs text-slate-500 font-semibold uppercase tracking-widest">Premium Learning</p></div>
+  <nav class="flex-1 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 text-sm font-semibold" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span><span>Dashboard</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-200 hover:text-blue-900 text-sm font-semibold" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">school</span><span>My Courses</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-200 hover:text-blue-900 text-sm font-semibold" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined">calendar_month</span><span>Attendance</span></a>
+  </nav>
+</aside>
+
+<main class="md:ml-64 pt-28 pb-24 px-6 md:px-10">
+  <header class="mb-10">
+    <h1 class="text-4xl font-extrabold text-primary font-headline tracking-tight mb-2">Welcome back, <span id="welcomeName">Aryan</span>!</h1>
+    <p class="text-on-surface-variant font-medium">Your learning journey is 72% complete this month. Keep it up!</p>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="lg:col-span-8 space-y-8">
+      <section class="bg-surface-container-lowest rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+        <h3 class="text-sm font-bold text-primary mb-4 uppercase tracking-wider">Enrolled Courses</h3>
+        <div id="enrolledCourses" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-surface-container-low p-4 rounded-2xl flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-primary"><span class="material-symbols-outlined">terminal</span></div><div><p data-enrolled-title class="text-sm font-bold">Advanced Python</p><p class="text-xs opacity-70">24 Lessons</p></div></div>
+          <div class="bg-surface-container-low p-4 rounded-2xl flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-primary"><span class="material-symbols-outlined">database</span></div><div><p data-enrolled-title class="text-sm font-bold">PostgreSQL Mastery</p><p class="text-xs opacity-70">18 Lessons</p></div></div>
+        </div>
+      </section>
+
+      <section class="bg-surface-container-low rounded-3xl p-8">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-primary font-headline">Recent Activity</h3>
+          <button class="text-sm font-bold text-on-surface-variant hover:underline">View All</button>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-surface-container-lowest p-5 rounded-2xl flex items-center justify-between shadow-sm"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white"><span class="material-symbols-outlined text-xl">play_circle</span></div><div><h4 class="font-bold text-sm">Decorators & Generators</h4><p class="text-xs text-on-surface-variant">Advanced Python</p></div></div><span class="text-xs font-medium text-on-surface-variant">2 hours ago</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="lg:col-span-4 space-y-8">
+      <section class="bg-gradient-to-br from-tertiary-fixed to-amber-200 rounded-3xl p-6 shadow-lg border border-white/50 relative overflow-hidden group">
+        <div class="flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">auto_awesome</span><h3 class="text-sm font-extrabold text-on-tertiary-container uppercase tracking-wider">Smart Path</h3></div>
+        <p class="text-primary font-bold text-lg mb-4 leading-tight">Recommended: Cloud Computing Basics</p>
+        <p class="text-on-surface-variant text-sm mb-6 opacity-80">Based on your performance in Advanced Python, we suggest starting with Cloud Infrastructure.</p>
+        <button class="w-full py-3 bg-primary text-white font-bold rounded-2xl flex items-center justify-center gap-2">Explore Course <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+      </section>
+    </div>
+  </div>
+</main>
+
+<nav class="fixed bottom-0 w-full rounded-t-3xl md:hidden bg-white/80 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 flex justify-around items-center h-20 px-4 pb-safe">
+  <a class="flex flex-col items-center justify-center bg-amber-100 text-blue-900 rounded-2xl px-5 py-2 scale-110 transition-transform" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span><span class="text-[10px] font-manrope font-medium">Home</span></a>
+  <a class="flex flex-col items-center justify-center text-slate-400" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">local_library</span><span class="text-[10px] font-manrope font-medium">Courses</span></a>
+  <a class="flex flex-col items-center justify-center text-slate-400" href="#" data-logout><span class="material-symbols-outlined">logout</span><span class="text-[10px] font-manrope font-medium">Logout</span></a>
+</nav>
+<script src="./js/app.js"></script>
+</body></html>

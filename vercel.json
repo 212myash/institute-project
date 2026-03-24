@@ -8,12 +8,12 @@
   ],
   "routes": [
     {
+      "src": "/$",
+      "dest": "backend/api/index.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "backend/api/index.js"
     }
-  ],
-  "env": {
-    "MONGO_URI": "@mongo_uri",
-    "JWT_SECRET": "@jwt_secret"
-  }
+  ]
 }
