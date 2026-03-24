@@ -1,8 +1,20 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const router = express.Router();
+
+const signAuthToken = (user) => {
+  return jwt.sign(
+    {
+      userId: user._id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  );
+};
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -33,9 +45,12 @@ router.post('/register', async (req, res) => {
       role: role || 'student',
     });
 
+    const token = signAuthToken(user);
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -79,9 +94,12 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    const token = signAuthToken(user);
+
     res.status(200).json({
       success: true,
       message: 'Login successful',
+      token,
       user: {
         id: user._id,
         name: user.name,

@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = "https://your-backend.vercel.app";
+  const API_BASE = "https://institute-project-mu.vercel.app";
   const AUTH_KEY = "sci_auth";
 
   const PAGE = document.body.getAttribute("data-page") || "";

@@ -15,15 +15,26 @@ const attendanceRoutes = require('./routes/attendance');
 // Initialize Express app
 const app = express();
 
-// Debug env loading (do not print full secret values)
-if (process.env.MONGO_URI) {
-  console.log('MONGO_URI loaded: YES');
-} else {
-  console.error('MONGO_URI loaded: NO');
-}
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
+requiredEnvVars.forEach((name) => {
+  if (!process.env[name]) {
+    throw new Error(`${name} environment variable is not set`);
+  }
+  console.log(`${name} loaded: YES`);
+});
+
+let dbReadyPromise = connectDB();
+dbReadyPromise.catch((error) => {
+  console.error('Initial DB connection failed:', error.message);
+});
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -35,9 +46,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// Connect DB once per runtime (works for local + Vercel serverless)
-connectDB().catch((error) => {
-  console.error('Connection failed:', error.message);
+// Ensure DB is ready before handling routes to prevent buffering timeouts.
+app.use(async (req, res, next) => {
+  try {
+    await dbReadyPromise;
+    next();
+  } catch (error) {
+    dbReadyPromise = connectDB();
+    dbReadyPromise.catch((err) => {
+      console.error('DB reconnection failed:', err.message);
+    });
+
+    res.status(503).json({
+      success: false,
+      message: 'Database connection unavailable',
+    });
+  }
 });
 
 // Health check endpoint

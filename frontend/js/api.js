@@ -1,4 +1,4 @@
-const BASE_URL = 'https://institute-project-five.vercel.app';
+export const BASE_URL = 'https://institute-project-mu.vercel.app';
 
 function normalizeApiError(error) {
   if (error.name === 'TypeError') {
@@ -38,4 +38,4 @@ async function apiRequest(path, options = {}) {
   return data;
 }
 
-export { BASE_URL, apiRequest, normalizeApiError };
+export { apiRequest, normalizeApiError };
