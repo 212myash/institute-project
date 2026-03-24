@@ -33,6 +33,7 @@
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 .course-card-shadow { box-shadow: 0 8px 32px rgba(25, 28, 29, 0.04); }
 .course-card-shadow:hover { box-shadow: 0 12px 40px rgba(25, 28, 29, 0.08); }
+.check-chip { width: 20px; height: 20px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; color: #e53935; }
 </style>
 </head>
 <body class="bg-surface font-body text-on-surface" data-page="courses">
@@ -52,17 +53,31 @@
     <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">Refine your digital craftsmanship with our specialized curriculum.</p>
   </header>
 
+  <section class="mb-12 bg-[#16244b] text-white rounded-xl p-6 md:p-8">
+    <h2 class="text-3xl font-headline font-extrabold text-[#ffb955] uppercase">Certification Course</h2>
+    <ul id="certificationList" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-2xl font-semibold">
+    </ul>
+
+    <h3 class="mt-10 text-3xl font-headline font-extrabold text-[#ffb955] uppercase">Others Services</h3>
+    <ul id="servicesList" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-2xl font-semibold">
+    </ul>
+  </section>
+
   <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <div id="courseCardTemplate" class="group bg-surface-container-lowest rounded-xl course-card-shadow overflow-hidden transition-all duration-300 hover:scale-[1.02] flex flex-col hidden">
       <div class="h-48 overflow-hidden relative">
-        <img alt="Course" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"/>
+        <img data-course-image alt="Course" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"/>
         <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-primary flex items-center gap-1 uppercase tracking-wider">
-          <span class="material-symbols-outlined text-xs">schedule</span> 3 Months
+          <span class="material-symbols-outlined text-xs">schedule</span> <span data-course-duration>3 Months</span>
         </div>
       </div>
       <div class="p-6 flex flex-col flex-1">
         <h3 data-course-title class="text-xl font-bold font-headline text-primary leading-tight">Course Title</h3>
-        <p data-course-description class="text-sm text-on-surface-variant mt-3 line-clamp-3">Course description</p>
+        <div class="flex items-center gap-3 mt-4 mb-6">
+          <img data-course-avatar alt="Instructor" class="w-8 h-8 rounded-full border-2 border-surface-container-low" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"/>
+          <span data-course-instructor class="text-sm font-medium text-on-surface-variant">Instructor</span>
+        </div>
+        <p data-course-description class="text-sm text-on-surface-variant mt-1 line-clamp-3">Course description</p>
         <div class="mt-auto pt-6">
           <div class="flex justify-between items-end mb-2">
             <span class="text-xs font-bold text-on-surface-variant">Progress</span>
@@ -76,6 +91,33 @@
       </div>
     </div>
   </div>
+
+  <section id="catalogAdminPanel" class="hidden mt-14 bg-white rounded-xl border border-slate-200 p-6 lg:p-8">
+    <h2 class="text-2xl font-extrabold text-primary font-headline">Catalog Manager (Admin)</h2>
+    <p class="text-sm text-on-surface-variant mt-1">Add new courses and manage certification/services list shown above.</p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+      <form id="adminCourseForm" class="space-y-3">
+        <h3 class="text-lg font-bold text-primary">Add Course</h3>
+        <input id="adminCourseTitle" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Course title" required />
+        <input id="adminCourseInstructor" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Instructor name" required />
+        <input id="adminCourseDuration" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Duration (e.g., 6 Months)" required />
+        <input id="adminCoursePrice" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="number" min="0" placeholder="Price" required />
+        <textarea id="adminCourseDescription" class="w-full border border-slate-300 rounded-lg px-3 py-2" rows="3" placeholder="Course description" required></textarea>
+        <button class="bg-primary text-white px-4 py-2 rounded-lg font-semibold" type="submit">Add Course</button>
+      </form>
+
+      <form id="adminServiceForm" class="space-y-3">
+        <h3 class="text-lg font-bold text-primary">Add Certification / Service</h3>
+        <select id="adminServiceType" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+          <option value="certifications">Certification Course</option>
+          <option value="services">Other Services</option>
+        </select>
+        <input id="adminServiceName" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Item name" required />
+        <button class="bg-primary text-white px-4 py-2 rounded-lg font-semibold" type="submit">Add Item</button>
+      </form>
+    </div>
+  </section>
 </main>
 
 <nav class="fixed bottom-0 w-full rounded-t-3xl md:hidden bg-white/80 backdrop-blur-xl flex justify-around items-center h-20 px-4 pb-safe z-50 border-t border-slate-100">
