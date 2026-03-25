@@ -2,9 +2,11 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SCI - Premium Tech Education</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<title>Shivam Computer Institute - Premium Tech Education</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
   tailwind.config = {
@@ -12,64 +14,348 @@
     theme: {
       extend: {
         colors: {
-          primary: "#08152e",
-          "primary-container": "#1e2a44",
-          surface: "#f8f9fa",
-          "surface-container-low": "#f3f4f5",
-          "surface-container-lowest": "#ffffff",
-          "on-surface": "#191c1d",
+          "on-primary": "#ffffff",
+          "inverse-primary": "#bac6e7",
+          "surface-container-highest": "#e1e3e4",
+          "secondary-fixed": "#d1e4fb",
           "on-surface-variant": "#45464d",
+          "on-secondary": "#ffffff",
+          "on-secondary-fixed": "#091d2e",
+          "primary": "#08152e",
+          "tertiary": "#221200",
+          "on-error-container": "#93000a",
+          "surface-dim": "#d9dadb",
+          "on-primary-fixed": "#0e1b34",
+          "background": "#f8f9fa",
+          "inverse-surface": "#2e3132",
+          "surface": "#f8f9fa",
+          "primary-fixed-dim": "#bac6e7",
+          "surface-container-low": "#f3f4f5",
+          "secondary-container": "#cfe2f9",
+          "on-tertiary-container": "#c78300",
+          "surface-container": "#edeeef",
+          "surface-container-high": "#e7e8e9",
+          "on-surface": "#191c1d",
+          "secondary-fixed-dim": "#b5c8df",
+          "tertiary-fixed-dim": "#ffb955",
+          "primary-fixed": "#d9e2ff",
           "tertiary-fixed": "#ffddb4",
-          "on-tertiary-container": "#c78300"
+          "on-secondary-fixed-variant": "#36485b",
+          "on-primary-container": "#8591b0",
+          "inverse-on-surface": "#f0f1f2",
+          "surface-container-lowest": "#ffffff",
+          "on-error": "#ffffff",
+          "error-container": "#ffdad6",
+          "on-tertiary-fixed": "#291800",
+          "secondary": "#4e6073",
+          "on-background": "#191c1d",
+          "tertiary-container": "#3d2500",
+          "on-tertiary-fixed-variant": "#633f00",
+          "surface-tint": "#525e7b",
+          "outline-variant": "#c5c6ce",
+          "primary-container": "#1e2a44",
+          "surface-bright": "#f8f9fa",
+          "surface-variant": "#e1e3e4",
+          "on-secondary-container": "#526478",
+          "error": "#ba1a1a",
+          "on-primary-fixed-variant": "#3b4662",
+          "outline": "#75777e",
+          "on-tertiary": "#ffffff"
         },
-        fontFamily: { headline: ["Manrope"], body: ["Inter"] }
+        fontFamily: {
+          "headline": ["Manrope"],
+          "body": ["Inter"],
+          "label": ["Inter"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"}
       }
     }
   }
 </script>
 <style>
-.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-.editorial-gradient { background: linear-gradient(135deg, #08152e 0%, #1e2a44 100%); }
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.glass-nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.editorial-gradient {
+  background: linear-gradient(135deg, #08152e 0%, #1e2a44 100%);
+}
 </style>
 </head>
-<body class="bg-surface font-body text-on-surface selection:bg-tertiary-fixed selection:text-primary" data-page="home">
+<body class="bg-surface font-body text-on-surface selection:bg-tertiary-fixed selection:text-on-tertiary-fixed" data-page="home">
 <nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-20">
-  <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline tracking-tight">SCI</span>
-  <div class="hidden md:flex items-center gap-4 ml-auto">
-    <a class="text-blue-700 font-bold px-3 py-2 rounded-lg" href="#">Home</a>
-    <a class="text-slate-500 hover:bg-slate-100 px-3 py-2 rounded-lg" href="./courses.html" data-route="./courses.html">Courses</a>
-    <a class="text-slate-500 hover:bg-slate-100 px-3 py-2 rounded-lg" href="./login.html" data-route="./login.html">Login</a>
-    <a class="text-slate-500 hover:bg-slate-100 px-3 py-2 rounded-lg" href="./register.html" data-route="./register.html">Register</a>
+  <div class="flex items-center gap-8">
+    <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline tracking-tight">Shivam Computer Institute</span>
+    <div class="hidden md:flex gap-6">
+      <a class="text-blue-700 font-bold font-manrope" href="./index.html">Home</a>
+      <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./courses.html" data-route="./courses.html">Courses</a>
+      <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./login.html" data-route="./login.html">Login</a>
+      <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./register.html" data-route="./register.html">Register</a>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="hidden lg:flex items-center bg-slate-100/50 px-4 py-2 rounded-full gap-2 border border-transparent focus-within:border-primary-fixed transition-all">
+      <span class="material-symbols-outlined text-slate-400">search</span>
+      <input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="Search courses..." type="text"/>
+    </div>
+    <div class="flex gap-2">
+      <button class="p-2 rounded-full hover:bg-slate-100 transition-all duration-300 text-slate-900 scale-95 active:scale-90" type="button">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+      <button class="p-2 rounded-full hover:bg-slate-100 transition-all duration-300 text-slate-900 scale-95 active:scale-90" type="button">
+        <span class="material-symbols-outlined">dark_mode</span>
+      </button>
+      <button class="p-2 rounded-full hover:bg-slate-100 transition-all duration-300 text-slate-900 scale-95 active:scale-90" type="button">
+        <span class="material-symbols-outlined">account_circle</span>
+      </button>
+    </div>
   </div>
 </nav>
 
 <main class="pt-20">
-  <section class="relative min-h-[720px] flex items-center overflow-hidden bg-surface-container-low px-6">
-    <div class="container mx-auto grid lg:grid-cols-2 gap-12 items-center z-10">
-      <div class="space-y-8">
-        <div class="inline-flex items-center gap-2 px-4 py-2 bg-tertiary-fixed text-primary rounded-full text-sm font-semibold tracking-wide"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>ADMISSION OPEN <span id="admissionYear"></span></div>
-        <h1 class="text-5xl lg:text-7xl font-headline font-extrabold text-primary leading-[1.1] tracking-tight">Get Skilled with <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-on-tertiary-container to-amber-500">Computers &amp; Tech</span> Services</h1>
-        <p class="text-xl text-on-surface-variant max-w-xl leading-relaxed">Grow Your Skills with industry-leading faculty and state-of-the-art infrastructure at Patna's premier technology atelier.</p>
-        <div class="flex flex-wrap gap-4 pt-4">
-          <button class="editorial-gradient text-white px-10 py-5 rounded-xl font-bold text-lg shadow-xl hover:scale-[1.02] active:scale-95 transition-all" data-route="./register.html">Register Now</button>
-          <button class="bg-surface-container-lowest text-primary border border-slate-200 px-10 py-5 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all" data-route="./courses.html">View Courses</button>
-        </div>
+<section class="relative min-h-[870px] flex items-center overflow-hidden bg-surface-container-low px-6">
+  <div class="container mx-auto grid lg:grid-cols-2 gap-12 items-center z-10">
+    <div class="space-y-8">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-sm font-semibold tracking-wide">
+        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+        ADMISSION OPEN <span id="admissionYear"></span>
       </div>
-      <div class="relative hidden lg:block">
-        <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-700 group">
-          <img alt="Student working on computer" class="w-full h-[560px] object-cover scale-110 group-hover:scale-100 transition-transform duration-1000" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"/>
+      <h1 class="text-5xl lg:text-7xl font-headline font-extrabold text-primary leading-[1.1] tracking-tight">
+        Get Skilled with <br/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-on-tertiary-container to-amber-500">Computers &amp; Tech</span>
+        Services
+      </h1>
+      <p class="text-xl text-on-surface-variant max-w-xl leading-relaxed">
+        Grow Your Skills with industry-leading faculty and state-of-the-art infrastructure at Patna's premier technology atelier.
+      </p>
+      <div class="flex flex-wrap gap-4 pt-4">
+        <button class="editorial-gradient text-on-primary px-10 py-5 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all" type="button" data-route="./register.html">
+          Register Now
+        </button>
+        <button class="bg-surface-container-lowest text-primary border border-outline-variant/30 px-10 py-5 rounded-xl font-bold text-lg hover:bg-surface-variant transition-all" type="button" data-route="./courses.html">
+          View Courses
+        </button>
+      </div>
+      <div class="flex items-center gap-6 pt-8 border-t border-outline-variant/20">
+        <div>
+          <p class="text-3xl font-headline font-extrabold text-primary">1500+</p>
+          <p class="text-sm text-on-surface-variant font-medium">Students Trained</p>
+        </div>
+        <div class="w-px h-10 bg-outline-variant/30"></div>
+        <div>
+          <p class="text-3xl font-headline font-extrabold text-primary">50+</p>
+          <p class="text-sm text-on-surface-variant font-medium">Expert Faculty</p>
         </div>
       </div>
     </div>
-  </section>
+
+    <div class="relative hidden lg:block">
+      <div class="absolute -top-10 -right-10 w-64 h-64 bg-tertiary-fixed opacity-20 blur-3xl rounded-full"></div>
+      <div class="absolute -bottom-10 -left-10 w-80 h-80 bg-primary-fixed opacity-10 blur-3xl rounded-full"></div>
+      <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-700 group">
+        <img alt="Student working on computer" class="w-full h-[600px] object-cover scale-110 group-hover:scale-100 transition-transform duration-1000" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+        <div class="absolute bottom-8 left-8 right-8 p-6 glass-nav bg-white/20 rounded-2xl border border-white/30">
+          <p class="text-white font-headline font-bold text-xl italic leading-tight">"The best place to transform from a beginner to a professional coder."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-24 px-6 bg-surface">
+  <div class="container mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+      <div class="max-w-2xl">
+        <h2 class="text-4xl font-headline font-extrabold text-primary mb-4 tracking-tight">Our Learning Architecture</h2>
+        <p class="text-on-surface-variant text-lg">We've designed our curriculum to bridge the gap between academic knowledge and industry demands.</p>
+      </div>
+      <div class="material-symbols-outlined text-6xl text-tertiary-fixed-dim select-none" style="font-variation-settings: 'wght' 200;">architecture</div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[600px]">
+      <div class="md:col-span-2 md:row-span-2 bg-surface-container-lowest rounded-xl p-8 flex flex-col justify-between shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all border border-outline-variant/10 group">
+        <div>
+          <div class="w-14 h-14 editorial-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:rotate-6 transition-transform">
+            <span class="material-symbols-outlined text-3xl">school</span>
+          </div>
+          <h3 class="text-3xl font-headline font-bold text-primary mb-4">Advanced Tech Diploma</h3>
+          <p class="text-on-surface-variant text-lg leading-relaxed max-w-lg">Complete computer application courses ranging from basics to professional software development, including DCA, ADCA, and Programming Languages.</p>
+        </div>
+        <div class="mt-8 flex gap-4 overflow-hidden">
+          <span class="px-4 py-2 bg-surface-container rounded-full text-xs font-bold text-primary tracking-widest uppercase">Software</span>
+          <span class="px-4 py-2 bg-surface-container rounded-full text-xs font-bold text-primary tracking-widest uppercase">Hardware</span>
+          <span class="px-4 py-2 bg-surface-container rounded-full text-xs font-bold text-primary tracking-widest uppercase">Networking</span>
+        </div>
+      </div>
+
+      <div class="bg-primary-container text-on-primary rounded-xl p-8 shadow-sm hover:translate-y-[-4px] transition-all flex flex-col justify-center">
+        <span class="material-symbols-outlined text-4xl mb-4 text-tertiary-fixed">verified_user</span>
+        <h4 class="text-xl font-headline font-bold mb-2">Government Recognized</h4>
+        <p class="text-primary-fixed-dim text-sm">Certified programs that hold value across major industry standards and government portals.</p>
+      </div>
+
+      <div class="bg-tertiary-fixed text-on-tertiary-fixed rounded-xl p-8 shadow-sm hover:translate-y-[-4px] transition-all flex flex-col justify-center">
+        <span class="material-symbols-outlined text-4xl mb-4 text-primary">psychology</span>
+        <h4 class="text-xl font-headline font-bold mb-2">Hands-on Projects</h4>
+        <p class="text-on-tertiary-fixed-variant text-sm">Learn by doing. We focus 80% of our training on practical lab sessions and real-world projects.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 px-6 bg-surface-container-low">
+  <div class="container mx-auto grid md:grid-cols-4 gap-8">
+    <div class="p-8 bg-white rounded-xl shadow-[0_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 text-center">
+      <span class="text-5xl font-headline font-extrabold text-primary block mb-2">10+</span>
+      <span class="text-sm font-bold text-on-tertiary-container tracking-widest uppercase">Years of Excellence</span>
+    </div>
+    <div class="p-8 bg-white rounded-xl shadow-[0_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 text-center">
+      <span class="text-5xl font-headline font-extrabold text-primary block mb-2">100%</span>
+      <span class="text-sm font-bold text-on-tertiary-container tracking-widest uppercase">Practical Focus</span>
+    </div>
+    <div class="p-8 bg-white rounded-xl shadow-[0_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 text-center">
+      <span class="text-5xl font-headline font-extrabold text-primary block mb-2">24/7</span>
+      <span class="text-sm font-bold text-on-tertiary-container tracking-widest uppercase">Lab Access</span>
+    </div>
+    <div class="p-8 bg-white rounded-xl shadow-[0_12px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 text-center">
+      <span class="text-5xl font-headline font-extrabold text-primary block mb-2">FREE</span>
+      <span class="text-sm font-bold text-on-tertiary-container tracking-widest uppercase">Career Counseling</span>
+    </div>
+  </div>
+</section>
+
+<section class="py-24 px-6 relative">
+  <div class="container mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <div class="order-2 lg:order-1">
+      <div class="space-y-8">
+        <h2 class="text-4xl font-headline font-extrabold text-primary tracking-tight">Visit Our Atelier</h2>
+        <div class="space-y-6">
+          <div class="flex gap-4 p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-on-secondary-fixed">location_on</span>
+            </div>
+            <div>
+              <h5 class="font-headline font-bold text-primary mb-1">Our Location</h5>
+              <p class="text-on-surface-variant">A.G Colony, Main Road, Near SBI Bank, Radhika Complex, Patna, Bihar.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-on-secondary-fixed">call</span>
+            </div>
+            <div>
+              <h5 class="font-headline font-bold text-primary mb-1">Call Support</h5>
+              <p class="text-on-surface-variant">930-876-6047, 799-229-2332</p>
+            </div>
+          </div>
+          <div class="flex gap-4 p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-on-secondary-fixed">mail</span>
+            </div>
+            <div>
+              <h5 class="font-headline font-bold text-primary mb-1">Email Inquiry</h5>
+              <p class="text-on-surface-variant">shivaminstitute317@gmail.com</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-1 lg:order-2">
+      <div class="rounded-3xl overflow-hidden shadow-2xl border-8 border-white h-[500px] relative">
+        <img alt="Patna Map Location" class="w-full h-full object-cover grayscale brightness-50 contrast-125" src="https://images.unsplash.com/photo-1577083552431-6e5fd75fc0d8?auto=format&fit=crop&w=1200&q=80"/>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="bg-white p-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-outline-variant/20 animate-bounce">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-sm">location_on</span>
+            </div>
+            <span class="font-bold text-primary">We are here!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-primary text-white py-20 px-6">
+  <div class="container mx-auto">
+    <div class="grid md:grid-cols-4 gap-12 mb-16">
+      <div class="md:col-span-2">
+        <span class="text-3xl font-headline font-extrabold tracking-tight block mb-6">Shivam Computer Institute</span>
+        <p class="text-primary-fixed/60 max-w-sm leading-relaxed mb-8">Empowering the youth of Bihar with next-generation digital skills. Join us to reshape your career in the world of technology.</p>
+        <div class="flex gap-4">
+          <a class="w-10 h-10 rounded-full border border-primary-fixed/20 flex items-center justify-center hover:bg-tertiary-fixed transition-colors hover:text-primary" href="#">
+            <span class="material-symbols-outlined text-sm">public</span>
+          </a>
+          <a class="w-10 h-10 rounded-full border border-primary-fixed/20 flex items-center justify-center hover:bg-tertiary-fixed transition-colors hover:text-primary" href="#">
+            <span class="material-symbols-outlined text-sm">share</span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h6 class="font-headline font-bold text-tertiary-fixed mb-6 uppercase tracking-widest text-xs">Quick Links</h6>
+        <ul class="space-y-4 text-primary-fixed/80">
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Digital Marketing</a></li>
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Tally ERP/Prime</a></li>
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Graphic Design</a></li>
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Web Development</a></li>
+        </ul>
+      </div>
+      <div>
+        <h6 class="font-headline font-bold text-tertiary-fixed mb-6 uppercase tracking-widest text-xs">Admissions</h6>
+        <ul class="space-y-4 text-primary-fixed/80">
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Fee Structure</a></li>
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Batch Timings</a></li>
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Scholarship Program</a></li>
+          <li><a class="hover:text-tertiary-fixed transition-colors" href="#">Online Enquiry</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-8 border-t border-primary-fixed/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-fixed/40">
+      <p>© <span id="footerYear"></span> Shivam Computer Institute. All rights reserved.</p>
+      <div class="flex gap-8">
+        <a class="hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+        <a class="hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
 </main>
+
+<div class="fixed bottom-0 w-full rounded-t-3xl md:hidden bg-white/80 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex justify-around items-center h-20 px-4 pb-safe z-50">
+  <a class="flex flex-col items-center justify-center bg-amber-100 text-blue-900 rounded-2xl px-5 py-2 scale-110 transition-transform" href="./index.html">
+    <span class="material-symbols-outlined">home</span>
+    <span class="text-[10px] font-manrope font-medium mt-1">Home</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-slate-400" href="./courses.html" data-route="./courses.html">
+    <span class="material-symbols-outlined">local_library</span>
+    <span class="text-[10px] font-manrope font-medium mt-1">Courses</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-slate-400" href="./login.html" data-route="./login.html">
+    <span class="material-symbols-outlined">login</span>
+    <span class="text-[10px] font-manrope font-medium mt-1">Login</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-slate-400" href="./register.html" data-route="./register.html">
+    <span class="material-symbols-outlined">person_add</span>
+    <span class="text-[10px] font-manrope font-medium mt-1">Register</span>
+  </a>
+</div>
+
 <script src="./js/app.js"></script>
 <script>
-  (function () {
-    var yearEl = document.getElementById('admissionYear');
-    if (yearEl) {
-      yearEl.textContent = String(new Date().getFullYear());
-    }
-  })();
+(function () {
+  var yearEl = document.getElementById('admissionYear');
+  if (yearEl) {
+    yearEl.textContent = String(new Date().getFullYear());
+  }
+  var footerYear = document.getElementById('footerYear');
+  if (footerYear) {
+    footerYear.textContent = String(new Date().getFullYear());
+  }
+})();
 </script>
 </body></html>
