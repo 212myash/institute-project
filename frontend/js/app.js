@@ -1179,6 +1179,47 @@
     }
   }
 
+  async function initStudentSettings() {
+    if (PAGE !== "student-settings") return;
+
+    function setField(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = value == null ? "" : String(value);
+    }
+
+    try {
+      const result = await api("/api/student/profile");
+      const profile = (result && result.data) || {};
+      const education = profile.education || {};
+
+      setField("settings_full_name", profile.full_name);
+      setField("settings_father_name", profile.father_name);
+      setField("settings_dob", profile.dob ? String(profile.dob).slice(0, 10) : "");
+      setField("settings_gender", profile.gender);
+      setField("settings_marital_status", profile.marital_status);
+      setField("settings_nationality", profile.nationality);
+      setField("settings_religion", profile.religion);
+      setField("settings_mobile", profile.mobile);
+      setField("settings_email", profile.email);
+      setField("settings_address", profile.address);
+
+      setField("settings_exam_passed", education.exam_passed);
+      setField("settings_board_university", education.board_university);
+      setField("settings_passing_year", education.passing_year);
+      setField("settings_marks", education.marks);
+      setField("settings_percentage", education.percentage);
+      setField("settings_course_selected", profile.course_selected);
+
+      const photo = document.getElementById("settings_photo");
+      const signature = document.getElementById("settings_signature");
+      if (photo) photo.src = profile.photo_url || "";
+      if (signature) signature.src = profile.signature_url || "";
+    } catch (err) {
+      notify(err.message || "Unable to load student details", "error");
+    }
+  }
+
   function renderAdminTableRows(items, mapper) {
     return items
       .map(function (item, index) {
@@ -1389,6 +1430,7 @@
     initRegister();
     initStudentForm();
     initStudentDashboard();
+    initStudentSettings();
     initAdminDashboard();
     initCourses();
   }

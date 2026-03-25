@@ -56,24 +56,90 @@ h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
     <p class="text-on-surface-variant font-medium">Manage your account preferences and personal details.</p>
   </header>
 
-  <section class="bg-surface-container-lowest rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)] max-w-3xl">
-    <h2 class="text-xl font-bold text-primary mb-4 font-headline">Account</h2>
+  <section class="bg-surface-container-lowest rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)] max-w-5xl">
+    <h2 class="text-xl font-bold text-primary mb-4 font-headline">Student Details</h2>
+    <p class="text-xs text-on-surface-variant mb-4">Locked fields: Full Name, Father Name, Date of Birth, Phone Number.</p>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Full Name</span>
-        <input type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Your full name" />
+        <input id="settings_full_name" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
       </label>
       <label class="block">
-        <span class="text-sm font-semibold text-on-surface-variant">Mobile Number</span>
-        <input type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Your mobile number" />
+        <span class="text-sm font-semibold text-on-surface-variant">Father Name</span>
+        <input id="settings_father_name" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Date of Birth</span>
+        <input id="settings_dob" type="date" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Gender</span>
+        <input id="settings_gender" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Marital Status</span>
+        <input id="settings_marital_status" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Nationality</span>
+        <input id="settings_nationality" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Religion</span>
+        <input id="settings_religion" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Phone Number</span>
+        <input id="settings_mobile" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Email</span>
+        <input id="settings_email" type="email" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
       </label>
       <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-on-surface-variant">Email</span>
-        <input type="email" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Your email" />
+        <span class="text-sm font-semibold text-on-surface-variant">Address</span>
+        <textarea id="settings_address" rows="3" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></textarea>
       </label>
     </div>
-    <div class="mt-6 flex justify-end">
-      <button type="button" class="px-5 py-3 rounded-xl bg-primary text-white font-semibold">Save Changes</button>
+
+    <h3 class="text-lg font-bold text-primary mt-8 mb-3 font-headline">Education</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Exam Passed</span>
+        <input id="settings_exam_passed" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Board / University</span>
+        <input id="settings_board_university" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Passing Year</span>
+        <input id="settings_passing_year" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Marks</span>
+        <input id="settings_marks" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Percentage</span>
+        <input id="settings_percentage" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-on-surface-variant">Course Selected</span>
+        <input id="settings_course_selected" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+      </label>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <div>
+        <p class="text-sm font-semibold text-on-surface-variant mb-2">Photo</p>
+        <img id="settings_photo" alt="Student photo" class="w-40 h-40 rounded-xl border border-slate-200 object-cover bg-slate-100" />
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-on-surface-variant mb-2">Signature</p>
+        <img id="settings_signature" alt="Student signature" class="w-40 h-24 rounded-xl border border-slate-200 object-contain bg-slate-100" />
+      </div>
     </div>
   </section>
 </main>
