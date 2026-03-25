@@ -237,11 +237,22 @@
     );
   }
 
-  function redirectByRole(role) {
-    if (role === "admin") {
+  function redirectByRole(user) {
+    if (!user) {
+      window.location.href = "./login.html";
+      return;
+    }
+
+    if (user.role === "admin") {
       window.location.href = "./admin-dashboard.html";
       return;
     }
+
+    if (user.role === "student" && !user.isProfileCompleted) {
+      window.location.href = "./student-form.html";
+      return;
+    }
+
     window.location.href = "./student-dashboard.html";
   }
 
@@ -316,6 +327,7 @@
   function guardRoute() {
     const auth = getAuth();
     const protectedPages = [
+      "student-form",
       "student-dashboard",
       "admin-dashboard",
       "courses",
@@ -329,6 +341,28 @@
 
     if (PAGE === "admin-dashboard" && auth && auth.user && auth.user.role !== "admin") {
       window.location.href = "./student-dashboard.html";
+      return;
+    }
+
+    if (!auth || !auth.user) return;
+
+    const user = auth.user;
+    const studentLockedPages = ["student-dashboard", "courses", "attendance"];
+
+    if (user.role === "student" && !user.isProfileCompleted && studentLockedPages.indexOf(PAGE) !== -1) {
+      window.location.href = "./student-form.html";
+      return;
+    }
+
+    if (PAGE === "student-form") {
+      if (user.role !== "student") {
+        window.location.href = "./admin-dashboard.html";
+        return;
+      }
+
+      if (user.isProfileCompleted) {
+        window.location.href = "./student-dashboard.html";
+      }
     }
   }
 
@@ -389,7 +423,7 @@
 
         setAuth({ token: data.token, user: data.user });
         notify("Login successful", "success");
-        redirectByRole(data.user.role);
+        redirectByRole(data.user);
       } catch (err) {
         notify(err.message, "error");
       }
@@ -421,7 +455,7 @@
         if (data.token && data.user) {
           setAuth({ token: data.token, user: data.user });
           notify("Registration successful", "success");
-          redirectByRole(data.user.role);
+          redirectByRole(data.user);
           return;
         }
 
@@ -429,6 +463,116 @@
         window.location.href = "./login.html";
       } catch (err) {
         notify(err.message, "error");
+      }
+    });
+  }
+
+  function initStudentForm() {
+    if (PAGE !== "student-form") return;
+
+    const form = document.getElementById("studentOnboardingForm");
+    if (!form) return;
+
+    const auth = getAuth();
+    if (!auth || !auth.user || auth.user.role !== "student") {
+      window.location.href = "./login.html";
+      return;
+    }
+
+    const fullName = document.getElementById("full_name");
+    const email = document.getElementById("email");
+    if (fullName && !fullName.value) fullName.value = auth.user.name || "";
+    if (email && !email.value) email.value = auth.user.email || "";
+
+    if (form.dataset.bound === "true") return;
+    form.dataset.bound = "true";
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const requiredIds = [
+        "full_name",
+        "father_name",
+        "dob",
+        "gender",
+        "marital_status",
+        "nationality",
+        "religion",
+        "address",
+        "mobile",
+        "email",
+        "exam_passed",
+        "board_university",
+        "passing_year",
+        "marks",
+        "percentage",
+        "course_selected",
+      ];
+
+      for (const id of requiredIds) {
+        const el = document.getElementById(id);
+        if (!el || !String(el.value || "").trim()) {
+          notify("Please fill all mandatory fields", "error");
+          el?.focus();
+          return;
+        }
+      }
+
+      const photoInput = document.getElementById("photo");
+      const signatureInput = document.getElementById("signature");
+      const photoFile = photoInput && photoInput.files ? photoInput.files[0] : null;
+      const signatureFile = signatureInput && signatureInput.files ? signatureInput.files[0] : null;
+
+      if (!photoFile) {
+        notify("Photo is required", "error");
+        return;
+      }
+
+      if (photoFile.size > 10 * 1024 * 1024 || (signatureFile && signatureFile.size > 10 * 1024 * 1024)) {
+        notify("File size must be 10MB or less", "error");
+        return;
+      }
+
+      const formData = new FormData();
+      requiredIds.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) {
+          formData.append(id, String(el.value || "").trim());
+        }
+      });
+
+      formData.append("photo", photoFile);
+      if (signatureFile) {
+        formData.append("signature", signatureFile);
+      }
+
+      const submitBtn = document.getElementById("submitOnboardingBtn");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+      }
+
+      try {
+        await api("/api/student/profile", {
+          method: "POST",
+          body: formData,
+        });
+
+        const updatedAuth = getAuth();
+        if (updatedAuth && updatedAuth.user) {
+          updatedAuth.user.isProfileCompleted = true;
+          setAuth(updatedAuth);
+        }
+
+        notify("Profile submitted successfully", "success");
+        window.location.href = "./student-dashboard.html";
+      } catch (err) {
+        notify(err.message || "Failed to submit profile", "error");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit Admission Form";
+        }
       }
     });
   }
@@ -1052,6 +1196,7 @@
     updateShellNavState();
     initLogin();
     initRegister();
+    initStudentForm();
     initStudentDashboard();
     initAdminDashboard();
     initCourses();

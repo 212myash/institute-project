@@ -56,6 +56,7 @@ router.post('/register', async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        isProfileCompleted: Boolean(user.isProfileCompleted),
       },
     });
   } catch (error) {
@@ -105,6 +106,7 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        isProfileCompleted: Boolean(user.isProfileCompleted),
       },
     });
   } catch (error) {

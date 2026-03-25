@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Onboarding Form - Shivam Computer Institute</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          primary: '#08152e',
+          surface: '#f8f9fa',
+          'surface-card': '#ffffff',
+          'surface-border': '#e2e8f0',
+        },
+        fontFamily: {
+          headline: ['Manrope', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="bg-surface text-slate-900 font-body min-h-screen" data-page="student-form">
+  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-surface-border">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold font-headline text-primary">Student Admission Form</h1>
+      <button data-logout class="text-sm font-semibold text-slate-600 hover:text-primary">Logout</button>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8">
+    <div class="bg-surface-card border border-surface-border rounded-2xl shadow-sm p-6 md:p-8">
+      <p class="text-sm text-slate-600 mb-6">Complete this mandatory onboarding form to access your student dashboard.</p>
+
+      <form id="studentOnboardingForm" class="space-y-8" enctype="multipart/form-data">
+        <section>
+          <h2 class="text-lg font-bold font-headline text-primary mb-4">Personal Details</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block md:col-span-2">
+              <span class="text-sm font-semibold">Full Name</span>
+              <input id="full_name" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Father's Name</span>
+              <input id="father_name" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Date of Birth</span>
+              <input id="dob" type="date" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Gender</span>
+              <select id="gender" class="mt-1 w-full rounded-xl border-surface-border" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Marital Status</span>
+              <input id="marital_status" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Nationality</span>
+              <input id="nationality" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Religion</span>
+              <input id="religion" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block md:col-span-2">
+              <span class="text-sm font-semibold">Address</span>
+              <textarea id="address" rows="3" class="mt-1 w-full rounded-xl border-surface-border" required></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold font-headline text-primary mb-4">Contact Details</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+              <span class="text-sm font-semibold">Mobile Number</span>
+              <input id="mobile" type="tel" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Email</span>
+              <input id="email" type="email" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold font-headline text-primary mb-4">Education</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+              <span class="text-sm font-semibold">Exam Passed</span>
+              <input id="exam_passed" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Board/University</span>
+              <input id="board_university" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Passing Year</span>
+              <input id="passing_year" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Marks</span>
+              <input id="marks" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Percentage</span>
+              <input id="percentage" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold font-headline text-primary mb-4">Course Selection</h2>
+          <label class="block">
+            <span class="text-sm font-semibold">Select Course</span>
+            <select id="course_selected" class="mt-1 w-full rounded-xl border-surface-border" required>
+              <option value="">Select</option>
+              <option value="ADCA">ADCA</option>
+              <option value="Computer Fundamentals">Computer Fundamentals</option>
+              <option value="English Typing">English Typing</option>
+              <option value="Hindi Typing">Hindi Typing</option>
+              <option value="English & Hindi Typing">English & Hindi Typing</option>
+              <option value="Shorthand (Hindi)">Shorthand (Hindi)</option>
+            </select>
+          </label>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold font-headline text-primary mb-4">Uploads</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+              <span class="text-sm font-semibold">Photo Upload (Required)</span>
+              <input id="photo" type="file" accept="image/*" class="mt-1 w-full rounded-xl border-surface-border" required />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold">Signature (Optional)</span>
+              <input id="signature" type="file" accept="image/*" class="mt-1 w-full rounded-xl border-surface-border" />
+            </label>
+          </div>
+        </section>
+
+        <div class="pt-2">
+          <button id="submitOnboardingBtn" type="submit" class="w-full md:w-auto px-8 py-3 rounded-xl bg-primary text-white font-bold hover:opacity-95">Submit Admission Form</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

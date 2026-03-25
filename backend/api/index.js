@@ -11,6 +11,7 @@ const courseRoutes = require('./routes/courses');
 const contactRoutes = require('./routes/contact');
 const adminRoutes = require('./routes/admin');
 const attendanceRoutes = require('./routes/attendance');
+const studentRoutes = require('./routes/student');
 
 // Initialize Express app
 const app = express();
@@ -92,6 +93,7 @@ app.use('/courses', courseRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/student', studentRoutes);
 
 // 404 handler
 app.use((req, res) => {
