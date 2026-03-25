@@ -1105,6 +1105,61 @@
       .join("");
   }
 
+  function formatShortDate(value) {
+    if (!value) return "--";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "--";
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  function renderUsersCreatedGraph(users) {
+    const graph = document.getElementById("usersCreatedGraph");
+    if (!graph) return;
+
+    if (!users || !users.length) {
+      graph.innerHTML = '<p class="text-xs text-slate-500">No user data available.</p>';
+      return;
+    }
+
+    const sorted = users
+      .slice()
+      .sort(function (a, b) {
+        return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+      })
+      .slice(-6);
+
+    const total = sorted.length;
+    graph.innerHTML = sorted
+      .map(function (u, idx) {
+        const width = Math.max(18, Math.round(((idx + 1) / total) * 100));
+        const name = (u && u.name) || "Unknown";
+        const dateLabel = formatShortDate(u && u.createdAt);
+
+        return (
+          '<div class="space-y-1">' +
+          '<div class="flex items-center justify-between text-[11px] text-slate-600">' +
+          '<span class="font-semibold truncate pr-2">' +
+          name +
+          "</span>" +
+          "<span>" +
+          dateLabel +
+          "</span>" +
+          "</div>" +
+          '<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">' +
+          '<div class="h-full rounded-full bg-gradient-to-r from-blue-900 to-amber-400" style="width:' +
+          width +
+          '%"></div>' +
+          "</div>" +
+          "</div>"
+        );
+      })
+      .join("");
+  }
+
   async function loadAdminData() {
     const usersBody = document.getElementById("usersTableBody");
     const requestsBody = document.getElementById("requestsTableBody");
@@ -1121,6 +1176,7 @@
       const requestsStat = document.getElementById("totalRequestsStat");
       if (usersStat) usersStat.textContent = String(users.length);
       if (requestsStat) requestsStat.textContent = String(contacts.length);
+      renderUsersCreatedGraph(users);
 
       usersBody.innerHTML = renderAdminTableRows(users, function (u, i) {
         return (
