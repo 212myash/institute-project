@@ -68,6 +68,7 @@
     search: "",
     duration: "",
     isAdmin: false,
+    selectedCourse: "",
   };
 
   function getAuth() {
@@ -677,16 +678,50 @@
     const emptyState = document.getElementById("coursesEmptyState");
     if (!grid || !template || !emptyState) return;
 
+    const enrolledSection = document.getElementById("enrolledCoursesSection");
+    const enrolledGrid = document.getElementById("enrolledCoursesGrid");
+    const enrolledEmptyState = document.getElementById("enrolledCoursesEmptyState");
+    const exploreSection = document.getElementById("exploreCoursesSection");
+
     grid.innerHTML = "";
 
     if (!coursesState.items.length) {
+      if (enrolledSection) enrolledSection.classList.add("hidden");
+      if (exploreSection) exploreSection.classList.add("hidden");
       emptyState.classList.remove("hidden");
       return;
     }
 
     emptyState.classList.add("hidden");
 
-    coursesState.items.forEach(function (course) {
+    if (coursesState.isAdmin) {
+      if (enrolledSection) enrolledSection.classList.add("hidden");
+      if (exploreSection) exploreSection.classList.add("hidden");
+    } else {
+      if (enrolledSection) enrolledSection.classList.remove("hidden");
+      if (exploreSection) exploreSection.classList.remove("hidden");
+      if (enrolledGrid) enrolledGrid.innerHTML = "";
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function isStudentEnrolledCourse(course) {
+      const selected = normalizeText(coursesState.selectedCourse);
+      const title = normalizeText(course && course.title);
+      const description = normalizeText(course && course.description);
+
+      if (selected && (title.includes(selected) || description.includes(selected) || selected.includes(title))) {
+        return true;
+      }
+
+      return Number(course && course.progress) > 0;
+    }
+
+    function createCourseCard(course) {
       const card = template.cloneNode(true);
       const progressValue = toSafeProgress(course.progress || 0);
 
@@ -768,7 +803,45 @@
         });
       }
 
-      grid.appendChild(card);
+      return card;
+    }
+
+    if (!coursesState.isAdmin && enrolledGrid) {
+      const enrolledItems = [];
+      const otherItems = [];
+
+      coursesState.items.forEach(function (course) {
+        if (isStudentEnrolledCourse(course)) {
+          enrolledItems.push(course);
+        } else {
+          otherItems.push(course);
+        }
+      });
+
+      if (enrolledItems.length) {
+        if (enrolledEmptyState) enrolledEmptyState.classList.add("hidden");
+        enrolledItems.forEach(function (course) {
+          enrolledGrid.appendChild(createCourseCard(course));
+        });
+      } else if (enrolledEmptyState) {
+        enrolledEmptyState.classList.remove("hidden");
+      }
+
+      if (!otherItems.length) {
+        emptyState.textContent = "No other courses found for this filter.";
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.textContent = "No courses found for this filter.";
+      otherItems.forEach(function (course) {
+        grid.appendChild(createCourseCard(course));
+      });
+      return;
+    }
+
+    coursesState.items.forEach(function (course) {
+      grid.appendChild(createCourseCard(course));
     });
   }
 
@@ -793,6 +866,15 @@
     if (grid) grid.classList.add("hidden");
 
     try {
+      if (!coursesState.isAdmin && !coursesState.selectedCourse) {
+        try {
+          const profileRes = await api("/api/student/profile");
+          coursesState.selectedCourse = String(profileRes?.data?.course_selected || "").trim();
+        } catch (profileErr) {
+          coursesState.selectedCourse = "";
+        }
+      }
+
       const params = new URLSearchParams();
       params.set("page", String(coursesState.page));
       params.set("limit", String(coursesState.limit));
