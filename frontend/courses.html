@@ -75,8 +75,8 @@
   <header class="mb-12">
     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-primary tracking-tight mb-3">Courses Management</h1>
-        <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">Admin can create, update, and remove courses. Students can only view, track progress, and continue learning.</p>
+        <h1 id="coursesPageTitle" class="text-4xl md:text-5xl font-extrabold font-headline text-primary tracking-tight mb-3">My Courses</h1>
+        <p id="coursesPageSubtitle" class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">Continue learning with your enrolled courses and track your progress.</p>
       </div>
       <button id="addCourseButton" class="hidden items-center gap-2 bg-amber-400 text-blue-900 font-bold px-5 py-3 rounded-xl shadow hover:scale-[1.02] transition-all">
         <span class="material-symbols-outlined text-lg">add</span>
@@ -127,16 +127,18 @@
           <img data-course-avatar alt="Instructor" class="w-8 h-8 rounded-full border-2 border-surface-container-low" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"/>
           <span data-course-instructor class="text-sm font-medium text-on-surface-variant">Instructor</span>
         </div>
-        <p data-course-description class="text-sm text-on-surface-variant mt-1 line-clamp-3">Course description</p>
+        <p data-course-description class="text-sm text-on-surface-variant mt-1 text-justify leading-relaxed break-words">Course description</p>
         <div class="mt-auto pt-6">
-          <div class="flex justify-between items-end mb-2">
-            <span class="text-xs font-bold text-on-surface-variant">Progress</span>
-            <span data-course-progress class="text-xs font-bold text-primary">0%</span>
+          <div data-course-student-only>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-xs font-bold text-on-surface-variant">Progress</span>
+              <span data-course-progress class="text-xs font-bold text-primary">0%</span>
+            </div>
+            <div class="h-1.5 w-full bg-secondary-container rounded-full mb-4">
+              <div data-course-progress-bar class="h-full bg-gradient-to-r from-tertiary-fixed-dim to-on-tertiary-container rounded-full" style="width: 0%"></div>
+            </div>
+            <button data-course-continue class="w-full bg-gradient-to-br from-primary to-primary-container text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">Continue <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
           </div>
-          <div class="h-1.5 w-full bg-secondary-container rounded-full mb-4">
-            <div data-course-progress-bar class="h-full bg-gradient-to-r from-tertiary-fixed-dim to-on-tertiary-container rounded-full" style="width: 0%"></div>
-          </div>
-          <button data-course-continue class="w-full bg-gradient-to-br from-primary to-primary-container text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">Continue <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
           <p data-course-created-at class="mt-3 text-[11px] text-slate-500 font-medium">Created: --</p>
         </div>
       </div>
@@ -157,61 +159,61 @@
     <button id="coursesNextPage" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 disabled:opacity-40" disabled>Next</button>
   </div>
 
-</main>
+  <button id="floatingAddCourseButton" class="hidden fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-amber-400 text-blue-900 w-14 h-14 rounded-full shadow-lg items-center justify-center hover:scale-110 transition-all active:scale-95 z-40">
+    <span class="material-symbols-outlined font-bold">add</span>
+  </button>
 
-<button id="floatingAddCourseButton" class="hidden fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-amber-400 text-blue-900 w-14 h-14 rounded-full shadow-lg items-center justify-center hover:scale-110 transition-all active:scale-95 z-40">
-  <span class="material-symbols-outlined font-bold">add</span>
-</button>
-
-<div id="courseModal" class="hidden fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm px-4">
-  <div class="max-w-2xl mx-auto mt-10 md:mt-16 bg-white rounded-2xl shadow-2xl overflow-hidden">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-      <h2 id="courseModalTitle" class="text-xl font-bold text-slate-900 font-headline">Add Course</h2>
-      <button id="closeCourseModal" class="h-10 w-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+  <div id="courseModal" class="hidden fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm px-4 py-6 overflow-y-auto">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+        <h2 id="courseModalTitle" class="text-xl font-bold text-slate-900 font-headline">Add Course</h2>
+        <button id="closeCourseModal" class="h-10 w-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="courseModalForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto">
+        <input id="courseIdInput" type="hidden" />
+        <label class="block md:col-span-2">
+          <span class="text-sm font-semibold text-slate-700">Course Title</span>
+          <input id="courseTitleInput" type="text" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="text-sm font-semibold text-slate-700">Description</span>
+          <textarea id="courseDescriptionInput" rows="3" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required></textarea>
+        </label>
+        <label class="block">
+          <span class="text-sm font-semibold text-slate-700">Instructor Name</span>
+          <input id="courseInstructorInput" type="text" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
+        </label>
+        <label class="block">
+          <span class="text-sm font-semibold text-slate-700">Duration</span>
+          <input id="courseDurationInput" type="text" placeholder="e.g., 3 Months" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="text-sm font-semibold text-slate-700">Thumbnail URL</span>
+          <input id="courseImageUrlInput" type="url" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" placeholder="https://..." />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="text-sm font-semibold text-slate-700">Or Upload Thumbnail</span>
+          <input id="courseImageFileInput" type="file" accept="image/*" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" />
+        </label>
+        <label class="block">
+          <span class="text-sm font-semibold text-slate-700">Progress (%)</span>
+          <input id="courseProgressInput" type="number" min="0" max="100" value="0" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" />
+        </label>
+        <div class="block">
+          <span class="text-sm font-semibold text-slate-700">Preview</span>
+          <img id="courseImagePreview" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=80" alt="Preview" class="mt-1 h-24 w-full object-cover rounded-xl border border-slate-200" />
+        </div>
+        <div class="md:col-span-2 flex items-center justify-end gap-3 pt-2">
+          <button type="button" id="cancelCourseModal" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700">Cancel</button>
+          <button type="submit" id="saveCourseButton" class="px-5 py-2.5 rounded-lg bg-blue-900 text-white text-sm font-semibold">Save Course</button>
+        </div>
+      </form>
     </div>
-    <form id="courseModalForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input id="courseIdInput" type="hidden" />
-      <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-slate-700">Course Title</span>
-        <input id="courseTitleInput" type="text" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
-      </label>
-      <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-slate-700">Description</span>
-        <textarea id="courseDescriptionInput" rows="3" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required></textarea>
-      </label>
-      <label class="block">
-        <span class="text-sm font-semibold text-slate-700">Instructor Name</span>
-        <input id="courseInstructorInput" type="text" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
-      </label>
-      <label class="block">
-        <span class="text-sm font-semibold text-slate-700">Duration</span>
-        <input id="courseDurationInput" type="text" placeholder="e.g., 3 Months" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
-      </label>
-      <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-slate-700">Thumbnail URL</span>
-        <input id="courseImageUrlInput" type="url" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" placeholder="https://..." />
-      </label>
-      <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-slate-700">Or Upload Thumbnail</span>
-        <input id="courseImageFileInput" type="file" accept="image/*" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" />
-      </label>
-      <label class="block">
-        <span class="text-sm font-semibold text-slate-700">Progress (%)</span>
-        <input id="courseProgressInput" type="number" min="0" max="100" value="0" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" />
-      </label>
-      <div class="block">
-        <span class="text-sm font-semibold text-slate-700">Preview</span>
-        <img id="courseImagePreview" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=80" alt="Preview" class="mt-1 h-24 w-full object-cover rounded-xl border border-slate-200" />
-      </div>
-      <div class="md:col-span-2 flex items-center justify-end gap-3 pt-2">
-        <button type="button" id="cancelCourseModal" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700">Cancel</button>
-        <button type="submit" id="saveCourseButton" class="px-5 py-2.5 rounded-lg bg-blue-900 text-white text-sm font-semibold">Save Course</button>
-      </div>
-    </form>
   </div>
-</div>
+
+</main>
 
 <nav class="fixed bottom-0 w-full rounded-t-3xl md:hidden bg-white/80 backdrop-blur-xl flex justify-around items-center h-20 px-4 pb-safe z-50 border-t border-slate-100">
   <a class="flex flex-col items-center justify-center text-slate-400" href="./student-dashboard.html" data-route="./student-dashboard.html"><span class="material-symbols-outlined">home</span><span class="text-[10px] font-manrope font-medium">Home</span></a>

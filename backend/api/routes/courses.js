@@ -1,8 +1,51 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 const Course = require('../models/Course');
 const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
+const uploadsDir = path.resolve(__dirname, '../../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+function uploadCourseImage(req, res, next) {
+  upload.single('image')(req, res, (error) => {
+    if (!error) return next();
+
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({
+        success: false,
+        message: 'Image size must be 10MB or less',
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: error.message || 'Image upload failed',
+    });
+  });
+}
+
+function saveUploadedImage(req) {
+  if (!req.file) return '';
+
+  const ext = path.extname(req.file.originalname || '').toLowerCase() || '.jpg';
+  const safeExt = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext) ? ext : '.jpg';
+  const fileName = `course-${Date.now()}-${Math.round(Math.random() * 1e6)}${safeExt}`;
+  const filePath = path.join(uploadsDir, fileName);
+  fs.writeFileSync(filePath, req.file.buffer);
+
+  return `${req.protocol}://${req.get('host')}/uploads/${fileName}`;
+}
 
 function sanitizeCoursePayload(payload) {
   return {
@@ -74,9 +117,13 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/courses
-router.post('/', requireRole('admin'), async (req, res) => {
+router.post('/', requireRole('admin'), uploadCourseImage, async (req, res) => {
   try {
     const payload = sanitizeCoursePayload(req.body || {});
+    const uploadedImageUrl = saveUploadedImage(req);
+    if (uploadedImageUrl) {
+      payload.image_url = uploadedImageUrl;
+    }
     const validationError = validateCourseInput(payload);
 
     if (validationError) {
@@ -102,9 +149,13 @@ router.post('/', requireRole('admin'), async (req, res) => {
 });
 
 // PUT /api/courses/:id
-router.put('/:id', requireRole('admin'), async (req, res) => {
+router.put('/:id', requireRole('admin'), uploadCourseImage, async (req, res) => {
   try {
     const payload = sanitizeCoursePayload(req.body || {});
+    const uploadedImageUrl = saveUploadedImage(req);
+    if (uploadedImageUrl) {
+      payload.image_url = uploadedImageUrl;
+    }
     const validationError = validateCourseInput(payload);
 
     if (validationError) {

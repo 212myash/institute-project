@@ -1,5 +1,8 @@
 (function () {
-  const API_BASE = "https://institute-project-mu.vercel.app";
+  const API_BASE =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://institute-project-mu.vercel.app";
   const AUTH_KEY = "sci_auth";
   const CATALOG_KEY = "sci_catalog_settings";
   const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance"];
@@ -154,8 +157,9 @@
 
   async function api(path, options) {
     const auth = getAuth();
+    const isFormData = options && options.body instanceof FormData;
     const headers = Object.assign(
-      { "Content-Type": "application/json" },
+      isFormData ? {} : { "Content-Type": "application/json" },
       (options && options.headers) || {}
     );
 
@@ -166,7 +170,12 @@
     const response = await fetch(API_BASE + path, {
       method: (options && options.method) || "GET",
       headers: headers,
-      body: options && options.body ? JSON.stringify(options.body) : undefined,
+      body:
+        options && options.body
+          ? isFormData
+            ? options.body
+            : JSON.stringify(options.body)
+          : undefined,
     });
 
     const data = await response.json().catch(function () {
@@ -479,6 +488,7 @@
       const avatar = card.querySelector("[data-course-avatar]");
       const createdAt = card.querySelector("[data-course-created-at]");
       const adminControls = card.querySelector("[data-admin-card-controls]");
+      const studentOnly = card.querySelector("[data-course-student-only]");
       const editBtn = card.querySelector("[data-edit-course]");
       const deleteBtn = card.querySelector("[data-delete-course]");
 
@@ -497,17 +507,23 @@
           adminControls.classList.remove("hidden");
           adminControls.classList.add("flex");
         }
+        if (studentOnly) {
+          studentOnly.classList.add("hidden");
+        }
       } else if (adminControls) {
         adminControls.classList.add("hidden");
+        if (studentOnly) {
+          studentOnly.classList.remove("hidden");
+        }
       }
 
-      if (editBtn) {
+      if (editBtn && coursesState.isAdmin) {
         editBtn.addEventListener("click", function () {
           openCourseModal("edit", course);
         });
       }
 
-      if (deleteBtn) {
+      if (deleteBtn && coursesState.isAdmin) {
         deleteBtn.addEventListener("click", async function () {
           const ok = window.confirm("Are you sure you want to delete this course?");
           if (!ok) return;
@@ -530,7 +546,7 @@
       }
 
       const continueBtn = card.querySelector("[data-course-continue]");
-      if (continueBtn) {
+      if (continueBtn && !coursesState.isAdmin) {
         continueBtn.addEventListener("click", function () {
           notify("Continuing " + (course.title || "course"), "success");
         });
@@ -639,16 +655,12 @@
       imageFileInput.addEventListener("change", function () {
         const file = imageFileInput.files && imageFileInput.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (ev) {
-          const result = typeof ev.target?.result === "string" ? ev.target.result : "";
-          if (!result) return;
-          imagePreview.src = result;
-          if (imageUrlInput) {
-            imageUrlInput.value = result;
-          }
-        };
-        reader.readAsDataURL(file);
+        if (file.size > 10 * 1024 * 1024) {
+          notify("Image must be 10MB or less", "error");
+          imageFileInput.value = "";
+          return;
+        }
+        imagePreview.src = URL.createObjectURL(file);
       });
     }
 
@@ -695,6 +707,13 @@
 
         const id = (document.getElementById("courseIdInput")?.value || "").trim();
         const payload = buildCoursePayloadFromForm();
+        const imageFileInput = document.getElementById("courseImageFileInput");
+        const imageFile = imageFileInput && imageFileInput.files ? imageFileInput.files[0] : null;
+
+        if (imageFile && imageFile.size > 10 * 1024 * 1024) {
+          notify("Image must be 10MB or less", "error");
+          return;
+        }
 
         if (!payload.title || !payload.description || !payload.instructor || !payload.duration) {
           notify("Please fill all required fields", "error");
@@ -713,10 +732,25 @@
         }
 
         try {
+          let requestBody = payload;
+          if (imageFile) {
+            const formData = new FormData();
+            formData.append("title", payload.title);
+            formData.append("description", payload.description);
+            formData.append("instructor", payload.instructor);
+            formData.append("duration", payload.duration);
+            formData.append("progress", String(payload.progress));
+            if (payload.image_url) {
+              formData.append("image_url", payload.image_url);
+            }
+            formData.append("image", imageFile);
+            requestBody = formData;
+          }
+
           if (id) {
             await api("/api/courses/" + id, {
               method: "PUT",
-              body: payload,
+              body: requestBody,
             });
             notify("Course updated", "success");
           } else {
@@ -730,7 +764,7 @@
 
             const created = await api("/api/courses", {
               method: "POST",
-              body: payload,
+              body: requestBody,
             });
 
             const createdCourse = created.data;
@@ -765,6 +799,8 @@
     const main = document.getElementById("coursesMain");
     const addBtn = document.getElementById("addCourseButton");
     const floatingAddBtn = document.getElementById("floatingAddCourseButton");
+    const pageTitle = document.getElementById("coursesPageTitle");
+    const pageSubtitle = document.getElementById("coursesPageSubtitle");
 
     if (sidebar) {
       if (isAdmin) {
@@ -796,12 +832,21 @@
       }
     }
 
+    if (pageTitle) {
+      pageTitle.textContent = isAdmin ? "Courses Management" : "My Courses";
+    }
+    if (pageSubtitle) {
+      pageSubtitle.textContent = isAdmin
+        ? "Manage all courses with full admin control: add, edit, and delete."
+        : "Continue learning with your enrolled courses and track your progress.";
+    }
+
     coursesState.isAdmin = isAdmin;
 
-    const root = document.getElementById("coursesMain");
-    if (root && root.dataset.bound !== "true") {
+    const root = document.getElementById("coursesMain") || document.querySelector("main");
+    if (root && root.dataset.coursesBound !== "true") {
       bindCourseManagementEvents();
-      root.dataset.bound = "true";
+      root.dataset.coursesBound = "true";
     }
 
     await fetchAndRenderCourses();
