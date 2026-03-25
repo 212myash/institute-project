@@ -1588,6 +1588,11 @@
       });
 
       requestsBody.innerHTML = renderAdminTableRows(contacts, function (c, i) {
+        const mobileFromField = String(c.mobile || "").trim();
+        const mobileMatch = String(c.message || "").match(/(?:^|\n)\s*Mobile\s*:\s*([^\n]+)/i);
+        const mobileFromMessage = mobileMatch ? String(mobileMatch[1] || "").trim() : "";
+        const mobile = mobileFromField || mobileFromMessage || "-";
+
         return (
           '<tr class="border-t border-surface-variant/40">' +
           '<td class="py-3 px-4 text-sm font-semibold">' +
@@ -1598,6 +1603,9 @@
           "</td>" +
           '<td class="py-3 px-4 text-sm">' +
           (c.email || "-") +
+          "</td>" +
+          '<td class="py-3 px-4 text-sm">' +
+          mobile +
           "</td>" +
           '<td class="py-3 px-4 text-sm line-clamp-1 max-w-[220px]">' +
           (c.message || "-") +
