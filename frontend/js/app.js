@@ -481,11 +481,36 @@
 
     const fullName = document.getElementById("full_name");
     const email = document.getElementById("email");
+    const photoInput = document.getElementById("photo");
+    const signatureInput = document.getElementById("signature");
+    const photoPreview = document.getElementById("photoPreview");
+    const photoPlaceholder = document.getElementById("photoPreviewPlaceholder");
+    const signaturePreview = document.getElementById("signaturePreview");
+    const signaturePlaceholder = document.getElementById("signaturePreviewPlaceholder");
     if (fullName && !fullName.value) fullName.value = auth.user.name || "";
     if (email && !email.value) email.value = auth.user.email || "";
 
     if (form.dataset.bound === "true") return;
     form.dataset.bound = "true";
+
+    function bindImagePreview(input, preview, placeholder) {
+      if (!input || !preview || !placeholder) return;
+      input.addEventListener("change", function () {
+        const file = input.files && input.files[0] ? input.files[0] : null;
+        if (!file) {
+          preview.classList.add("hidden");
+          placeholder.classList.remove("hidden");
+          preview.removeAttribute("src");
+          return;
+        }
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+      });
+    }
+
+    bindImagePreview(photoInput, photoPreview, photoPlaceholder);
+    bindImagePreview(signatureInput, signaturePreview, signaturePlaceholder);
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -518,8 +543,6 @@
         }
       }
 
-      const photoInput = document.getElementById("photo");
-      const signatureInput = document.getElementById("signature");
       const photoFile = photoInput && photoInput.files ? photoInput.files[0] : null;
       const signatureFile = signatureInput && signatureInput.files ? signatureInput.files[0] : null;
 

@@ -65,15 +65,31 @@
             </label>
             <label class="block">
               <span class="text-sm font-semibold">Marital Status</span>
-              <input id="marital_status" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+              <select id="marital_status" class="mt-1 w-full rounded-xl border-surface-border" required>
+                <option value="">Select</option>
+                <option value="Unmarried">Unmarried</option>
+                <option value="Married">Married</option>
+                <option value="Other">Other</option>
+              </select>
             </label>
             <label class="block">
               <span class="text-sm font-semibold">Nationality</span>
-              <input id="nationality" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+              <select id="nationality" class="mt-1 w-full rounded-xl border-surface-border" required>
+                <option value="">Select</option>
+                <option value="Indian">Indian</option>
+                <option value="Other">Other</option>
+              </select>
             </label>
             <label class="block">
               <span class="text-sm font-semibold">Religion</span>
-              <input id="religion" type="text" class="mt-1 w-full rounded-xl border-surface-border" required />
+              <select id="religion" class="mt-1 w-full rounded-xl border-surface-border" required>
+                <option value="">Select</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Muslim">Muslim</option>
+                <option value="Sikh">Sikh</option>
+                <option value="Christian">Christian</option>
+                <option value="Other">Other</option>
+              </select>
             </label>
             <label class="block md:col-span-2">
               <span class="text-sm font-semibold">Address</span>
@@ -140,14 +156,22 @@
 
         <section>
           <h2 class="text-lg font-bold font-headline text-primary mb-4">Uploads</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <label class="block">
               <span class="text-sm font-semibold">Photo Upload (Required)</span>
               <input id="photo" type="file" accept="image/*" class="mt-1 w-full rounded-xl border-surface-border" required />
+              <div class="mt-3 p-3 rounded-xl border border-surface-border bg-slate-50">
+                <img id="photoPreview" alt="Photo preview" class="hidden w-full h-40 object-cover rounded-lg border border-surface-border" />
+                <p id="photoPreviewPlaceholder" class="text-xs text-slate-500">Selected photo will appear here.</p>
+              </div>
             </label>
             <label class="block">
               <span class="text-sm font-semibold">Signature (Optional)</span>
               <input id="signature" type="file" accept="image/*" class="mt-1 w-full rounded-xl border-surface-border" />
+              <div class="mt-3 p-3 rounded-xl border border-surface-border bg-slate-50">
+                <img id="signaturePreview" alt="Signature preview" class="hidden w-full h-40 object-contain bg-white rounded-lg border border-surface-border" />
+                <p id="signaturePreviewPlaceholder" class="text-xs text-slate-500">Selected signature will appear here.</p>
+              </div>
             </label>
           </div>
         </section>
