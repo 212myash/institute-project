@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Enquire Now | Shivam Computer Institute</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary-container": "#1e2a44",
+          "on-secondary-fixed-variant": "#36485b",
+          "tertiary-fixed": "#ffddb4",
+          "inverse-on-surface": "#f0f1f2",
+          "on-surface-variant": "#45464d",
+          "on-primary-fixed": "#0e1b34",
+          "on-error-container": "#93000a",
+          "surface-dim": "#d9dadb",
+          "tertiary-container": "#3d2500",
+          "tertiary": "#221200",
+          "surface-container": "#edeeef",
+          "inverse-primary": "#bac6e7",
+          "on-surface": "#191c1d",
+          "outline-variant": "#c5c6ce",
+          "surface-tint": "#525e7b",
+          "surface-container-low": "#f3f4f5",
+          "on-tertiary-fixed-variant": "#633f00",
+          "primary-fixed-dim": "#bac6e7",
+          "tertiary-fixed-dim": "#ffb955",
+          "surface-variant": "#e1e3e4",
+          "on-primary-fixed-variant": "#3b4662",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-highest": "#e1e3e4",
+          "primary": "#08152e",
+          "on-secondary-container": "#526478",
+          "error-container": "#ffdad6",
+          "background": "#f8f9fa",
+          "surface-container-high": "#e7e8e9",
+          "on-secondary": "#ffffff",
+          "on-primary-container": "#8591b0",
+          "on-background": "#191c1d",
+          "on-secondary-fixed": "#091d2e",
+          "inverse-surface": "#2e3132",
+          "surface-bright": "#f8f9fa",
+          "outline": "#75777e",
+          "secondary-container": "#cfe2f9",
+          "on-tertiary": "#ffffff",
+          "error": "#ba1a1a",
+          "secondary": "#4e6073",
+          "secondary-fixed-dim": "#b5c8df",
+          "primary-fixed": "#d9e2ff",
+          "on-tertiary-fixed": "#291800",
+          "surface": "#f8f9fa",
+          "on-primary": "#ffffff",
+          "on-error": "#ffffff",
+          "secondary-fixed": "#d1e4fb",
+          "on-tertiary-container": "#c78300"
+        },
+        fontFamily: {
+          "headline": ["Manrope"],
+          "body": ["Inter"],
+          "label": ["Inter"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"}
+      }
+    }
+  }
+</script>
+<style>
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.glass-nav {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+</style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-tertiary-fixed selection:text-on-tertiary-fixed" data-page="enquiry">
+<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-20">
+  <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline tracking-tight">SCI</span>
+  <div class="hidden md:flex gap-6">
+    <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./index.html" data-route="./index.html">Home</a>
+    <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./courses.html" data-route="./courses.html">Courses</a>
+    <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./login.html" data-route="./login.html">Login</a>
+    <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./register.html" data-route="./register.html">Register</a>
+    <a class="text-blue-700 font-bold font-manrope" href="./enquiry.html">Enquiry</a>
+  </div>
+</nav>
+
+<main class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+<div class="mb-16">
+<h1 class="text-5xl md:text-6xl font-headline font-extrabold text-primary tracking-tight mb-4 leading-tight">
+  Your Future in Tech <br/> Starts with a <span class="text-on-tertiary-container">Conversation</span>.
+</h1>
+<p class="text-on-surface-variant text-lg max-w-2xl leading-relaxed">
+  Whether you're looking to start a new career or upgrade your skills, our academic advisors are here to help you choose the right path.
+</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-8 md:p-12 shadow-[0_8px_32px_rgba(25,28,29,0.04)] relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-tertiary-fixed/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+<h2 class="text-2xl font-headline font-bold text-primary mb-8 relative z-10">Academic Enquiry Form</h2>
+<form id="enquiryPageForm" class="space-y-6 relative z-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant" for="name">Full Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-on-tertiary-container transition-all" id="name" placeholder="John Doe" type="text" required/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant" for="mobile">Mobile Number</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-on-tertiary-container transition-all" id="mobile" placeholder="+91 XXXXX XXXXX" type="tel"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant" for="email">Email Address</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-on-tertiary-container transition-all" id="email" placeholder="john@example.com" type="email" required/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant" for="message">Your Message</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-on-tertiary-container transition-all resize-none" id="message" placeholder="Tell us about the courses you're interested in..." rows="5" required></textarea>
+</div>
+<div class="pt-4 flex flex-col gap-2">
+<button id="enquiryPageSubmit" class="w-full md:w-auto px-10 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all" type="submit">
+  Submit Enquiry
+</button>
+<p id="enquiryPageStatus" class="text-sm text-on-surface-variant"></p>
+</div>
+</form>
+</div>
+<div class="lg:col-span-4 space-y-6">
+<div class="bg-surface-container-low rounded-xl p-8 space-y-8">
+<h3 class="text-xl font-headline font-bold text-primary">Contact Information</h3>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-tertiary-container shadow-sm">
+<span class="material-symbols-outlined">call</span>
+</div>
+<div>
+<p class="text-xs font-bold text-outline-variant uppercase tracking-widest mb-1">Phone</p>
+<p class="text-on-surface font-semibold">930-876-6047</p>
+<p class="text-on-surface font-semibold">799-229-2332</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-tertiary-container shadow-sm">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<div>
+<p class="text-xs font-bold text-outline-variant uppercase tracking-widest mb-1">Email</p>
+<p class="text-on-surface font-semibold break-all">shivaminstitute317@gmail.com</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-tertiary-container shadow-sm">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<p class="text-xs font-bold text-outline-variant uppercase tracking-widest mb-1">Address</p>
+<p class="text-on-surface font-semibold leading-relaxed">
+A.G Colony, Main Road,<br/>
+Near SBI Bank, Radhika Complex,<br/>
+Patna, Bihar
+</p>
+</div>
+</div>
+</div>
+</div>
+<div class="relative rounded-xl overflow-hidden aspect-square shadow-md group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="modern computer lab with students" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoVEkVJ0cUYv_H-vggcwB0Wy0XSpf7NtEZeCOHGwnD6X1lJHWuBFhLgHk9XYUjhFFXcci6KkyvShuHnHkKPK2iaCZEk9BssmSm93SLuaLnJoQwchEY2jQe7kUt28dzvQujGIjVF-SSG2T7oVBaQZOHv7jrQXWcQEOzLvc9Hgn2x_y6j_OwPwR-GHvUEo9xQxQWglkt_068zeytMe91oK1OsVbB8GPL-QSEZCQsYSQ_YmU3t3QJiyZ1Z4K7ukkBRC6SohSDCEpipUl-"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent flex flex-col justify-end p-8">
+<p class="text-tertiary-fixed text-lg font-headline font-bold leading-tight">"The best way to predict the future is to create it."</p>
+<p class="text-on-primary-container text-sm mt-2">- Abraham Lincoln</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 bg-surface-container-low rounded-xl overflow-hidden h-[400px] relative shadow-inner">
+<img class="w-full h-full object-cover grayscale contrast-125 opacity-80" alt="Patna map area" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFCO_eQmY15tcVfvUdwv2yzMMIn1vS8UQzcrZIvuMJqHc5C3FwVL3MiX4lM7bqk3u1b2wDaaO5q8YkcBrB6EHnHk2nNWaE9t-t2S44Z_aHu9I4s4ugUabOPkHk9rSSVDgcQtclZvqX8m4EGy1EGeUzgUrFQGBNpeQpraAKw5cFW-I6OHw5Lwy2evO3lBV6pUCIA1QBzOW8X4eM_bN92LwFK1Nz6hzAAODoLg4_t6YYJV3sUSVvRcqAoe94OSd8CGyc6PaIevY2Hm2x"/>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-2xl flex items-center gap-4 border border-outline-variant/20">
+<div class="w-10 h-10 rounded-full bg-on-tertiary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<p class="font-headline font-bold text-primary">Shivam Computer Institute</p>
+<p class="text-xs text-on-surface-variant">Radhika Complex, Patna</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="w-full py-12 px-8 bg-slate-50 border-t border-slate-200">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto gap-8">
+<div class="text-lg font-bold text-slate-800">Shivam Computer Institute</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-slate-600 hover:text-slate-900 font-manrope text-sm underline decoration-orange-400 underline-offset-4" href="#">Privacy Policy</a>
+<a class="text-slate-600 hover:text-slate-900 font-manrope text-sm underline decoration-orange-400 underline-offset-4" href="#">Terms of Service</a>
+<a class="text-slate-600 hover:text-slate-900 font-manrope text-sm underline decoration-orange-400 underline-offset-4" href="#">Contact Support</a>
+<a class="text-slate-600 hover:text-slate-900 font-manrope text-sm underline decoration-orange-400 underline-offset-4" href="#">Location</a>
+</div>
+<div class="text-slate-600 font-manrope text-sm">© 2024 Shivam Computer Institute. All rights reserved.</div>
+</div>
+</footer>
+<script>
+(function () {
+  var form = document.getElementById('enquiryPageForm');
+  var status = document.getElementById('enquiryPageStatus');
+  var submit = document.getElementById('enquiryPageSubmit');
+  var name = document.getElementById('name');
+  var email = document.getElementById('email');
+  var mobile = document.getElementById('mobile');
+  var message = document.getElementById('message');
+
+  function getApiBaseForEnquiry() {
+    var stored = localStorage.getItem('sci_api_base');
+    if (stored) return String(stored).replace(/\/+$/, '');
+    return window.location.origin;
+  }
+
+  if (!form || !status || !submit || !name || !email || !message) return;
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    submit.disabled = true;
+    submit.textContent = 'Submitting...';
+    status.textContent = '';
+
+    try {
+      var payloadMessage = (message.value || '').trim();
+      if (mobile && mobile.value) {
+        payloadMessage += '\nMobile: ' + mobile.value.trim();
+      }
+
+      var response = await fetch(getApiBaseForEnquiry() + '/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.value.trim(),
+          email: email.value.trim(),
+          message: payloadMessage,
+        }),
+      });
+
+      var result = await response.json().catch(function () { return {}; });
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to submit enquiry');
+      }
+
+      form.reset();
+      status.textContent = 'Enquiry sent successfully.';
+    } catch (err) {
+      status.textContent = err.message || 'Failed to submit enquiry';
+    } finally {
+      submit.disabled = false;
+      submit.textContent = 'Submit Enquiry';
+    }
+  });
+})();
+</script>
+</body></html>

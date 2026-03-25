@@ -93,7 +93,7 @@
     <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./courses.html" data-route="./courses.html">Courses</a>
     <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./login.html" data-route="./login.html">Login</a>
     <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./register.html" data-route="./register.html">Register</a>
-    <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="#enquiryFormSection">Enquiry</a>
+    <a class="text-slate-500 hover:bg-slate-100 transition-all duration-300 px-3 py-1 rounded-lg" href="./enquiry.html" data-route="./enquiry.html">Enquiry</a>
   </div>
 </nav>
 
@@ -230,17 +230,6 @@
               <p class="text-on-surface-variant">shivaminstitute317@gmail.com</p>
             </div>
           </div>
-
-          <div id="enquiryFormSection" class="p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm">
-            <h5 class="font-headline font-bold text-primary mb-3">Enquiry</h5>
-            <form id="indexEnquiryForm" class="space-y-3">
-              <input id="indexEnquiryName" type="text" required placeholder="Your name" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm" />
-              <input id="indexEnquiryEmail" type="email" required placeholder="Your email" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm" />
-              <textarea id="indexEnquiryMessage" rows="3" required placeholder="Your message" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm"></textarea>
-              <button id="indexEnquirySubmit" type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold">Send Enquiry</button>
-              <p id="indexEnquiryStatus" class="text-xs font-medium text-on-surface-variant"></p>
-            </form>
-          </div>
         </div>
       </div>
     </div>
@@ -331,53 +320,6 @@
   var footerYear = document.getElementById('footerYear');
   if (footerYear) {
     footerYear.textContent = String(new Date().getFullYear());
-  }
-
-  var enquiryForm = document.getElementById('indexEnquiryForm');
-  var enquiryName = document.getElementById('indexEnquiryName');
-  var enquiryEmail = document.getElementById('indexEnquiryEmail');
-  var enquiryMessage = document.getElementById('indexEnquiryMessage');
-  var enquirySubmit = document.getElementById('indexEnquirySubmit');
-  var enquiryStatus = document.getElementById('indexEnquiryStatus');
-
-  function getApiBaseForEnquiry() {
-    var stored = localStorage.getItem('sci_api_base');
-    if (stored) return String(stored).replace(/\/+$/, '');
-    return window.location.origin;
-  }
-
-  if (enquiryForm && enquiryName && enquiryEmail && enquiryMessage && enquirySubmit && enquiryStatus) {
-    enquiryForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      enquiryStatus.textContent = '';
-      enquirySubmit.disabled = true;
-      enquirySubmit.textContent = 'Sending...';
-
-      try {
-        var response = await fetch(getApiBaseForEnquiry() + '/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: enquiryName.value.trim(),
-            email: enquiryEmail.value.trim(),
-            message: enquiryMessage.value.trim(),
-          }),
-        });
-
-        var result = await response.json().catch(function () { return {}; });
-        if (!response.ok) {
-          throw new Error(result.message || 'Failed to send enquiry');
-        }
-
-        enquiryForm.reset();
-        enquiryStatus.textContent = 'Enquiry sent successfully.';
-      } catch (err) {
-        enquiryStatus.textContent = err.message || 'Failed to send enquiry';
-      } finally {
-        enquirySubmit.disabled = false;
-        enquirySubmit.textContent = 'Send Enquiry';
-      }
-    });
   }
 
   var mapFrame = document.getElementById('instituteMapFrame');
