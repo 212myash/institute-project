@@ -245,6 +245,7 @@
     }
 
     if (user.role === "admin") {
+      window.location.href = "./admin-dashboard.html";
       return;
     }
 
@@ -1312,7 +1313,6 @@
       return d.getFullYear() === year && d.getMonth() === month;
     });
 
-    // Fallback to latest month with data if current month has no accounts.
     if (!monthItems.length && allSorted.length) {
       const latest = new Date(allSorted[allSorted.length - 1].createdAt || 0);
       month = latest.getMonth();
@@ -1328,74 +1328,119 @@
       return;
     }
 
-    const roleColor = function (role) {
-      return String(role || "").toLowerCase() === "admin" ? "#16a34a" : "#dc2626";
-    };
-
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const points = monthItems.map(function (u) {
-      const d = new Date(u.createdAt || 0);
-      const day = d.getDate();
-      const x = 6 + ((day - 1) / Math.max(1, daysInMonth - 1)) * 88;
-      const isAdmin = String(u.role || "").toLowerCase() === "admin";
-      const y = isAdmin ? 13 : 31;
-      const color = roleColor(u.role);
+    const adminDaily = new Array(daysInMonth).fill(0);
+    const studentDaily = new Array(daysInMonth).fill(0);
 
-      return {
-        x: x,
-        y: y,
-        day: day,
-        name: (u && u.name) || "Unknown",
-        date: formatShortDate(u && u.createdAt),
-        color: color,
-        role: isAdmin ? "Admin" : "Student",
-      };
+    monthItems.forEach(function (u) {
+      const d = new Date(u.createdAt || 0);
+      const dayIdx = Math.max(0, Math.min(daysInMonth - 1, d.getDate() - 1));
+      const role = String(u.role || "student").toLowerCase();
+      if (role === "admin") {
+        adminDaily[dayIdx] += 1;
+      } else {
+        studentDaily[dayIdx] += 1;
+      }
     });
 
-    const segments = points
-      .slice(0, -1)
-      .map(function (start, idx) {
-        const end = points[idx + 1];
-        const midX = (start.x + end.x) / 2;
-        const midY = (start.y + end.y) / 2;
+    const maxCount = Math.max(1, ...adminDaily, ...studentDaily);
+    const yTop = maxCount;
+    const yMid = Math.max(0, Math.ceil(maxCount / 2));
+    const yBottom = 0;
 
+    const W = 920;
+    const H = 280;
+    const PAD_L = 56;
+    const PAD_R = 16;
+    const PAD_T = 20;
+    const PAD_B = 48;
+    const CW = W - PAD_L - PAD_R;
+    const CH = H - PAD_T - PAD_B;
+
+    function xFor(dayIndex) {
+      if (daysInMonth === 1) return PAD_L + CW / 2;
+      return PAD_L + (dayIndex * CW) / (daysInMonth - 1);
+    }
+
+    function yFor(value) {
+      return PAD_T + CH - (value / maxCount) * CH;
+    }
+
+    function pathFor(series) {
+      return series
+        .map(function (v, i) {
+          const cmd = i === 0 ? "M" : "L";
+          return cmd + xFor(i).toFixed(2) + " " + yFor(v).toFixed(2);
+        })
+        .join(" ");
+    }
+
+    const adminPath = pathFor(adminDaily);
+    const studentPath = pathFor(studentDaily);
+
+    function pointsFor(series, color) {
+      return series
+        .map(function (v, i) {
+          if (v <= 0) return "";
+          return (
+            '<circle cx="' +
+            xFor(i).toFixed(2) +
+            '" cy="' +
+            yFor(v).toFixed(2) +
+            '" r="3.2" fill="' +
+            color +
+            '" />'
+          );
+        })
+        .join("");
+    }
+
+    const adminPoints = pointsFor(adminDaily, "#16a34a");
+    const studentPoints = pointsFor(studentDaily, "#dc2626");
+
+    const xTicks = [1, Math.ceil(daysInMonth * 0.25), Math.ceil(daysInMonth * 0.5), Math.ceil(daysInMonth * 0.75), daysInMonth]
+      .filter(function (d, idx, arr) {
+        return arr.indexOf(d) === idx;
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+
+    const xTickLabels = xTicks
+      .map(function (day) {
         return (
-          '<line x1="' +
-          start.x.toFixed(2) +
-          '" y1="' +
-          start.y.toFixed(2) +
-          '" x2="' +
-          midX.toFixed(2) +
-          '" y2="' +
-          midY.toFixed(2) +
-          '" stroke="' +
-          start.color +
-          '" stroke-width="1.5" stroke-linecap="round" />' +
-          '<line x1="' +
-          midX.toFixed(2) +
-          '" y1="' +
-          midY.toFixed(2) +
-          '" x2="' +
-          end.x.toFixed(2) +
-          '" y2="' +
-          end.y.toFixed(2) +
-          '" stroke="' +
-          end.color +
-          '" stroke-width="1.5" stroke-linecap="round" />'
+          '<text x="' +
+          xFor(day - 1).toFixed(2) +
+          '" y="' +
+          (H - 18) +
+          '" font-size="11" fill="#64748b" text-anchor="middle">' +
+          day +
+          "</text>"
         );
       })
       .join("");
 
-    const dots = points
-      .map(function (p) {
+    const yGridVals = [yTop, yMid, yBottom];
+    const yGrid = yGridVals
+      .map(function (v) {
+        const y = yFor(v).toFixed(2);
         return (
-          '<circle cx="' +
-          p.x.toFixed(2) +
-          '" cy="' +
-          p.y.toFixed(2) +
-          '" r="2.1" fill="' +
-          p.color +
-          '" />'
+          '<line x1="' +
+          PAD_L +
+          '" y1="' +
+          y +
+          '" x2="' +
+          (W - PAD_R) +
+          '" y2="' +
+          y +
+          '" stroke="#d1d5db" stroke-width="1" />' +
+          '<text x="' +
+          (PAD_L - 10) +
+          '" y="' +
+          (Number(y) + 4).toFixed(2) +
+          '" font-size="11" fill="#64748b" text-anchor="end">' +
+          v +
+          "</text>"
         );
       })
       .join("");
@@ -1405,41 +1450,37 @@
       year: "numeric",
     });
 
-    const labels = points
-      .map(function (p) {
-        return (
-          '<div class="flex items-center justify-between text-[11px] text-slate-600">' +
-          '<span class="font-semibold truncate pr-2">' +
-          p.name +
-          ' (' +
-          p.role +
-          ")</span>" +
-          "<span>" +
-          p.date +
-          "</span>" +
-          "</div>"
-        );
-      })
-      .join("");
-
     graph.innerHTML =
-      '<div class="flex items-center justify-between text-[11px] text-slate-600 mb-2">' +
+      '<div class="flex items-center justify-between text-[12px] text-slate-600 mb-2">' +
       '<span class="font-semibold">One Month Timeline: ' +
       monthLabel +
       '</span>' +
-      '<span class="flex items-center gap-3">' +
-      '<span class="inline-flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-green-600"></span>Admin</span>' +
-      '<span class="inline-flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600"></span>Student</span>' +
+      '<span class="inline-flex items-center gap-4">' +
+      '<span class="inline-flex items-center gap-1"><span class="inline-block w-3 h-0.5 bg-green-600"></span><span class="inline-block w-2 h-2 rounded-full bg-green-600"></span>Admin</span>' +
+      '<span class="inline-flex items-center gap-1"><span class="inline-block w-3 h-0.5 bg-red-600"></span><span class="inline-block w-2 h-2 rounded-full bg-red-600"></span>Student</span>' +
       "</span>" +
       "</div>" +
-      '<svg viewBox="0 0 100 40" class="w-full h-24" preserveAspectRatio="none" aria-label="Monthly account creation line graph">' +
-      '<line x1="6" y1="36" x2="94" y2="36" stroke="#e2e8f0" stroke-width="0.8" />' +
-      segments +
-      dots +
-      "</svg>" +
-      '<div class="space-y-1 mt-1">' +
-      labels +
-      "</div>";
+      '<svg viewBox="0 0 ' +
+      W +
+      " " +
+      H +
+      '" class="w-full h-56" preserveAspectRatio="none" aria-label="Account creation chart">' +
+      yGrid +
+      '<path d="' +
+      adminPath +
+      '" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />' +
+      '<path d="' +
+      studentPath +
+      '" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />' +
+      adminPoints +
+      studentPoints +
+      xTickLabels +
+      '<text x="' +
+      (PAD_L + CW / 2).toFixed(2) +
+      '" y="' +
+      (H - 2) +
+      '" font-size="11" fill="#475569" text-anchor="middle">Day of Month</text>' +
+      "</svg>";
   }
 
   async function loadAdminData() {
