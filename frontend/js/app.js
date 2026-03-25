@@ -1141,10 +1141,9 @@
 
     coursesState.isAdmin = isAdmin;
 
-    const root = document.getElementById("coursesMain") || document.querySelector("main");
-    if (root && root.dataset.coursesBound !== "true") {
+    if (grid && grid.dataset.coursesBound !== "true") {
       bindCourseManagementEvents();
-      root.dataset.coursesBound = "true";
+      grid.dataset.coursesBound = "true";
     }
 
     await fetchAndRenderCourses();
