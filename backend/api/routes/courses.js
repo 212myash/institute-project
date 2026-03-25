@@ -12,9 +12,12 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-const uploadsDir = path.resolve(__dirname, '../../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+function getUploadsDir() {
+  const dir = path.resolve(__dirname, '../../uploads');
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  return dir;
 }
 
 function uploadCourseImage(req, res, next) {
@@ -38,10 +41,16 @@ function uploadCourseImage(req, res, next) {
 function saveUploadedImage(req) {
   if (!req.file) return '';
 
+  if (process.env.VERCEL) {
+    const mimeType = req.file.mimetype || 'image/jpeg';
+    const base64 = req.file.buffer.toString('base64');
+    return `data:${mimeType};base64,${base64}`;
+  }
+
   const ext = path.extname(req.file.originalname || '').toLowerCase() || '.jpg';
   const safeExt = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext) ? ext : '.jpg';
   const fileName = `course-${Date.now()}-${Math.round(Math.random() * 1e6)}${safeExt}`;
-  const filePath = path.join(uploadsDir, fileName);
+  const filePath = path.join(getUploadsDir(), fileName);
   fs.writeFileSync(filePath, req.file.buffer);
 
   return `${req.protocol}://${req.get('host')}/uploads/${fileName}`;
