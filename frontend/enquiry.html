@@ -214,10 +214,28 @@ Patna, Bihar
   var mobile = document.getElementById('mobile');
   var message = document.getElementById('message');
 
-  function getApiBaseForEnquiry() {
-    var stored = localStorage.getItem('sci_api_base');
-    if (stored) return String(stored).replace(/\/+$/, '');
-    return window.location.origin;
+  function normalizeBase(base) {
+    if (!base) return '';
+    return String(base).trim().replace(/\/+$/, '').replace(/\/api$/i, '');
+  }
+
+  function isLocalHost() {
+    return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  }
+
+  function getApiBaseCandidatesForEnquiry() {
+    var candidates = [];
+    var stored = normalizeBase(localStorage.getItem('sci_api_base'));
+    if (stored) candidates.push(stored);
+
+    if (isLocalHost()) {
+      candidates.push('http://localhost:5000');
+    }
+
+    candidates.push(normalizeBase(window.location.origin));
+    candidates.push('https://institute-project-mu.vercel.app');
+
+    return Array.from(new Set(candidates.filter(Boolean)));
   }
 
   if (!form || !status || !submit || !name || !email || !message) return;
@@ -234,19 +252,49 @@ Patna, Bihar
         payloadMessage += '\nMobile: ' + mobile.value.trim();
       }
 
-      var response = await fetch(getApiBaseForEnquiry() + '/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.value.trim(),
-          email: email.value.trim(),
-          message: payloadMessage,
-        }),
-      });
+      var response = null;
+      var result = {};
+      var lastNetworkError = null;
+      var bases = getApiBaseCandidatesForEnquiry();
 
-      var result = await response.json().catch(function () { return {}; });
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to submit enquiry');
+      for (var i = 0; i < bases.length; i++) {
+        var base = bases[i];
+        try {
+          response = await fetch(base + '/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name.value.trim(),
+              email: email.value.trim(),
+              message: payloadMessage,
+            }),
+          });
+          result = await response.json().catch(function () { return {}; });
+
+          if (!response.ok && response.status === 404) {
+            continue;
+          }
+
+          if (!response.ok) {
+            throw new Error(result.message || 'Failed to submit enquiry');
+          }
+
+          localStorage.setItem('sci_api_base', base);
+          break;
+        } catch (fetchErr) {
+          if (fetchErr && fetchErr.name === 'TypeError') {
+            lastNetworkError = fetchErr;
+            continue;
+          }
+          throw fetchErr;
+        }
+      }
+
+      if (!response || !response.ok) {
+        if (lastNetworkError) {
+          throw new Error('Network error. Please check your connection and try again.');
+        }
+        throw new Error('Failed to submit enquiry');
       }
 
       form.reset();
