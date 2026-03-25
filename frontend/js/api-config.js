@@ -3,7 +3,7 @@ const API_BASE_STORAGE_KEY = 'sci_api_base';
 
 function normalizeBase(base) {
   if (!base) return '';
-  return String(base).trim().replace(/\/+$/, '');
+  return String(base).trim().replace(/\/+$/, '').replace(/\/api$/i, '');
 }
 
 function isLocalHost() {

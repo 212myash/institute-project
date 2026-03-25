@@ -155,7 +155,7 @@
 
   function normalizeBase(base) {
     if (!base) return "";
-    return String(base).trim().replace(/\/+$/, "");
+    return String(base).trim().replace(/\/+$/, "").replace(/\/api$/i, "");
   }
 
   function getApiBaseCandidates() {
@@ -213,6 +213,9 @@
         });
 
         if (!response.ok) {
+          if (response.status === 404) {
+            continue;
+          }
           throw new Error(data.message || `API error (${response.status})`);
         }
 
