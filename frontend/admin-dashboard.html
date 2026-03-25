@@ -69,7 +69,7 @@
     <p class="text-on-surface-variant font-medium mt-1">Detailed performance overview for March <span id="dashboardCurrentYear"></span></p>
   </section>
 
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  <section class="mb-8">
     <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
       <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Total Users</p>
       <h3 id="totalUsersStat" class="mt-4 text-4xl font-headline font-extrabold text-primary">0</h3>
@@ -78,13 +78,9 @@
         <div id="usersCreatedGraph" class="space-y-2"></div>
       </div>
     </div>
-    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
-      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Contact Requests</p>
-      <h3 id="totalRequestsStat" class="mt-4 text-4xl font-headline font-extrabold text-primary">0</h3>
-    </div>
   </section>
 
-  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <section class="mb-8">
     <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-auto">
       <h3 class="text-xl font-headline font-bold text-primary mb-4">Users</h3>
       <table class="w-full text-left">
@@ -100,7 +96,16 @@
         <tbody id="usersTableBody"></tbody>
       </table>
     </div>
+  </section>
 
+  <section class="mb-8">
+    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Contact Requests</p>
+      <h3 id="totalRequestsStat" class="mt-4 text-4xl font-headline font-extrabold text-primary">0</h3>
+    </div>
+  </section>
+
+  <section class="mb-8">
     <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-auto">
       <h3 class="text-xl font-headline font-bold text-primary mb-4">Contact Requests</h3>
       <table class="w-full text-left">

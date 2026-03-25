@@ -1215,31 +1215,57 @@
       .slice(-6);
 
     const total = sorted.length;
-    graph.innerHTML = sorted
+    const points = sorted
       .map(function (u, idx) {
-        const width = Math.max(18, Math.round(((idx + 1) / total) * 100));
-        const name = (u && u.name) || "Unknown";
-        const dateLabel = formatShortDate(u && u.createdAt);
+        const x = total === 1 ? 50 : 8 + (idx * 84) / (total - 1);
+        const y = 34 - (idx * 22) / Math.max(1, total - 1);
+        return { x: x, y: y, name: (u && u.name) || "Unknown", date: formatShortDate(u && u.createdAt) };
+      });
 
+    const pointsAttr = points
+      .map(function (p) {
+        return p.x.toFixed(2) + "," + p.y.toFixed(2);
+      })
+      .join(" ");
+
+    const dots = points
+      .map(function (p) {
         return (
-          '<div class="space-y-1">' +
+          '<circle cx="' +
+          p.x.toFixed(2) +
+          '" cy="' +
+          p.y.toFixed(2) +
+          '" r="1.7" fill="#0f172a" />'
+        );
+      })
+      .join("");
+
+    const labels = points
+      .map(function (p) {
+        return (
           '<div class="flex items-center justify-between text-[11px] text-slate-600">' +
           '<span class="font-semibold truncate pr-2">' +
-          name +
+          p.name +
           "</span>" +
           "<span>" +
-          dateLabel +
+          p.date +
           "</span>" +
-          "</div>" +
-          '<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">' +
-          '<div class="h-full rounded-full bg-gradient-to-r from-blue-900 to-amber-400" style="width:' +
-          width +
-          '%"></div>' +
-          "</div>" +
           "</div>"
         );
       })
       .join("");
+
+    graph.innerHTML =
+      '<svg viewBox="0 0 100 40" class="w-full h-20" preserveAspectRatio="none" aria-label="User account creation line graph">' +
+      '<line x1="8" y1="34" x2="92" y2="34" stroke="#e2e8f0" stroke-width="0.8" />' +
+      '<polyline fill="none" stroke="#0f172a" stroke-width="1.2" points="' +
+      pointsAttr +
+      '" />' +
+      dots +
+      "</svg>" +
+      '<div class="space-y-1 mt-1">' +
+      labels +
+      "</div>";
   }
 
   async function loadAdminData() {
