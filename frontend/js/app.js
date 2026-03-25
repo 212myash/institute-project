@@ -2,6 +2,7 @@
   const API_BASE = "https://institute-project-mu.vercel.app";
   const AUTH_KEY = "sci_auth";
   const CATALOG_KEY = "sci_catalog_settings";
+  const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance"];
 
   const DEFAULT_CATALOG = {
     certifications: [
@@ -50,7 +51,23 @@
     },
   ];
 
-  const PAGE = document.body.getAttribute("data-page") || "";
+  let PAGE = document.body.getAttribute("data-page") || "";
+  let adminRefreshTimer = null;
+  let coursesSearchTimer = null;
+
+  const DEFAULT_COURSE_IMAGE =
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80";
+
+  const coursesState = {
+    items: [],
+    page: 1,
+    limit: 6,
+    totalPages: 1,
+    total: 0,
+    search: "",
+    duration: "",
+    isAdmin: false,
+  };
 
   function getAuth() {
     try {
@@ -169,6 +186,74 @@
       return;
     }
     window.location.href = "./student-dashboard.html";
+  }
+
+  function getPageNameFromRoute(route) {
+    if (!route) return "";
+    const clean = route.split("?")[0].split("#")[0];
+    const last = clean.split("/").pop() || "";
+    return last.replace(/\.html$/i, "");
+  }
+
+  function updateShellNavState() {
+    if (SHELL_PAGES.indexOf(PAGE) === -1) return;
+
+    const navLinks = document.querySelectorAll("[data-route]");
+    navLinks.forEach(function (link) {
+      const target = getPageNameFromRoute(link.getAttribute("data-route") || "");
+      const active = target === PAGE;
+      const isMobile = link.classList.contains("flex-col");
+
+      if (isMobile) {
+        if (active) {
+          link.classList.add("bg-amber-100", "text-blue-900", "rounded-2xl", "px-5", "py-2", "scale-110");
+          link.classList.remove("text-slate-400");
+        } else {
+          link.classList.remove("bg-amber-100", "text-blue-900", "rounded-2xl", "px-5", "py-2", "scale-110");
+          link.classList.add("text-slate-400");
+        }
+        return;
+      }
+
+      if (active) {
+        link.classList.add("border-l-4", "border-amber-400", "bg-amber-50", "text-blue-900");
+        link.classList.remove("text-slate-600", "text-slate-500");
+      } else {
+        link.classList.remove("border-l-4", "border-amber-400", "bg-amber-50", "text-blue-900");
+        if (!link.classList.contains("text-slate-400")) {
+          link.classList.add("text-slate-600");
+        }
+      }
+    });
+  }
+
+  async function swapMainContent(route) {
+    const currentMain = document.querySelector("main");
+    if (!currentMain) {
+      window.location.href = route;
+      return;
+    }
+
+    const response = await fetch(route, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Unable to load page");
+    }
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const nextMain = doc.querySelector("main");
+
+    if (!nextMain) {
+      window.location.href = route;
+      return;
+    }
+
+    currentMain.innerHTML = nextMain.innerHTML;
+    PAGE = getPageNameFromRoute(route);
+    document.body.setAttribute("data-page", PAGE);
+    window.history.pushState({}, "", route);
+    initializePageFeatures();
   }
 
   function guardRoute() {
@@ -291,125 +376,435 @@
     });
   }
 
+  function toSafeProgress(progress) {
+    const num = Number(progress);
+    if (Number.isNaN(num)) return 0;
+    return Math.max(0, Math.min(100, num));
+  }
+
+  function formatCreatedDate(value) {
+    if (!value) return "--";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return "--";
+    return parsed.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  function buildCoursePayloadFromForm() {
+    return {
+      title: (document.getElementById("courseTitleInput")?.value || "").trim(),
+      description: (document.getElementById("courseDescriptionInput")?.value || "").trim(),
+      instructor: (document.getElementById("courseInstructorInput")?.value || "").trim(),
+      duration: (document.getElementById("courseDurationInput")?.value || "").trim(),
+      image_url: (document.getElementById("courseImageUrlInput")?.value || "").trim(),
+      progress: toSafeProgress(document.getElementById("courseProgressInput")?.value || 0),
+    };
+  }
+
+  function openCourseModal(mode, course) {
+    const modal = document.getElementById("courseModal");
+    const title = document.getElementById("courseModalTitle");
+    const idInput = document.getElementById("courseIdInput");
+    const imagePreview = document.getElementById("courseImagePreview");
+    const form = document.getElementById("courseModalForm");
+    if (!modal || !title || !idInput || !imagePreview || !form) return;
+
+    form.reset();
+    idInput.value = "";
+    title.textContent = mode === "edit" ? "Edit Course" : "Add Course";
+
+    if (mode === "edit" && course) {
+      idInput.value = course._id || "";
+      const titleInput = document.getElementById("courseTitleInput");
+      const descriptionInput = document.getElementById("courseDescriptionInput");
+      const instructorInput = document.getElementById("courseInstructorInput");
+      const durationInput = document.getElementById("courseDurationInput");
+      const imageUrlInput = document.getElementById("courseImageUrlInput");
+      const progressInput = document.getElementById("courseProgressInput");
+
+      if (titleInput) titleInput.value = course.title || "";
+      if (descriptionInput) descriptionInput.value = course.description || "";
+      if (instructorInput) instructorInput.value = course.instructor || "";
+      if (durationInput) durationInput.value = course.duration || "";
+      if (imageUrlInput) imageUrlInput.value = course.image_url || "";
+      if (progressInput) progressInput.value = toSafeProgress(course.progress || 0);
+      imagePreview.src = course.image_url || DEFAULT_COURSE_IMAGE;
+    } else {
+      imagePreview.src = DEFAULT_COURSE_IMAGE;
+    }
+
+    modal.classList.remove("hidden");
+  }
+
+  function closeCourseModal() {
+    const modal = document.getElementById("courseModal");
+    if (modal) {
+      modal.classList.add("hidden");
+    }
+  }
+
+  function renderCoursesGrid() {
+    const grid = document.getElementById("coursesGrid");
+    const template = document.getElementById("courseCardTemplate");
+    const emptyState = document.getElementById("coursesEmptyState");
+    if (!grid || !template || !emptyState) return;
+
+    grid.innerHTML = "";
+
+    if (!coursesState.items.length) {
+      emptyState.classList.remove("hidden");
+      return;
+    }
+
+    emptyState.classList.add("hidden");
+
+    coursesState.items.forEach(function (course) {
+      const card = template.cloneNode(true);
+      const progressValue = toSafeProgress(course.progress || 0);
+
+      card.removeAttribute("id");
+      card.classList.remove("hidden");
+      card.dataset.courseId = course._id || "";
+
+      const title = card.querySelector("[data-course-title]");
+      const desc = card.querySelector("[data-course-description]");
+      const progress = card.querySelector("[data-course-progress]");
+      const bar = card.querySelector("[data-course-progress-bar]");
+      const duration = card.querySelector("[data-course-duration]");
+      const instructor = card.querySelector("[data-course-instructor]");
+      const image = card.querySelector("[data-course-image]");
+      const avatar = card.querySelector("[data-course-avatar]");
+      const createdAt = card.querySelector("[data-course-created-at]");
+      const adminControls = card.querySelector("[data-admin-card-controls]");
+      const editBtn = card.querySelector("[data-edit-course]");
+      const deleteBtn = card.querySelector("[data-delete-course]");
+
+      if (title) title.textContent = course.title || "Untitled Course";
+      if (desc) desc.textContent = course.description || "No description available";
+      if (progress) progress.textContent = progressValue + "%";
+      if (bar) bar.style.width = progressValue + "%";
+      if (duration) duration.textContent = course.duration || "--";
+      if (instructor) instructor.textContent = course.instructor || "--";
+      if (image) image.src = course.image_url || DEFAULT_COURSE_IMAGE;
+      if (avatar) avatar.src = DEFAULT_COURSE_IMAGE;
+      if (createdAt) createdAt.textContent = "Created: " + formatCreatedDate(course.createdAt);
+
+      if (coursesState.isAdmin) {
+        if (adminControls) {
+          adminControls.classList.remove("hidden");
+          adminControls.classList.add("flex");
+        }
+      } else if (adminControls) {
+        adminControls.classList.add("hidden");
+      }
+
+      if (editBtn) {
+        editBtn.addEventListener("click", function () {
+          openCourseModal("edit", course);
+        });
+      }
+
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", async function () {
+          const ok = window.confirm("Are you sure you want to delete this course?");
+          if (!ok) return;
+
+          const currentItems = coursesState.items.slice();
+          coursesState.items = coursesState.items.filter(function (item) {
+            return item._id !== course._id;
+          });
+          renderCoursesGrid();
+
+          try {
+            await api("/api/courses/" + course._id, { method: "DELETE" });
+            notify("Course deleted", "success");
+          } catch (err) {
+            coursesState.items = currentItems;
+            renderCoursesGrid();
+            notify(err.message || "Delete failed", "error");
+          }
+        });
+      }
+
+      const continueBtn = card.querySelector("[data-course-continue]");
+      if (continueBtn) {
+        continueBtn.addEventListener("click", function () {
+          notify("Continuing " + (course.title || "course"), "success");
+        });
+      }
+
+      grid.appendChild(card);
+    });
+  }
+
+  function renderCoursePagination() {
+    const prevBtn = document.getElementById("coursesPrevPage");
+    const nextBtn = document.getElementById("coursesNextPage");
+    const pageInfo = document.getElementById("coursesPageInfo");
+    if (!prevBtn || !nextBtn || !pageInfo) return;
+
+    const current = coursesState.page;
+    const totalPages = coursesState.totalPages || 1;
+
+    prevBtn.disabled = current <= 1;
+    nextBtn.disabled = current >= totalPages;
+    pageInfo.textContent = "Page " + current + " of " + totalPages;
+  }
+
+  async function fetchAndRenderCourses() {
+    const skeleton = document.getElementById("coursesSkeleton");
+    const grid = document.getElementById("coursesGrid");
+    if (skeleton) skeleton.classList.remove("hidden");
+    if (grid) grid.classList.add("hidden");
+
+    try {
+      const params = new URLSearchParams();
+      params.set("page", String(coursesState.page));
+      params.set("limit", String(coursesState.limit));
+      if (coursesState.search) params.set("search", coursesState.search);
+      if (coursesState.duration) params.set("duration", coursesState.duration);
+
+      const result = await api("/api/courses?" + params.toString());
+      coursesState.items = Array.isArray(result.data) ? result.data : [];
+      coursesState.totalPages = result.pagination?.totalPages || 1;
+      coursesState.total = result.pagination?.total || coursesState.items.length;
+
+      renderCoursesGrid();
+      renderCoursePagination();
+    } catch (err) {
+      coursesState.items = [];
+      renderCoursesGrid();
+      renderCoursePagination();
+      notify(err.message || "Unable to load courses", "error");
+    } finally {
+      if (skeleton) skeleton.classList.add("hidden");
+      if (grid) grid.classList.remove("hidden");
+    }
+  }
+
+  function bindCourseManagementEvents() {
+    const addBtn = document.getElementById("addCourseButton");
+    const floatingAddBtn = document.getElementById("floatingAddCourseButton");
+    const closeBtn = document.getElementById("closeCourseModal");
+    const cancelBtn = document.getElementById("cancelCourseModal");
+    const modal = document.getElementById("courseModal");
+    const form = document.getElementById("courseModalForm");
+    const imageUrlInput = document.getElementById("courseImageUrlInput");
+    const imageFileInput = document.getElementById("courseImageFileInput");
+    const imagePreview = document.getElementById("courseImagePreview");
+    const searchInput = document.getElementById("courseSearchInput");
+    const durationFilter = document.getElementById("courseDurationFilter");
+    const prevBtn = document.getElementById("coursesPrevPage");
+    const nextBtn = document.getElementById("coursesNextPage");
+
+    if (addBtn) {
+      addBtn.addEventListener("click", function () {
+        openCourseModal("add");
+      });
+    }
+
+    if (floatingAddBtn) {
+      floatingAddBtn.addEventListener("click", function () {
+        openCourseModal("add");
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", closeCourseModal);
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", closeCourseModal);
+    }
+
+    if (modal) {
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) {
+          closeCourseModal();
+        }
+      });
+    }
+
+    if (imageUrlInput && imagePreview) {
+      imageUrlInput.addEventListener("input", function () {
+        const value = imageUrlInput.value.trim();
+        imagePreview.src = value || DEFAULT_COURSE_IMAGE;
+      });
+    }
+
+    if (imageFileInput && imagePreview) {
+      imageFileInput.addEventListener("change", function () {
+        const file = imageFileInput.files && imageFileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          const result = typeof ev.target?.result === "string" ? ev.target.result : "";
+          if (!result) return;
+          imagePreview.src = result;
+          if (imageUrlInput) {
+            imageUrlInput.value = result;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener("input", function () {
+        if (coursesSearchTimer) {
+          clearTimeout(coursesSearchTimer);
+        }
+        coursesSearchTimer = setTimeout(function () {
+          coursesState.search = searchInput.value.trim();
+          coursesState.page = 1;
+          fetchAndRenderCourses();
+        }, 300);
+      });
+    }
+
+    if (durationFilter) {
+      durationFilter.addEventListener("change", function () {
+        coursesState.duration = durationFilter.value;
+        coursesState.page = 1;
+        fetchAndRenderCourses();
+      });
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", function () {
+        if (coursesState.page <= 1) return;
+        coursesState.page -= 1;
+        fetchAndRenderCourses();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", function () {
+        if (coursesState.page >= coursesState.totalPages) return;
+        coursesState.page += 1;
+        fetchAndRenderCourses();
+      });
+    }
+
+    if (form) {
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const id = (document.getElementById("courseIdInput")?.value || "").trim();
+        const payload = buildCoursePayloadFromForm();
+
+        if (!payload.title || !payload.description || !payload.instructor || !payload.duration) {
+          notify("Please fill all required fields", "error");
+          return;
+        }
+
+        if (!coursesState.isAdmin) {
+          notify("Only admin can manage courses", "error");
+          return;
+        }
+
+        const saveBtn = document.getElementById("saveCourseButton");
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Saving...";
+        }
+
+        try {
+          if (id) {
+            await api("/api/courses/" + id, {
+              method: "PUT",
+              body: payload,
+            });
+            notify("Course updated", "success");
+          } else {
+            const optimistic = {
+              _id: "temp-" + Date.now(),
+              createdAt: new Date().toISOString(),
+              ...payload,
+            };
+            coursesState.items = [optimistic].concat(coursesState.items);
+            renderCoursesGrid();
+
+            const created = await api("/api/courses", {
+              method: "POST",
+              body: payload,
+            });
+
+            const createdCourse = created.data;
+            coursesState.items = coursesState.items.map(function (item) {
+              return item._id === optimistic._id ? createdCourse : item;
+            });
+            notify("Course created", "success");
+          }
+
+          closeCourseModal();
+          await fetchAndRenderCourses();
+        } catch (err) {
+          notify(err.message || "Unable to save course", "error");
+          await fetchAndRenderCourses();
+        } finally {
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = "Save Course";
+          }
+        }
+      });
+    }
+  }
+
   async function initCourses() {
     const grid = document.getElementById("coursesGrid");
     if (!grid) return;
 
-    const template = document.getElementById("courseCardTemplate");
-    if (!template) return;
-
-    renderCatalogLists();
-
     const auth = getAuth();
     const isAdmin = Boolean(auth && auth.user && auth.user.role === "admin");
-    initCatalogAdminControls(isAdmin);
+    const sidebar = document.getElementById("adminCoursesSidebar");
+    const main = document.getElementById("coursesMain");
+    const addBtn = document.getElementById("addCourseButton");
+    const floatingAddBtn = document.getElementById("floatingAddCourseButton");
 
-    try {
-      const result = await api("/api/courses");
-      const courses = result.data || result.courses || [];
-
-      if (!courses.length) {
-        return;
+    if (sidebar) {
+      if (isAdmin) {
+        sidebar.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("hidden");
       }
-
-      grid.innerHTML = "";
-      courses.forEach(function (course, index) {
-        const card = template.cloneNode(true);
-        card.removeAttribute("id");
-        card.classList.remove("hidden");
-
-        const title = card.querySelector("[data-course-title]");
-        const desc = card.querySelector("[data-course-description]");
-        const progress = card.querySelector("[data-course-progress]");
-        const bar = card.querySelector("[data-course-progress-bar]");
-        const duration = card.querySelector("[data-course-duration]");
-        const instructor = card.querySelector("[data-course-instructor]");
-        const image = card.querySelector("[data-course-image]");
-        const avatar = card.querySelector("[data-course-avatar]");
-
-        const visual = COURSE_VISUALS[index % COURSE_VISUALS.length];
-        const randomProgress = Math.max(10, Math.min(98, Math.floor(Math.random() * 95)));
-
-        if (title) title.textContent = course.title || "Untitled Course";
-        if (desc) desc.textContent = course.description || "No description";
-        if (progress) progress.textContent = randomProgress + "%";
-        if (bar) bar.style.width = randomProgress + "%";
-        if (duration) duration.textContent = visual.duration;
-        if (instructor) instructor.textContent = visual.instructor;
-        if (image) image.src = visual.image;
-        if (avatar) avatar.src = visual.avatar;
-
-        grid.appendChild(card);
-      });
-    } catch (err) {
-      notify("Unable to load courses", "error");
-    }
-  }
-
-  function initCatalogAdminControls(isAdmin) {
-    const panel = document.getElementById("catalogAdminPanel");
-    const courseForm = document.getElementById("adminCourseForm");
-    const serviceForm = document.getElementById("adminServiceForm");
-
-    if (!panel || !courseForm || !serviceForm) return;
-    if (!isAdmin) {
-      panel.classList.add("hidden");
-      return;
     }
 
-    panel.classList.remove("hidden");
-
-    if (panel.dataset.bound === "true") {
-      return;
+    if (main) {
+      main.style.marginLeft = isAdmin ? "" : "0";
     }
-    panel.dataset.bound = "true";
 
-    courseForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const title = document.getElementById("adminCourseTitle").value.trim();
-      const instructor = document.getElementById("adminCourseInstructor").value.trim();
-      const duration = document.getElementById("adminCourseDuration").value.trim();
-      const price = Number(document.getElementById("adminCoursePrice").value || 0);
-      const description = document.getElementById("adminCourseDescription").value.trim();
-
-      if (!title || !instructor || !duration || !description) {
-        notify("Please fill all course fields", "error");
-        return;
+    if (addBtn) {
+      if (isAdmin) {
+        addBtn.classList.remove("hidden");
+        addBtn.classList.add("inline-flex");
+      } else {
+        addBtn.classList.add("hidden");
       }
+    }
 
-      try {
-        await api("/api/courses", {
-          method: "POST",
-          body: { title: title, description: description, price: price },
-        });
-
-        notify("Course added successfully", "success");
-        courseForm.reset();
-        initCourses();
-      } catch (err) {
-        notify(err.message || "Failed to add course", "error");
+    if (floatingAddBtn) {
+      if (isAdmin) {
+        floatingAddBtn.classList.remove("hidden");
+        floatingAddBtn.classList.add("flex");
+      } else {
+        floatingAddBtn.classList.add("hidden");
       }
-    });
+    }
 
-    serviceForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+    coursesState.isAdmin = isAdmin;
 
-      const type = document.getElementById("adminServiceType").value;
-      const name = document.getElementById("adminServiceName").value.trim();
-      if (!name) {
-        notify("Please enter item name", "error");
-        return;
-      }
+    const root = document.getElementById("coursesMain");
+    if (root && root.dataset.bound !== "true") {
+      bindCourseManagementEvents();
+      root.dataset.bound = "true";
+    }
 
-      const settings = getCatalogSettings();
-      const bucket = type === "services" ? "services" : "certifications";
-      settings[bucket].push(name);
-      setCatalogSettings(settings);
-      renderCatalogLists();
-      serviceForm.reset();
-      notify("Catalog list updated", "success");
-    });
+    await fetchAndRenderCourses();
   }
 
   async function initStudentDashboard() {
@@ -512,37 +907,65 @@
   }
 
   function initAdminDashboard() {
+    if (adminRefreshTimer) {
+      clearInterval(adminRefreshTimer);
+      adminRefreshTimer = null;
+    }
+
     if (PAGE !== "admin-dashboard") return;
+
+    const yearEl = document.getElementById("dashboardCurrentYear");
+    if (yearEl) {
+      yearEl.textContent = String(new Date().getFullYear());
+    }
 
     loadAdminData();
 
     const refreshMs = 30000;
-    setInterval(async function () {
+    adminRefreshTimer = setInterval(async function () {
       await loadAdminData();
       notify("Dashboard data auto-refreshed", "success");
     }, refreshMs);
   }
 
   function initRouteRedirects() {
-    const links = document.querySelectorAll("[data-route]");
-    links.forEach(function (a) {
-      a.addEventListener("click", function (e) {
-        e.preventDefault();
-        const to = a.getAttribute("data-route");
-        if (to) window.location.href = to;
-      });
+    if (document.body.dataset.routeBound === "true") return;
+    document.body.dataset.routeBound = "true";
+
+    document.addEventListener("click", function (e) {
+      const link = e.target.closest("[data-route]");
+      if (!link) return;
+
+      e.preventDefault();
+      const to = link.getAttribute("data-route");
+      if (!to) return;
+
+      const targetPage = getPageNameFromRoute(to);
+      if (SHELL_PAGES.indexOf(PAGE) !== -1 && SHELL_PAGES.indexOf(targetPage) !== -1) {
+        swapMainContent(to).catch(function () {
+          window.location.href = to;
+        });
+        return;
+      }
+
+      window.location.href = to;
     });
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function initializePageFeatures() {
     guardRoute();
     bindLogout();
     applyUserName();
-    initRouteRedirects();
+    updateShellNavState();
     initLogin();
     initRegister();
     initStudentDashboard();
     initAdminDashboard();
     initCourses();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    initRouteRedirects();
+    initializePageFeatures();
   });
 })();

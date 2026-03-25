@@ -2,7 +2,7 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Course Catalog - Shivam Computer Institute</title>
+<title>Courses Management - Shivam Computer Institute</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -33,34 +33,76 @@
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 .course-card-shadow { box-shadow: 0 8px 32px rgba(25, 28, 29, 0.04); }
 .course-card-shadow:hover { box-shadow: 0 12px 40px rgba(25, 28, 29, 0.08); }
-.check-chip { width: 20px; height: 20px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; color: #e53935; }
 </style>
 </head>
 <body class="bg-surface font-body text-on-surface" data-page="courses">
-<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-20 w-full">
+<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-20">
   <div class="flex items-center gap-8">
     <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline tracking-tight">Shivam Computer Institute</span>
   </div>
-  <div class="flex items-center gap-2">
-    <span class="text-sm font-semibold text-on-surface-variant">Hi, <span data-user-name>User</span></span>
-    <button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all" data-logout><span class="material-symbols-outlined">logout</span></button>
+  <div class="flex items-center gap-3">
+    <span class="text-sm font-semibold text-on-surface-variant">Admin: <span data-user-name>Admin</span></span>
+    <button class="p-1 border-2 border-primary rounded-full"><img alt="Admin" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeK0B2shUNAnFZfZ5nJk5wl5kez394IrOZnS-rp6sscJdv6dwmZ8OYsrzRRxvJd8LZQlpIqBV8deso7UmVk1Bg25C_cSjKJB6VneL9LVOZRb-R_8BKVg1qi_Y5Mych_B1GhR57avoI32Vi-tYwA3vSy6katM1EPeqLZyBC4KqhN_odlFpJ8oCdt4klY_VceYmYx0hjzNqjuvTaC66Gm1PHf0GMMgUFELeAs0RQXT0W2CUAbnVhgG21lfXFy1NwENIElYvUloL1Ju0Z"/></button>
   </div>
 </nav>
 
-<main class="pt-28 pb-24 px-6 lg:px-12 min-h-screen">
+<aside id="adminCoursesSidebar" class="hidden fixed top-20 left-0 w-64 h-[calc(100vh-5rem)] bg-slate-50 border-r border-slate-200 p-4 md:flex md:flex-col">
+  <div class="mb-8 px-2">
+    <p class="text-lg font-bold text-slate-900 font-headline">Academic Atelier</p>
+    <p class="text-xs text-on-surface-variant font-medium">Premium Learning</p>
+  </div>
+  <nav class="space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="./admin-dashboard.html" data-route="./admin-dashboard.html">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+      Dashboard
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold text-sm" href="./courses.html" data-route="./courses.html">
+      <span class="material-symbols-outlined">school</span>
+      Courses Management
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold text-sm" href="#">
+      <span class="material-symbols-outlined">settings</span>
+      Settings
+    </a>
+  </nav>
+  <div class="mt-auto pt-6 border-t border-slate-200 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#"><span class="material-symbols-outlined">help</span>Help Center</a>
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-logout><span class="material-symbols-outlined">logout</span>Logout</a>
+  </div>
+</aside>
+
+<main id="coursesMain" class="pt-28 pb-24 px-6 lg:px-12 min-h-screen md:ml-64">
   <header class="mb-12">
-    <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-primary tracking-tight mb-4">Course Catalog</h1>
-    <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">Refine your digital craftsmanship with our specialized curriculum.</p>
+    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-primary tracking-tight mb-3">Courses Management</h1>
+        <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">Admin can create, update, and remove courses. Students can only view, track progress, and continue learning.</p>
+      </div>
+      <button id="addCourseButton" class="hidden items-center gap-2 bg-amber-400 text-blue-900 font-bold px-5 py-3 rounded-xl shadow hover:scale-[1.02] transition-all">
+        <span class="material-symbols-outlined text-lg">add</span>
+        Add Course
+      </button>
+    </div>
   </header>
 
-  <section class="mb-12 bg-[#16244b] text-white rounded-xl p-6 md:p-8">
-    <h2 class="text-3xl font-headline font-extrabold text-[#ffb955] uppercase">Certification Course</h2>
-    <ul id="certificationList" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-2xl font-semibold">
-    </ul>
-
-    <h3 class="mt-10 text-3xl font-headline font-extrabold text-[#ffb955] uppercase">Others Services</h3>
-    <ul id="servicesList" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-2xl font-semibold">
-    </ul>
+  <section class="mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <label class="block md:col-span-2">
+        <span class="sr-only">Search Courses</span>
+        <input id="courseSearchInput" type="text" placeholder="Search by title, description, or instructor" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-300" />
+      </label>
+      <label class="block">
+        <span class="sr-only">Filter by Duration</span>
+        <select id="courseDurationFilter" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-300">
+          <option value="">All Durations</option>
+          <option value="1 Month">1 Month</option>
+          <option value="2 Months">2 Months</option>
+          <option value="3 Months">3 Months</option>
+          <option value="6 Months">6 Months</option>
+          <option value="12 Months">12 Months</option>
+        </select>
+      </label>
+    </div>
   </section>
 
   <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -69,6 +111,14 @@
         <img data-course-image alt="Course" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"/>
         <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-primary flex items-center gap-1 uppercase tracking-wider">
           <span class="material-symbols-outlined text-xs">schedule</span> <span data-course-duration>3 Months</span>
+        </div>
+        <div data-admin-card-controls class="hidden absolute left-4 top-4 gap-2">
+          <button data-edit-course class="h-9 w-9 rounded-full bg-white/90 text-blue-900 shadow flex items-center justify-center hover:bg-white" title="Edit Course">
+            <span class="material-symbols-outlined text-[18px]">edit</span>
+          </button>
+          <button data-delete-course class="h-9 w-9 rounded-full bg-white/90 text-red-600 shadow flex items-center justify-center hover:bg-white" title="Delete Course">
+            <span class="material-symbols-outlined text-[18px]">delete</span>
+          </button>
         </div>
       </div>
       <div class="p-6 flex flex-col flex-1">
@@ -86,43 +136,86 @@
           <div class="h-1.5 w-full bg-secondary-container rounded-full mb-4">
             <div data-course-progress-bar class="h-full bg-gradient-to-r from-tertiary-fixed-dim to-on-tertiary-container rounded-full" style="width: 0%"></div>
           </div>
-          <button class="w-full bg-gradient-to-br from-primary to-primary-container text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">Continue <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+          <button data-course-continue class="w-full bg-gradient-to-br from-primary to-primary-container text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">Continue <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+          <p data-course-created-at class="mt-3 text-[11px] text-slate-500 font-medium">Created: --</p>
         </div>
       </div>
     </div>
   </div>
 
-  <section id="catalogAdminPanel" class="hidden mt-14 bg-white rounded-xl border border-slate-200 p-6 lg:p-8">
-    <h2 class="text-2xl font-extrabold text-primary font-headline">Catalog Manager (Admin)</h2>
-    <p class="text-sm text-on-surface-variant mt-1">Add new courses and manage certification/services list shown above.</p>
+  <div id="coursesSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+    <div class="bg-white rounded-xl p-4 animate-pulse h-72"></div>
+    <div class="bg-white rounded-xl p-4 animate-pulse h-72"></div>
+    <div class="bg-white rounded-xl p-4 animate-pulse h-72"></div>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-      <form id="adminCourseForm" class="space-y-3">
-        <h3 class="text-lg font-bold text-primary">Add Course</h3>
-        <input id="adminCourseTitle" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Course title" required />
-        <input id="adminCourseInstructor" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Instructor name" required />
-        <input id="adminCourseDuration" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Duration (e.g., 6 Months)" required />
-        <input id="adminCoursePrice" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="number" min="0" placeholder="Price" required />
-        <textarea id="adminCourseDescription" class="w-full border border-slate-300 rounded-lg px-3 py-2" rows="3" placeholder="Course description" required></textarea>
-        <button class="bg-primary text-white px-4 py-2 rounded-lg font-semibold" type="submit">Add Course</button>
-      </form>
+  <p id="coursesEmptyState" class="hidden mt-8 text-center text-slate-500 font-medium">No courses found for this filter.</p>
 
-      <form id="adminServiceForm" class="space-y-3">
-        <h3 class="text-lg font-bold text-primary">Add Certification / Service</h3>
-        <select id="adminServiceType" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-          <option value="certifications">Certification Course</option>
-          <option value="services">Other Services</option>
-        </select>
-        <input id="adminServiceName" class="w-full border border-slate-300 rounded-lg px-3 py-2" type="text" placeholder="Item name" required />
-        <button class="bg-primary text-white px-4 py-2 rounded-lg font-semibold" type="submit">Add Item</button>
-      </form>
-    </div>
-  </section>
+  <div id="coursesPagination" class="mt-10 flex items-center justify-between gap-4">
+    <button id="coursesPrevPage" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 disabled:opacity-40" disabled>Previous</button>
+    <p id="coursesPageInfo" class="text-sm text-slate-600 font-semibold">Page 1</p>
+    <button id="coursesNextPage" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 disabled:opacity-40" disabled>Next</button>
+  </div>
+
 </main>
+
+<button id="floatingAddCourseButton" class="hidden fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-amber-400 text-blue-900 w-14 h-14 rounded-full shadow-lg items-center justify-center hover:scale-110 transition-all active:scale-95 z-40">
+  <span class="material-symbols-outlined font-bold">add</span>
+</button>
+
+<div id="courseModal" class="hidden fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm px-4">
+  <div class="max-w-2xl mx-auto mt-10 md:mt-16 bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <h2 id="courseModalTitle" class="text-xl font-bold text-slate-900 font-headline">Add Course</h2>
+      <button id="closeCourseModal" class="h-10 w-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="courseModalForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input id="courseIdInput" type="hidden" />
+      <label class="block md:col-span-2">
+        <span class="text-sm font-semibold text-slate-700">Course Title</span>
+        <input id="courseTitleInput" type="text" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
+      </label>
+      <label class="block md:col-span-2">
+        <span class="text-sm font-semibold text-slate-700">Description</span>
+        <textarea id="courseDescriptionInput" rows="3" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required></textarea>
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-700">Instructor Name</span>
+        <input id="courseInstructorInput" type="text" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-700">Duration</span>
+        <input id="courseDurationInput" type="text" placeholder="e.g., 3 Months" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" required />
+      </label>
+      <label class="block md:col-span-2">
+        <span class="text-sm font-semibold text-slate-700">Thumbnail URL</span>
+        <input id="courseImageUrlInput" type="url" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" placeholder="https://..." />
+      </label>
+      <label class="block md:col-span-2">
+        <span class="text-sm font-semibold text-slate-700">Or Upload Thumbnail</span>
+        <input id="courseImageFileInput" type="file" accept="image/*" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" />
+      </label>
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-700">Progress (%)</span>
+        <input id="courseProgressInput" type="number" min="0" max="100" value="0" class="mt-1 w-full border border-slate-200 rounded-xl px-4 py-3 text-sm" />
+      </label>
+      <div class="block">
+        <span class="text-sm font-semibold text-slate-700">Preview</span>
+        <img id="courseImagePreview" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=80" alt="Preview" class="mt-1 h-24 w-full object-cover rounded-xl border border-slate-200" />
+      </div>
+      <div class="md:col-span-2 flex items-center justify-end gap-3 pt-2">
+        <button type="button" id="cancelCourseModal" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700">Cancel</button>
+        <button type="submit" id="saveCourseButton" class="px-5 py-2.5 rounded-lg bg-blue-900 text-white text-sm font-semibold">Save Course</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <nav class="fixed bottom-0 w-full rounded-t-3xl md:hidden bg-white/80 backdrop-blur-xl flex justify-around items-center h-20 px-4 pb-safe z-50 border-t border-slate-100">
   <a class="flex flex-col items-center justify-center text-slate-400" href="./student-dashboard.html" data-route="./student-dashboard.html"><span class="material-symbols-outlined">home</span><span class="text-[10px] font-manrope font-medium">Home</span></a>
-  <a class="flex flex-col items-center justify-center bg-amber-100 text-blue-900 rounded-2xl px-5 py-2 scale-110 transition-transform" href="#"><span class="material-symbols-outlined">local_library</span><span class="text-[10px] font-manrope font-medium">Courses</span></a>
+  <a class="flex flex-col items-center justify-center bg-amber-100 text-blue-900 rounded-2xl px-5 py-2 scale-110 transition-transform" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">local_library</span><span class="text-[10px] font-manrope font-medium">Courses</span></a>
   <a class="flex flex-col items-center justify-center text-slate-400" href="#" data-logout><span class="material-symbols-outlined">logout</span><span class="text-[10px] font-manrope font-medium">Logout</span></a>
 </nav>
 <script src="./js/app.js"></script>
