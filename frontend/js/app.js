@@ -422,6 +422,149 @@
     });
   }
 
+  function getHelpRole() {
+    const auth = getAuth();
+    if (auth && auth.user && auth.user.role === "admin") return "admin";
+    return "student";
+  }
+
+  function getHelpDrawerContent(role) {
+    if (role === "admin") {
+      return (
+        '<section class="space-y-4">' +
+        '<h3 class="text-base font-extrabold text-primary">Admin Guide</h3>' +
+        '<div class="space-y-3 text-sm text-on-surface-variant leading-6">' +
+        '<div><p class="font-semibold text-on-surface">Dashboard</p><ul class="list-disc ml-5"><li>View analytics and user statistics</li></ul></div>' +
+        '<div><p class="font-semibold text-on-surface">Courses Management</p><ul class="list-disc ml-5"><li>Add new courses</li><li>Edit or delete existing courses</li></ul></div>' +
+        '<div><p class="font-semibold text-on-surface">Attendance</p><ul class="list-disc ml-5"><li>View and manage student attendance records</li></ul></div>' +
+        '<div><p class="font-semibold text-on-surface">Services Management</p><ul class="list-disc ml-5"><li>Manage institute services (Printout, Photocopy, etc.)</li></ul></div>' +
+        '<div><p class="font-semibold text-on-surface">Contact Requests</p><ul class="list-disc ml-5"><li>View and respond to student/public enquiries</li></ul></div>' +
+        '</div>' +
+        '</section>' +
+        '<section class="mt-6 space-y-3">' +
+        '<h3 class="text-base font-extrabold text-primary">How To Use The System</h3>' +
+        '<ul class="list-disc ml-5 text-sm text-on-surface-variant leading-6">' +
+        '<li>Login to your account</li>' +
+        '<li>Navigate using sidebar menu</li>' +
+        '<li>Click any section to open features</li>' +
+        '<li>Use buttons like Add, Edit, Continue</li>' +
+        '<li>Submit forms where required</li>' +
+        '</ul>' +
+        '</section>'
+      );
+    }
+
+    return (
+      '<section class="space-y-4">' +
+      '<h3 class="text-base font-extrabold text-primary">Student Guide</h3>' +
+      '<div class="space-y-3 text-sm text-on-surface-variant leading-6">' +
+      '<div><p class="font-semibold text-on-surface">Dashboard</p><ul class="list-disc ml-5"><li>View your progress and updates</li></ul></div>' +
+      '<div><p class="font-semibold text-on-surface">My Courses</p><ul class="list-disc ml-5"><li>Access enrolled courses</li></ul></div>' +
+      '<div><p class="font-semibold text-on-surface">Attendance</p><ul class="list-disc ml-5"><li>Check your attendance records</li></ul></div>' +
+      '<div><p class="font-semibold text-on-surface">Services</p><ul class="list-disc ml-5"><li>Request services like printout, photocopy, etc.</li></ul></div>' +
+      '</div>' +
+      '</section>' +
+      '<section class="mt-6 space-y-3">' +
+      '<h3 class="text-base font-extrabold text-primary">How To Use The System</h3>' +
+      '<ul class="list-disc ml-5 text-sm text-on-surface-variant leading-6">' +
+      '<li>Login to your account</li>' +
+      '<li>Navigate using sidebar menu</li>' +
+      '<li>Click any section to open features</li>' +
+      '<li>Use buttons like Continue and Save</li>' +
+      '<li>Submit forms where required</li>' +
+      '</ul>' +
+      '</section>'
+    );
+  }
+
+  function ensureHelpDrawer() {
+    let root = document.getElementById("helpDrawerRoot");
+    if (root) return root;
+
+    root = document.createElement("div");
+    root.id = "helpDrawerRoot";
+    root.className = "fixed inset-0 z-[120] hidden";
+    root.innerHTML =
+      '<div id="helpDrawerBackdrop" class="absolute inset-0 bg-slate-900/35 opacity-0 transition-opacity duration-300"></div>' +
+      '<aside id="helpDrawerPanel" class="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl border-l border-slate-200 translate-x-full transition-transform duration-300 flex flex-col">' +
+      '<div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">' +
+      '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">help</span><h2 class="text-lg font-extrabold text-primary">Help Center</h2></div>' +
+      '<button type="button" data-help-close class="h-10 w-10 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center"><span class="material-symbols-outlined">close</span></button>' +
+      '</div>' +
+      '<div id="helpDrawerBody" class="p-6 overflow-y-auto"></div>' +
+      '</aside>';
+
+    document.body.appendChild(root);
+
+    const backdrop = root.querySelector("#helpDrawerBackdrop");
+    const closeBtn = root.querySelector("[data-help-close]");
+    if (backdrop) {
+      backdrop.addEventListener("click", function () {
+        closeHelpDrawer();
+      });
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        closeHelpDrawer();
+      });
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeHelpDrawer();
+    });
+
+    return root;
+  }
+
+  function openHelpDrawer() {
+    const root = ensureHelpDrawer();
+    const body = root.querySelector("#helpDrawerBody");
+    const panel = root.querySelector("#helpDrawerPanel");
+    const backdrop = root.querySelector("#helpDrawerBackdrop");
+
+    if (!body || !panel || !backdrop) return;
+
+    body.innerHTML = getHelpDrawerContent(getHelpRole());
+    root.classList.remove("hidden");
+
+    requestAnimationFrame(function () {
+      backdrop.classList.remove("opacity-0");
+      backdrop.classList.add("opacity-100");
+      panel.classList.remove("translate-x-full");
+      panel.classList.add("translate-x-0");
+    });
+  }
+
+  function closeHelpDrawer() {
+    const root = document.getElementById("helpDrawerRoot");
+    if (!root || root.classList.contains("hidden")) return;
+
+    const panel = root.querySelector("#helpDrawerPanel");
+    const backdrop = root.querySelector("#helpDrawerBackdrop");
+    if (!panel || !backdrop) return;
+
+    backdrop.classList.remove("opacity-100");
+    backdrop.classList.add("opacity-0");
+    panel.classList.remove("translate-x-0");
+    panel.classList.add("translate-x-full");
+
+    setTimeout(function () {
+      root.classList.add("hidden");
+    }, 300);
+  }
+
+  function initHelpCenter() {
+    const triggers = document.querySelectorAll("[data-help-open]");
+    triggers.forEach(function (el) {
+      if (el.dataset.helpBound === "true") return;
+      el.dataset.helpBound = "true";
+      el.addEventListener("click", function (e) {
+        e.preventDefault();
+        openHelpDrawer();
+      });
+    });
+  }
+
   function applyUserName() {
     const auth = getAuth();
     if (!auth || !auth.user) return;
@@ -1725,6 +1868,7 @@
   function initializePageFeatures() {
     guardRoute();
     bindLogout();
+    initHelpCenter();
     applyUserName();
     updateShellNavState();
     initLogin();
