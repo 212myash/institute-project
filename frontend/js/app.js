@@ -581,6 +581,13 @@
     });
   }
 
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  }
+
   function initLogin() {
     const form = document.getElementById("loginForm");
     if (!form) return;
@@ -1346,12 +1353,9 @@
     if (PAGE !== "student-dashboard") return;
 
     try {
-      const auth = getAuth();
-      if (auth && auth.user && auth.user.name) {
-        const welcome = document.getElementById("welcomeName");
-        if (welcome) {
-          welcome.textContent = auth.user.name;
-        }
+      const yearEl = document.getElementById("studentDashboardCurrentYear");
+      if (yearEl) {
+        yearEl.textContent = String(new Date().getFullYear());
       }
 
       const result = await api("/api/courses");
@@ -1830,6 +1834,17 @@
     const yearEl = document.getElementById("dashboardCurrentYear");
     if (yearEl) {
       yearEl.textContent = String(new Date().getFullYear());
+    }
+
+    const auth = getAuth();
+    const adminName = String((auth && auth.user && auth.user.name) || "Admin");
+    const welcomeTitle = document.getElementById("adminWelcomeTitle");
+    const greetingLine = document.getElementById("adminGreetingLine");
+    if (welcomeTitle) {
+      welcomeTitle.textContent = "Welcome, " + adminName + "!";
+    }
+    if (greetingLine) {
+      greetingLine.textContent = getGreeting();
     }
 
     loadAdminData();
