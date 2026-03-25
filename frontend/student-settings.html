@@ -61,6 +61,10 @@ h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
     <p class="text-xs text-on-surface-variant mb-4">Locked fields: Full Name, Father Name, Date of Birth, Phone Number.</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="md:col-span-2">
+        <p class="text-sm font-semibold text-on-surface-variant mb-2">Student Profile Photo</p>
+        <img id="settings_photo" alt="Student profile photo" class="w-32 h-32 rounded-xl border border-slate-200 object-cover bg-slate-100" />
+      </div>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Full Name</span>
         <input id="settings_full_name" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
@@ -79,15 +83,37 @@ h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
       </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Marital Status</span>
-        <input id="settings_marital_status" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+        <select id="settings_marital_status" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm">
+          <option value="">Select Marital Status</option>
+          <option value="Single">Single</option>
+          <option value="Married">Married</option>
+          <option value="Divorced">Divorced</option>
+          <option value="Widowed">Widowed</option>
+        </select>
       </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Nationality</span>
-        <input id="settings_nationality" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+        <select id="settings_nationality" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm">
+          <option value="">Select Nationality</option>
+          <option value="Indian">Indian</option>
+          <option value="Nepali">Nepali</option>
+          <option value="Bhutanese">Bhutanese</option>
+          <option value="Bangladeshi">Bangladeshi</option>
+          <option value="Other">Other</option>
+        </select>
       </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Religion</span>
-        <input id="settings_religion" type="text" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+        <select id="settings_religion" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm">
+          <option value="">Select Religion</option>
+          <option value="Hindu">Hindu</option>
+          <option value="Muslim">Muslim</option>
+          <option value="Sikh">Sikh</option>
+          <option value="Christian">Christian</option>
+          <option value="Buddhist">Buddhist</option>
+          <option value="Jain">Jain</option>
+          <option value="Other">Other</option>
+        </select>
       </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Phone Number</span>
@@ -131,15 +157,18 @@ h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
       </label>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-      <div>
-        <p class="text-sm font-semibold text-on-surface-variant mb-2">Photo</p>
-        <img id="settings_photo" alt="Student photo" class="w-40 h-40 rounded-xl border border-slate-200 object-cover bg-slate-100" />
-      </div>
-      <div>
-        <p class="text-sm font-semibold text-on-surface-variant mb-2">Signature</p>
-        <img id="settings_signature" alt="Student signature" class="w-40 h-24 rounded-xl border border-slate-200 object-contain bg-slate-100" />
-      </div>
+    <div class="mt-8">
+      <p class="text-sm font-semibold text-on-surface-variant mb-2">Signature</p>
+      <img id="settings_signature" alt="Student signature" class="w-56 h-28 rounded-xl border border-slate-200 object-contain bg-slate-100" />
+    </div>
+
+    <label class="mt-6 flex items-start gap-2 text-sm text-on-surface-variant">
+      <input id="settings_terms" type="checkbox" class="mt-1 rounded border-slate-300" />
+      <span>I confirm that the information provided by me is correct. If any information is found incorrect, institute can take action.</span>
+    </label>
+
+    <div class="mt-6 flex justify-end">
+      <button id="settingsSaveBtn" type="button" class="px-5 py-3 rounded-xl bg-primary text-white font-semibold">Save Changes</button>
     </div>
   </section>
 </main>

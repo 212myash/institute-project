@@ -1187,9 +1187,7 @@
       el.value = value == null ? "" : String(value);
     }
 
-    try {
-      const result = await api("/api/student/profile");
-      const profile = (result && result.data) || {};
+    function applyProfile(profile) {
       const education = profile.education || {};
 
       setField("settings_full_name", profile.full_name);
@@ -1214,6 +1212,58 @@
       const signature = document.getElementById("settings_signature");
       if (photo) photo.src = profile.photo_url || "";
       if (signature) signature.src = profile.signature_url || "";
+    }
+
+    try {
+      const result = await api("/api/student/profile");
+      const profile = (result && result.data) || {};
+      applyProfile(profile);
+
+      const saveBtn = document.getElementById("settingsSaveBtn");
+      const terms = document.getElementById("settings_terms");
+      if (saveBtn && saveBtn.dataset.bound !== "true") {
+        saveBtn.dataset.bound = "true";
+        saveBtn.addEventListener("click", async function () {
+          if (terms && !terms.checked) {
+            notify("Please accept terms before saving", "error");
+            return;
+          }
+
+          const payload = {
+            gender: (document.getElementById("settings_gender")?.value || "").trim(),
+            marital_status: (document.getElementById("settings_marital_status")?.value || "").trim(),
+            nationality: (document.getElementById("settings_nationality")?.value || "").trim(),
+            religion: (document.getElementById("settings_religion")?.value || "").trim(),
+            email: (document.getElementById("settings_email")?.value || "").trim(),
+            address: (document.getElementById("settings_address")?.value || "").trim(),
+            education: {
+              exam_passed: (document.getElementById("settings_exam_passed")?.value || "").trim(),
+              board_university: (document.getElementById("settings_board_university")?.value || "").trim(),
+              passing_year: (document.getElementById("settings_passing_year")?.value || "").trim(),
+              marks: (document.getElementById("settings_marks")?.value || "").trim(),
+              percentage: (document.getElementById("settings_percentage")?.value || "").trim(),
+            },
+            course_selected: (document.getElementById("settings_course_selected")?.value || "").trim(),
+          };
+
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Saving...";
+          try {
+            const updated = await api("/api/student/profile", {
+              method: "PUT",
+              body: payload,
+            });
+
+            applyProfile((updated && updated.data) || {});
+            notify("Settings saved successfully", "success");
+          } catch (saveErr) {
+            notify(saveErr.message || "Unable to save settings", "error");
+          } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = "Save Changes";
+          }
+        });
+      }
     } catch (err) {
       notify(err.message || "Unable to load student details", "error");
     }

@@ -186,4 +186,59 @@ router.post('/profile', requireRole('student'), uploadStudentFiles, async (req, 
   }
 });
 
+router.put('/profile', requireRole('student'), async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const profile = await StudentProfile.findOne({ user: userId });
+
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Profile not found' });
+    }
+
+    const body = req.body || {};
+    const editable = {
+      gender: String(body.gender ?? profile.gender).trim(),
+      marital_status: String(body.marital_status ?? profile.marital_status).trim(),
+      nationality: String(body.nationality ?? profile.nationality).trim(),
+      religion: String(body.religion ?? profile.religion).trim(),
+      address: String(body.address ?? profile.address).trim(),
+      email: String(body.email ?? profile.email).trim().toLowerCase(),
+      course_selected: String(body.course_selected ?? profile.course_selected).trim(),
+      education: {
+        exam_passed: String((body.education && body.education.exam_passed) ?? profile.education.exam_passed).trim(),
+        board_university: String((body.education && body.education.board_university) ?? profile.education.board_university).trim(),
+        passing_year: String((body.education && body.education.passing_year) ?? profile.education.passing_year).trim(),
+        marks: String((body.education && body.education.marks) ?? profile.education.marks).trim(),
+        percentage: String((body.education && body.education.percentage) ?? profile.education.percentage).trim(),
+      },
+    };
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editable.email)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email' });
+    }
+
+    profile.gender = editable.gender;
+    profile.marital_status = editable.marital_status;
+    profile.nationality = editable.nationality;
+    profile.religion = editable.religion;
+    profile.address = editable.address;
+    profile.email = editable.email;
+    profile.course_selected = editable.course_selected;
+    profile.education = editable.education;
+
+    await profile.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: profile,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Unable to update profile',
+    });
+  }
+});
+
 module.exports = router;
