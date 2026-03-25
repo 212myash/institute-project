@@ -245,7 +245,6 @@
     }
 
     if (user.role === "admin") {
-      window.location.href = "./admin-dashboard.html";
       return;
     }
 
@@ -1248,26 +1247,94 @@
       return;
     }
 
-    const sorted = users
+    const allSorted = users
       .slice()
       .sort(function (a, b) {
         return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-      })
-      .slice(-6);
-
-    const total = sorted.length;
-    const points = sorted
-      .map(function (u, idx) {
-        const x = total === 1 ? 50 : 8 + (idx * 84) / (total - 1);
-        const y = 34 - (idx * 22) / Math.max(1, total - 1);
-        return { x: x, y: y, name: (u && u.name) || "Unknown", date: formatShortDate(u && u.createdAt) };
       });
 
-    const pointsAttr = points
-      .map(function (p) {
-        return p.x.toFixed(2) + "," + p.y.toFixed(2);
+    const now = new Date();
+    let month = now.getMonth();
+    let year = now.getFullYear();
+
+    let monthItems = allSorted.filter(function (u) {
+      const d = new Date(u.createdAt || 0);
+      return d.getFullYear() === year && d.getMonth() === month;
+    });
+
+    // Fallback to latest month with data if current month has no accounts.
+    if (!monthItems.length && allSorted.length) {
+      const latest = new Date(allSorted[allSorted.length - 1].createdAt || 0);
+      month = latest.getMonth();
+      year = latest.getFullYear();
+      monthItems = allSorted.filter(function (u) {
+        const d = new Date(u.createdAt || 0);
+        return d.getFullYear() === year && d.getMonth() === month;
+      });
+    }
+
+    if (!monthItems.length) {
+      graph.innerHTML = '<p class="text-xs text-slate-500">No account creation data available for this month.</p>';
+      return;
+    }
+
+    const roleColor = function (role) {
+      return String(role || "").toLowerCase() === "admin" ? "#16a34a" : "#dc2626";
+    };
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const points = monthItems.map(function (u) {
+      const d = new Date(u.createdAt || 0);
+      const day = d.getDate();
+      const x = 6 + ((day - 1) / Math.max(1, daysInMonth - 1)) * 88;
+      const isAdmin = String(u.role || "").toLowerCase() === "admin";
+      const y = isAdmin ? 13 : 31;
+      const color = roleColor(u.role);
+
+      return {
+        x: x,
+        y: y,
+        day: day,
+        name: (u && u.name) || "Unknown",
+        date: formatShortDate(u && u.createdAt),
+        color: color,
+        role: isAdmin ? "Admin" : "Student",
+      };
+    });
+
+    const segments = points
+      .slice(0, -1)
+      .map(function (start, idx) {
+        const end = points[idx + 1];
+        const midX = (start.x + end.x) / 2;
+        const midY = (start.y + end.y) / 2;
+
+        return (
+          '<line x1="' +
+          start.x.toFixed(2) +
+          '" y1="' +
+          start.y.toFixed(2) +
+          '" x2="' +
+          midX.toFixed(2) +
+          '" y2="' +
+          midY.toFixed(2) +
+          '" stroke="' +
+          start.color +
+          '" stroke-width="1.5" stroke-linecap="round" />' +
+          '<line x1="' +
+          midX.toFixed(2) +
+          '" y1="' +
+          midY.toFixed(2) +
+          '" x2="' +
+          end.x.toFixed(2) +
+          '" y2="' +
+          end.y.toFixed(2) +
+          '" stroke="' +
+          end.color +
+          '" stroke-width="1.5" stroke-linecap="round" />'
+        );
       })
-      .join(" ");
+      .join("");
 
     const dots = points
       .map(function (p) {
@@ -1276,10 +1343,17 @@
           p.x.toFixed(2) +
           '" cy="' +
           p.y.toFixed(2) +
-          '" r="1.7" fill="#0f172a" />'
+          '" r="2.1" fill="' +
+          p.color +
+          '" />'
         );
       })
       .join("");
+
+    const monthLabel = new Date(year, month, 1).toLocaleDateString("en-IN", {
+      month: "short",
+      year: "numeric",
+    });
 
     const labels = points
       .map(function (p) {
@@ -1287,7 +1361,9 @@
           '<div class="flex items-center justify-between text-[11px] text-slate-600">' +
           '<span class="font-semibold truncate pr-2">' +
           p.name +
-          "</span>" +
+          ' (' +
+          p.role +
+          ")</span>" +
           "<span>" +
           p.date +
           "</span>" +
@@ -1297,11 +1373,18 @@
       .join("");
 
     graph.innerHTML =
-      '<svg viewBox="0 0 100 40" class="w-full h-20" preserveAspectRatio="none" aria-label="User account creation line graph">' +
-      '<line x1="8" y1="34" x2="92" y2="34" stroke="#e2e8f0" stroke-width="0.8" />' +
-      '<polyline fill="none" stroke="#0f172a" stroke-width="1.2" points="' +
-      pointsAttr +
-      '" />' +
+      '<div class="flex items-center justify-between text-[11px] text-slate-600 mb-2">' +
+      '<span class="font-semibold">One Month Timeline: ' +
+      monthLabel +
+      '</span>' +
+      '<span class="flex items-center gap-3">' +
+      '<span class="inline-flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-green-600"></span>Admin</span>' +
+      '<span class="inline-flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600"></span>Student</span>' +
+      "</span>" +
+      "</div>" +
+      '<svg viewBox="0 0 100 40" class="w-full h-24" preserveAspectRatio="none" aria-label="Monthly account creation line graph">' +
+      '<line x1="6" y1="36" x2="94" y2="36" stroke="#e2e8f0" stroke-width="0.8" />' +
+      segments +
       dots +
       "</svg>" +
       '<div class="space-y-1 mt-1">' +
