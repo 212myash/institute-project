@@ -3,7 +3,7 @@
   const API_BASE_STORAGE_KEY = "sci_api_base";
   const AUTH_KEY = "sci_auth";
   const CATALOG_KEY = "sci_catalog_settings";
-  const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance"];
+  const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance", "student-settings"];
 
   const DEFAULT_CATALOG = {
     certifications: [
@@ -332,6 +332,7 @@
       "admin-dashboard",
       "courses",
       "attendance",
+      "student-settings",
     ];
 
     if (protectedPages.indexOf(PAGE) !== -1 && (!auth || !auth.token || !auth.user)) {
@@ -347,7 +348,7 @@
     if (!auth || !auth.user) return;
 
     const user = auth.user;
-    const studentLockedPages = ["student-dashboard", "courses", "attendance"];
+    const studentLockedPages = ["student-dashboard", "courses", "attendance", "student-settings"];
 
     if (user.role === "student" && !user.isProfileCompleted && studentLockedPages.indexOf(PAGE) !== -1) {
       window.location.href = "./student-form.html";
@@ -1132,6 +1133,9 @@
           "</td>" +
           '<td class="py-3 px-4 text-sm">' +
           (u.email || "-") +
+          "</td>" +
+          '<td class="py-3 px-4 text-sm">' +
+          (u.mobile || "-") +
           "</td>" +
           '<td class="py-3 px-4 text-sm uppercase font-semibold">' +
           (u.role || "student") +
