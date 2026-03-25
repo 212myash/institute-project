@@ -4,7 +4,16 @@
   const AUTH_KEY = "sci_auth";
   const CATALOG_KEY = "sci_catalog_settings";
   const PROFILE_GENDER_KEY = "sci_profile_gender";
-  const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance", "student-settings"];
+  const SERVICE_DETAIL_PAGES = ["printout", "photocopy", "lamination", "form-apply"];
+  const SHELL_PAGES = [
+    "student-dashboard",
+    "admin-dashboard",
+    "courses",
+    "attendance",
+    "student-settings",
+    "services",
+    ...SERVICE_DETAIL_PAGES,
+  ];
   const AVATAR_BY_GENDER = {
     male: "https://img.icons8.com/color/96/administrator-male.png",
     female: "https://img.icons8.com/color/96/businesswoman.png",
@@ -297,7 +306,7 @@
     const navLinks = document.querySelectorAll("[data-route]");
     navLinks.forEach(function (link) {
       const target = getPageNameFromRoute(link.getAttribute("data-route") || "");
-      const active = target === PAGE;
+      const active = target === PAGE || (target === "services" && SERVICE_DETAIL_PAGES.indexOf(PAGE) !== -1);
       const isMobile = link.classList.contains("flex-col");
 
       if (isMobile) {
@@ -360,6 +369,8 @@
       "admin-dashboard",
       "courses",
       "attendance",
+      "services",
+      ...SERVICE_DETAIL_PAGES,
       "student-settings",
     ];
 
@@ -368,7 +379,12 @@
       return;
     }
 
-    if (PAGE === "admin-dashboard" && auth && auth.user && auth.user.role !== "admin") {
+    if (
+      (PAGE === "admin-dashboard" || PAGE === "services" || SERVICE_DETAIL_PAGES.indexOf(PAGE) !== -1) &&
+      auth &&
+      auth.user &&
+      auth.user.role !== "admin"
+    ) {
       window.location.href = "./student-dashboard.html";
       return;
     }

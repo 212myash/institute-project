@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Services Management - Shivam Computer Institute</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#08152e",
+          "primary-container": "#1e2a44",
+          "background": "#f8f9fa",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f3f4f5",
+          "on-surface-variant": "#45464d",
+          "tertiary-fixed-dim": "#ffb955",
+          "on-tertiary-container": "#c78300"
+        },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+        borderRadius: { xl: "1.5rem", full: "9999px" }
+      }
+    }
+  }
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background font-body text-on-background antialiased" data-page="services">
+<header class="fixed top-0 w-full z-30 flex justify-between items-center px-6 h-20 bg-white/70 backdrop-blur-md shadow-sm md:pl-72">
+  <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700 font-headline">Shivam Computer Institute</span>
+  <div class="flex items-center gap-3">
+    <span class="text-sm font-semibold text-on-surface-variant">Admin: <span data-user-name>Admin</span></span>
+    <button class="p-1 border-2 border-primary rounded-full"><img data-user-avatar alt="Admin" class="w-8 h-8 rounded-full object-cover" src="https://img.icons8.com/color/96/user.png"/></button>
+  </div>
+</header>
+
+<aside class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 py-8 px-4 space-y-2 z-40">
+  <div class="px-4 mb-8">
+    <h2 class="text-lg font-bold text-slate-900 font-headline">Academic Atelier</h2>
+    <p class="text-xs text-on-surface-variant font-medium">Premium Learning</p>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./admin-dashboard.html" data-route="./admin-dashboard.html"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">school</span>Courses Management</a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined">calendar_month</span>Attendance</a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="./services.html" data-route="./services.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">build</span>Services Management</a>
+  </nav>
+  <div class="mt-auto pt-6 border-t border-slate-200 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#"><span class="material-symbols-outlined">help</span>Help Center</a>
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-logout><span class="material-symbols-outlined">logout</span>Logout</a>
+  </div>
+</aside>
+
+<main class="pt-24 pb-24 md:pb-8 md:pl-72 px-6 min-h-screen">
+  <section class="mb-10">
+    <h1 class="text-3xl font-extrabold font-headline tracking-tight text-primary">Services Management</h1>
+    <p class="text-on-surface-variant font-medium mt-1">Manage and review available institute services.</p>
+  </section>
+
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a href="./services/printout.html" data-route="./services/printout.html" class="block bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center justify-between gap-3 mb-2"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-tertiary-container">print</span><h3 class="text-lg font-bold text-primary">Printout (Color &amp; Black)</h3></div><span class="material-symbols-outlined text-slate-500">arrow_forward</span></div>
+      <p class="text-sm text-on-surface-variant">High-quality color and black-and-white printouts for forms, notes, and projects.</p>
+    </a>
+    <a href="./services/photocopy.html" data-route="./services/photocopy.html" class="block bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center justify-between gap-3 mb-2"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-tertiary-container">content_copy</span><h3 class="text-lg font-bold text-primary">Photocopy</h3></div><span class="material-symbols-outlined text-slate-500">arrow_forward</span></div>
+      <p class="text-sm text-on-surface-variant">Fast photocopy service for academic and official documents.</p>
+    </a>
+    <a href="./services/lamination.html" data-route="./services/lamination.html" class="block bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center justify-between gap-3 mb-2"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-tertiary-container">layers</span><h3 class="text-lg font-bold text-primary">Lamination</h3></div><span class="material-symbols-outlined text-slate-500">arrow_forward</span></div>
+      <p class="text-sm text-on-surface-variant">Document lamination for certificates, IDs, and important papers.</p>
+    </a>
+    <a href="./services/form-apply.html" data-route="./services/form-apply.html" class="block bg-surface-container-lowest p-6 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center justify-between gap-3 mb-2"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-tertiary-container">description</span><h3 class="text-lg font-bold text-primary">Form Apply</h3></div><span class="material-symbols-outlined text-slate-500">arrow_forward</span></div>
+      <p class="text-sm text-on-surface-variant">Support for online and offline form filling and application submission.</p>
+    </a>
+  </section>
+</main>
+
+<script src="./js/app.js"></script>
+</body></html>
