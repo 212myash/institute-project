@@ -15,13 +15,28 @@ const attendanceRoutes = require('./routes/attendance');
 // Initialize Express app
 const app = express();
 
-let dbReadyPromise = connectDB();
-dbReadyPromise.catch((error) => {
-  console.error('Initial DB connection failed:', error.message);
-});
+let dbReadyPromise = null;
+
+function ensureDbConnection() {
+  if (!dbReadyPromise) {
+    dbReadyPromise = connectDB().catch((error) => {
+      console.error('DB connection failed:', error.message);
+      dbReadyPromise = null;
+      throw error;
+    });
+  }
+
+  return dbReadyPromise;
+}
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
@@ -35,15 +50,14 @@ app.use((req, res, next) => {
 });
 
 app.use(async (req, res, next) => {
+  if (req.path === '/' || req.path === '/api/health' || req.path === '/api/test') {
+    return next();
+  }
+
   try {
-    await dbReadyPromise;
+    await ensureDbConnection();
     next();
   } catch (error) {
-    dbReadyPromise = connectDB();
-    dbReadyPromise.catch((err) => {
-      console.error('DB reconnection failed:', err.message);
-    });
-
     res.status(503).json({
       success: false,
       message: 'Database connection unavailable',
@@ -60,6 +74,14 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Server is running',
+  });
+});
+
+app.get('/api/test', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'API working',
+    timestamp: new Date().toISOString(),
   });
 });
 

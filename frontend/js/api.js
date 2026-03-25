@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://institute-project-mu.vercel.app';
+import { getApiBaseCandidates, saveWorkingApiBase } from './api-config.js';
 
 function normalizeApiError(error) {
   if (error.name === 'TypeError') {
@@ -9,7 +9,6 @@ function normalizeApiError(error) {
 }
 
 async function apiRequest(path, options = {}) {
-  const url = `${BASE_URL}${path}`;
   const config = {
     method: options.method || 'GET',
     headers: {
@@ -22,20 +21,36 @@ async function apiRequest(path, options = {}) {
     config.body = JSON.stringify(options.body);
   }
 
-  let response;
-  try {
-    response = await fetch(url, config);
-  } catch (error) {
-    throw new Error(normalizeApiError(error));
+  const candidates = getApiBaseCandidates();
+  let networkError = null;
+
+  for (const base of candidates) {
+    const url = `${base}${path}`;
+    try {
+      const response = await fetch(url, config);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const message = data.message || `Request failed with status ${response.status}`;
+        throw new Error(message);
+      }
+
+      saveWorkingApiBase(base);
+      return data;
+    } catch (error) {
+      if (error instanceof TypeError) {
+        networkError = error;
+        continue;
+      }
+
+      throw error;
+    }
   }
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const message = data.message || `Request failed with status ${response.status}`;
-    throw new Error(message);
-  }
-
-  return data;
+  throw new Error(
+    networkError
+      ? normalizeApiError(networkError)
+      : `Unable to connect to API. Checked: ${candidates.join(', ')}`
+  );
 }
 
 export { apiRequest, normalizeApiError };

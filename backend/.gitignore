@@ -34,3 +34,6 @@ coverage/
 
 # Vercel
 .vercel
+
+# Local uploads
+uploads/

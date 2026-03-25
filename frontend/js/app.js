@@ -1,8 +1,6 @@
 (function () {
-  const API_BASE =
-    window.location.hostname === "localhost"
-      ? "http://localhost:5000"
-      : "https://institute-project-mu.vercel.app";
+  const DEPLOYED_API_ORIGIN = "https://institute-project-mu.vercel.app";
+  const API_BASE_STORAGE_KEY = "sci_api_base";
   const AUTH_KEY = "sci_auth";
   const CATALOG_KEY = "sci_catalog_settings";
   const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance"];
@@ -155,6 +153,30 @@
     }, 2500);
   }
 
+  function normalizeBase(base) {
+    if (!base) return "";
+    return String(base).trim().replace(/\/+$/, "");
+  }
+
+  function getApiBaseCandidates() {
+    const candidates = [];
+    const fromStorage = normalizeBase(localStorage.getItem(API_BASE_STORAGE_KEY));
+    if (fromStorage) candidates.push(fromStorage);
+
+    const fromGlobal = normalizeBase(window.__API_BASE__);
+    if (fromGlobal) candidates.push(fromGlobal);
+
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      candidates.push("http://localhost:5000");
+    }
+
+    candidates.push(normalizeBase(window.location.origin));
+    candidates.push(DEPLOYED_API_ORIGIN);
+
+    return Array.from(new Set(candidates.filter(Boolean)));
+  }
+
   async function api(path, options) {
     const auth = getAuth();
     const isFormData = options && options.body instanceof FormData;
@@ -167,26 +189,49 @@
       headers.Authorization = "Bearer " + auth.token;
     }
 
-    const response = await fetch(API_BASE + path, {
-      method: (options && options.method) || "GET",
-      headers: headers,
-      body:
-        options && options.body
-          ? isFormData
-            ? options.body
-            : JSON.stringify(options.body)
-          : undefined,
-    });
+    const requestBody =
+      options && options.body
+        ? isFormData
+          ? options.body
+          : JSON.stringify(options.body)
+        : undefined;
 
-    const data = await response.json().catch(function () {
-      return {};
-    });
+    const method = (options && options.method) || "GET";
+    const bases = getApiBaseCandidates();
+    let lastNetworkError = null;
 
-    if (!response.ok) {
-      throw new Error(data.message || "Request failed");
+    for (const base of bases) {
+      try {
+        const response = await fetch(base + path, {
+          method,
+          headers,
+          body: requestBody,
+        });
+
+        const data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          throw new Error(data.message || `API error (${response.status})`);
+        }
+
+        localStorage.setItem(API_BASE_STORAGE_KEY, base);
+        return data;
+      } catch (error) {
+        if (error instanceof TypeError) {
+          lastNetworkError = error;
+          continue;
+        }
+
+        throw error;
+      }
     }
 
-    return data;
+    throw new Error(
+      `Failed to connect to API. Checked: ${bases.join(", ")}. ` +
+        `Ensure backend is running and reachable over HTTPS in production.`
+    );
   }
 
   function redirectByRole(role) {
