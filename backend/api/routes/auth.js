@@ -19,7 +19,7 @@ const signAuthToken = (user) => {
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -42,7 +42,7 @@ router.post('/register', async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || 'student',
+      role: 'student',
     });
 
     const token = signAuthToken(user);

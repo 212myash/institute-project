@@ -62,16 +62,7 @@
           <input id="password" name="password" class="block w-full px-4 py-3 bg-surface-container-low border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest focus:border-primary transition-all duration-200 outline-none" placeholder="••••••••" required type="password"/>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <label class="flex items-center gap-2 text-sm font-semibold bg-surface-container-low p-3 rounded-xl cursor-pointer">
-            <input name="role" type="radio" value="student" checked>
-            Student
-          </label>
-          <label class="flex items-center gap-2 text-sm font-semibold bg-surface-container-low p-3 rounded-xl cursor-pointer">
-            <input name="role" type="radio" value="admin">
-            Admin
-          </label>
-        </div>
+        <input name="role" type="hidden" value="student" />
 
         <button class="w-full py-4 px-6 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-lg hover:shadow-primary/20 active:scale-95 transition-all duration-300" type="submit">
           Create Account

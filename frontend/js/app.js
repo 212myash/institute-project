@@ -441,7 +441,6 @@
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      const role = document.querySelector("input[name='role']:checked");
 
       try {
         const data = await api("/api/auth/register", {
@@ -450,7 +449,7 @@
             name: name,
             email: email,
             password: password,
-            role: role ? role.value : "student",
+            role: "student",
           },
         });
 
@@ -1518,8 +1517,63 @@
           '<td class="py-3 px-4 text-sm uppercase font-semibold">' +
           (u.role || "student") +
           "</td>" +
+          '<td class="py-3 px-4 text-sm">' +
+          '<div class="flex items-center gap-2">' +
+          '<select data-user-role-select data-user-id="' +
+          (u._id || "") +
+          '" class="border border-slate-300 rounded-lg px-2 py-1 text-xs font-semibold">' +
+          '<option value="student" ' +
+          ((u.role || "student") === "student" ? "selected" : "") +
+          ">Student</option>" +
+          '<option value="admin" ' +
+          ((u.role || "student") === "admin" ? "selected" : "") +
+          ">Admin</option>" +
+          "</select>" +
+          '<button data-user-role-save data-user-id="' +
+          (u._id || "") +
+          '" class="px-2 py-1 rounded-lg bg-slate-900 text-white text-xs font-semibold">Update</button>' +
+          "</div>" +
+          "</td>" +
           "</tr>"
         );
+      });
+
+      const roleSaveButtons = usersBody.querySelectorAll("[data-user-role-save]");
+      roleSaveButtons.forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          const userId = btn.getAttribute("data-user-id");
+          if (!userId) return;
+
+          const select = usersBody.querySelector('[data-user-role-select][data-user-id="' + userId + '"]');
+          if (!select) return;
+
+          const nextRole = String(select.value || "").trim().toLowerCase();
+          btn.disabled = true;
+          const originalText = btn.textContent;
+          btn.textContent = "Saving...";
+
+          try {
+            await api("/api/admin/users/" + userId + "/role", {
+              method: "PUT",
+              body: { role: nextRole },
+            });
+
+            const targetUser = users.find(function (item) {
+              return String(item._id) === String(userId);
+            });
+            if (targetUser) {
+              targetUser.role = nextRole;
+            }
+
+            notify("User role updated", "success");
+            await loadAdminData();
+          } catch (roleErr) {
+            notify(roleErr.message || "Failed to update role", "error");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        });
       });
 
       requestsBody.innerHTML = renderAdminTableRows(contacts, function (c, i) {
