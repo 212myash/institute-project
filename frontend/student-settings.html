@@ -61,21 +61,29 @@ h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
     <p class="text-xs text-on-surface-variant mb-4">Locked fields: Full Name, Father Name, Date of Birth, Phone Number.</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="md:col-span-2">
-        <p class="text-sm font-semibold text-on-surface-variant mb-2">Student Profile Photo</p>
-        <img id="settings_photo" alt="Student profile photo" class="w-32 h-32 rounded-xl border border-slate-200 object-cover bg-slate-100" />
+      <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-[140px_1fr] gap-4 items-start">
+        <div>
+          <p class="text-sm font-semibold text-on-surface-variant mb-2">Student Profile Photo</p>
+          <img id="settings_photo" alt="Student profile photo" class="w-32 h-32 rounded-xl border border-slate-200 object-cover bg-slate-100" />
+        </div>
+        <div class="grid grid-cols-1 gap-4">
+          <label class="block">
+            <span class="text-sm font-semibold text-on-surface-variant">Full Name</span>
+            <input id="settings_full_name" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-on-surface-variant">Date of Birth</span>
+            <input id="settings_dob" type="date" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-on-surface-variant">Phone Number</span>
+            <input id="settings_mobile" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
+          </label>
+        </div>
       </div>
-      <label class="block">
-        <span class="text-sm font-semibold text-on-surface-variant">Full Name</span>
-        <input id="settings_full_name" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
-      </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Father Name</span>
         <input id="settings_father_name" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
-      </label>
-      <label class="block">
-        <span class="text-sm font-semibold text-on-surface-variant">Date of Birth</span>
-        <input id="settings_dob" type="date" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
       </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Gender</span>
@@ -114,10 +122,6 @@ h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
           <option value="Jain">Jain</option>
           <option value="Other">Other</option>
         </select>
-      </label>
-      <label class="block">
-        <span class="text-sm font-semibold text-on-surface-variant">Phone Number</span>
-        <input id="settings_mobile" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm" />
       </label>
       <label class="block">
         <span class="text-sm font-semibold text-on-surface-variant">Email</span>
