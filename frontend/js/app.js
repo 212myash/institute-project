@@ -3,7 +3,13 @@
   const API_BASE_STORAGE_KEY = "sci_api_base";
   const AUTH_KEY = "sci_auth";
   const CATALOG_KEY = "sci_catalog_settings";
+  const PROFILE_GENDER_KEY = "sci_profile_gender";
   const SHELL_PAGES = ["student-dashboard", "admin-dashboard", "courses", "attendance", "student-settings"];
+  const AVATAR_BY_GENDER = {
+    male: "https://img.icons8.com/color/96/administrator-male.png",
+    female: "https://img.icons8.com/color/96/businesswoman.png",
+    other: "https://img.icons8.com/color/96/user.png",
+  };
 
   const DEFAULT_CATALOG = {
     certifications: [
@@ -109,6 +115,27 @@
 
   function setCatalogSettings(settings) {
     localStorage.setItem(CATALOG_KEY, JSON.stringify(settings));
+  }
+
+  function normalizeGender(value) {
+    const v = String(value || "").trim().toLowerCase();
+    if (!v) return "";
+    if (v === "m" || v === "male" || v === "man" || v === "boy") return "male";
+    if (v === "f" || v === "female" || v === "woman" || v === "girl") return "female";
+    return "other";
+  }
+
+  function getEffectiveGender() {
+    const auth = getAuth();
+    const fromAuth = normalizeGender(auth && auth.user ? auth.user.gender : "");
+    if (fromAuth) return fromAuth;
+
+    const fromStorage = normalizeGender(localStorage.getItem(PROFILE_GENDER_KEY));
+    return fromStorage || "other";
+  }
+
+  function getAvatarForGender(gender) {
+    return AVATAR_BY_GENDER[normalizeGender(gender)] || AVATAR_BY_GENDER.other;
   }
 
   function renderCatalogLists() {
@@ -387,6 +414,12 @@
     userEls.forEach(function (el) {
       el.textContent = auth.user.name || "User";
     });
+
+    const avatarEls = document.querySelectorAll("[data-user-avatar]");
+    const avatarSrc = getAvatarForGender(getEffectiveGender());
+    avatarEls.forEach(function (el) {
+      el.src = avatarSrc;
+    });
   }
 
   function initLogin() {
@@ -577,6 +610,8 @@
       }
 
       try {
+        localStorage.setItem(PROFILE_GENDER_KEY, normalizeGender(document.getElementById("gender")?.value || ""));
+
         await api("/api/student/profile", {
           method: "POST",
           body: formData,
@@ -1188,6 +1223,7 @@
 
     function applyProfile(profile) {
       const education = profile.education || {};
+      localStorage.setItem(PROFILE_GENDER_KEY, normalizeGender(profile.gender));
 
       setField("settings_full_name", profile.full_name);
       setField("settings_father_name", profile.father_name);
@@ -1254,6 +1290,7 @@
             });
 
             applyProfile((updated && updated.data) || {});
+            localStorage.setItem(PROFILE_GENDER_KEY, normalizeGender(payload.gender));
             notify("Settings saved successfully", "success");
           } catch (saveErr) {
             notify(saveErr.message || "Unable to save settings", "error");
@@ -1364,19 +1401,19 @@
       return PAD_T + CH - (value / maxCount) * CH;
     }
 
-    function pathFor(series) {
+    function pathFor(series, yOffsetPx) {
       return series
         .map(function (v, i) {
           const cmd = i === 0 ? "M" : "L";
-          return cmd + xFor(i).toFixed(2) + " " + yFor(v).toFixed(2);
+          return cmd + xFor(i).toFixed(2) + " " + (yFor(v) + yOffsetPx).toFixed(2);
         })
         .join(" ");
     }
 
-    const adminPath = pathFor(adminDaily);
-    const studentPath = pathFor(studentDaily);
+    const adminPath = pathFor(adminDaily, -1.5);
+    const studentPath = pathFor(studentDaily, 1.5);
 
-    function pointsFor(series, color) {
+    function pointsFor(series, color, yOffsetPx) {
       return series
         .map(function (v, i) {
           if (v <= 0) return "";
@@ -1384,7 +1421,7 @@
             '<circle cx="' +
             xFor(i).toFixed(2) +
             '" cy="' +
-            yFor(v).toFixed(2) +
+            (yFor(v) + yOffsetPx).toFixed(2) +
             '" r="3.2" fill="' +
             color +
             '" />'
@@ -1393,8 +1430,8 @@
         .join("");
     }
 
-    const adminPoints = pointsFor(adminDaily, "#16a34a");
-    const studentPoints = pointsFor(studentDaily, "#dc2626");
+    const adminPoints = pointsFor(adminDaily, "#16a34a", -1.5);
+    const studentPoints = pointsFor(studentDaily, "#dc2626", 1.5);
 
     const xTicks = [1, Math.ceil(daysInMonth * 0.25), Math.ceil(daysInMonth * 0.5), Math.ceil(daysInMonth * 0.75), daysInMonth]
       .filter(function (d, idx, arr) {
