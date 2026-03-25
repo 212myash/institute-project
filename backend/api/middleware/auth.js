@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
@@ -13,9 +14,18 @@ function authenticate(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(payload.userId).select('role isProfileCompleted');
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired token',
+      });
+    }
+
     req.user = {
       userId: payload.userId,
-      role: payload.role,
+      role: user.role,
+      isProfileCompleted: Boolean(user.isProfileCompleted),
     };
     return next();
   } catch (error) {

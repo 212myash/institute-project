@@ -1565,6 +1565,17 @@
               targetUser.role = nextRole;
             }
 
+            const auth = getAuth();
+            const authUserId = String((auth && auth.user && (auth.user.id || auth.user._id)) || "");
+            if (auth && auth.user && authUserId && authUserId === String(userId)) {
+              auth.user.role = nextRole;
+              auth.user.isProfileCompleted = false;
+              setAuth(auth);
+              notify("Your role was updated. Redirecting...", "success");
+              redirectByRole(auth.user);
+              return;
+            }
+
             notify("User role updated", "success");
             await loadAdminData();
           } catch (roleErr) {

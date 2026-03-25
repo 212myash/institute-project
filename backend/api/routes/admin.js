@@ -66,18 +66,27 @@ router.put('/users/:id/role', authenticate, requireRole('admin'), async (req, re
       });
     }
 
-    const updated = await User.findByIdAndUpdate(
-      req.params.id,
-      { role },
-      { new: true, runValidators: true }
-    ).select('-password');
-
-    if (!updated) {
+    const existing = await User.findById(req.params.id).select('role');
+    if (!existing) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
       });
     }
+
+    const roleChanged = String(existing.role || '').toLowerCase() !== role;
+    const updatePayload = { role };
+
+    if (roleChanged) {
+      updatePayload.isProfileCompleted = false;
+      await StudentProfile.deleteOne({ user: req.params.id });
+    }
+
+    const updated = await User.findByIdAndUpdate(
+      req.params.id,
+      updatePayload,
+      { new: true, runValidators: true }
+    ).select('-password');
 
     return res.status(200).json({
       success: true,
