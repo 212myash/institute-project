@@ -2012,6 +2012,162 @@
     }, refreshMs);
   }
 
+  function initAttendancePage() {
+    if (PAGE !== "attendance") return;
+
+    const auth = getAuth();
+    const role = normalizeRole(auth && auth.user ? auth.user.role : "");
+    if (role !== "admin") return;
+
+    const markBtn = document.getElementById("markAttendanceBtn");
+    const panel = document.getElementById("adminAttendancePanel");
+    const studentSelect = document.getElementById("attendanceStudentSelect");
+    const dateInput = document.getElementById("attendanceDateInput");
+    const statusSelect = document.getElementById("attendanceStatusSelect");
+    const saveBtn = document.getElementById("saveAttendanceBtn");
+    const tableBody = document.getElementById("attendanceAdminTableBody");
+    const statsEl = document.getElementById("attendanceAdminStats");
+
+    if (!markBtn || !panel || !studentSelect || !dateInput || !statusSelect || !saveBtn || !tableBody || !statsEl) {
+      return;
+    }
+
+    markBtn.textContent = "View Student Attendance";
+    markBtn.dataset.loaded = markBtn.dataset.loaded || "false";
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    dateInput.value = yyyy + "-" + mm + "-" + dd;
+
+    function renderRecords(records) {
+      if (!records || !records.length) {
+        tableBody.innerHTML =
+          '<tr><td colspan="3" class="py-3 px-2 text-sm text-slate-500">No attendance records found.</td></tr>';
+        statsEl.textContent = "Present: 0 | Absent: 0";
+        return;
+      }
+
+      let present = 0;
+      let absent = 0;
+      records.forEach(function (r) {
+        const s = String((r && r.status) || "").toLowerCase();
+        if (s === "present") {
+          present += 1;
+        } else if (s === "absent") {
+          absent += 1;
+        }
+      });
+
+      statsEl.textContent = "Present: " + present + " | Absent: " + absent;
+
+      tableBody.innerHTML = records
+        .map(function (rec, index) {
+          const status = String((rec && rec.status) || "").toLowerCase();
+          const badgeClass = status === "present" ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100";
+          const dateText = formatShortDate(rec.date);
+          return (
+            '<tr class="border-t border-surface-variant/40">' +
+            '<td class="py-2 px-2 text-sm font-semibold">' +
+            (index + 1) +
+            "</td>" +
+            '<td class="py-2 px-2 text-sm">' +
+            dateText +
+            "</td>" +
+            '<td class="py-2 px-2 text-sm"><span class="px-2 py-1 rounded-full text-xs font-bold uppercase ' +
+            badgeClass +
+            '\">' +
+            status +
+            "</span></td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    }
+
+    async function loadStudents() {
+      const studentsRes = await api("/api/attendance/students");
+      const students = (studentsRes && studentsRes.data) || [];
+
+      if (!students.length) {
+        studentSelect.innerHTML = '<option value="">No students found</option>';
+        renderRecords([]);
+        return;
+      }
+
+      studentSelect.innerHTML = students
+        .map(function (s) {
+          return '<option value="' +
+            (s._id || "") +
+            '">' +
+            (s.name || "Student") +
+            ' - ' +
+            (s.email || "") +
+            "</option>";
+        })
+        .join("");
+    }
+
+    async function loadStudentRecords(studentId) {
+      if (!studentId) {
+        renderRecords([]);
+        return;
+      }
+      const recordsRes = await api("/api/attendance/student/" + studentId);
+      renderRecords((recordsRes && recordsRes.data) || []);
+    }
+
+    markBtn.addEventListener("click", async function () {
+      panel.classList.remove("hidden");
+      if (markBtn.dataset.loaded !== "true") {
+        try {
+          await loadStudents();
+          await loadStudentRecords(studentSelect.value);
+          markBtn.dataset.loaded = "true";
+        } catch (err) {
+          notify(err.message || "Failed to load students", "error");
+        }
+      }
+    });
+
+    studentSelect.addEventListener("change", async function () {
+      try {
+        await loadStudentRecords(studentSelect.value);
+      } catch (err) {
+        notify(err.message || "Failed to load attendance", "error");
+      }
+    });
+
+    saveBtn.addEventListener("click", async function () {
+      const studentId = studentSelect.value;
+      const date = dateInput.value;
+      const status = statusSelect.value;
+
+      if (!studentId || !date || !status) {
+        notify("Please select student, date and status", "error");
+        return;
+      }
+
+      const originalText = saveBtn.textContent;
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+      try {
+        await api("/api/attendance", {
+          method: "POST",
+          body: { studentId: studentId, date: date, status: status },
+        });
+        notify("Attendance saved", "success");
+        await loadStudentRecords(studentId);
+      } catch (err) {
+        notify(err.message || "Failed to save attendance", "error");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
+      }
+    });
+  }
+
   function initRouteRedirects() {
     if (document.body.dataset.routeBound === "true") return;
     document.body.dataset.routeBound = "true";
@@ -2048,6 +2204,7 @@
     initStudentDashboard();
     initStudentSettings();
     initAdminDashboard();
+    initAttendancePage();
     initCourses();
   }
 
