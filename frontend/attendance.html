@@ -56,7 +56,18 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
         <h2 class="text-4xl font-extrabold tracking-tight brand-font text-primary">Attendance Tracker</h2>
         <p class="text-on-surface-variant mt-2 text-lg">Maintaining consistency is the first step to excellence.</p>
       </div>
-      <button id="markAttendanceBtn" class="bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>Mark Attendance</button>
+      <div class="flex items-center gap-3">
+        <button id="markAttendanceBtn" class="bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>Mark Attendance</button>
+        <button id="generateAttendanceCodesBtn" class="hidden bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">key</span>Generate Attendance Codes</button>
+      </div>
+    </section>
+
+    <section id="studentCodePanel" class="hidden bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50 space-y-4">
+      <h3 class="text-xl font-bold brand-font text-primary">Enter Attendance Code</h3>
+      <div class="flex flex-col md:flex-row gap-3">
+        <input id="attendanceCodeInput" maxlength="12" placeholder="Enter Attendance Code" class="flex-1 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold uppercase tracking-wider" />
+        <button id="submitAttendanceCodeBtn" class="bg-gradient-to-br from-primary to-slate-800 text-white px-6 py-3 rounded-xl font-bold">Submit Code</button>
+      </div>
     </section>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">

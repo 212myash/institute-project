@@ -2017,9 +2017,12 @@
 
     const auth = getAuth();
     const role = normalizeRole(auth && auth.user ? auth.user.role : "");
-    if (role !== "admin") return;
 
     const markBtn = document.getElementById("markAttendanceBtn");
+    const generateCodesBtn = document.getElementById("generateAttendanceCodesBtn");
+    const studentCodePanel = document.getElementById("studentCodePanel");
+    const codeInput = document.getElementById("attendanceCodeInput");
+    const submitCodeBtn = document.getElementById("submitAttendanceCodeBtn");
     const panel = document.getElementById("adminAttendancePanel");
     const studentSelect = document.getElementById("attendanceStudentSelect");
     const dateInput = document.getElementById("attendanceDateInput");
@@ -2028,9 +2031,60 @@
     const tableBody = document.getElementById("attendanceAdminTableBody");
     const statsEl = document.getElementById("attendanceAdminStats");
 
-    if (!markBtn || !panel || !studentSelect || !dateInput || !statusSelect || !saveBtn || !tableBody || !statsEl) {
+    if (!markBtn) {
       return;
     }
+
+    if (role === "student") {
+      if (generateCodesBtn) generateCodesBtn.classList.add("hidden");
+      if (studentCodePanel) studentCodePanel.classList.add("hidden");
+      if (panel) panel.classList.add("hidden");
+
+      markBtn.addEventListener("click", function () {
+        if (!studentCodePanel) return;
+        studentCodePanel.classList.remove("hidden");
+      });
+
+      if (submitCodeBtn && codeInput) {
+        submitCodeBtn.addEventListener("click", async function () {
+          const code = String(codeInput.value || "").trim().toUpperCase();
+          if (!code) {
+            notify("Please enter attendance code", "error");
+            return;
+          }
+
+          const originalText = submitCodeBtn.textContent;
+          submitCodeBtn.disabled = true;
+          submitCodeBtn.textContent = "Submitting...";
+          try {
+            await api("/api/attendance/submit-code", {
+              method: "POST",
+              body: { code: code },
+            });
+            notify("Attendance marked successfully", "success");
+            codeInput.value = "";
+          } catch (err) {
+            notify(err.message || "Failed to submit code", "error");
+          } finally {
+            submitCodeBtn.disabled = false;
+            submitCodeBtn.textContent = originalText;
+          }
+        });
+      }
+
+      return;
+    }
+
+    if (role !== "admin") {
+      return;
+    }
+
+    if (!panel || !studentSelect || !dateInput || !statusSelect || !saveBtn || !tableBody || !statsEl) {
+      return;
+    }
+
+    if (studentCodePanel) studentCodePanel.classList.add("hidden");
+    if (generateCodesBtn) generateCodesBtn.classList.remove("hidden");
 
     markBtn.textContent = "View Student Attendance";
     markBtn.dataset.loaded = markBtn.dataset.loaded || "false";
@@ -2130,6 +2184,26 @@
         }
       }
     });
+
+    if (generateCodesBtn) {
+      generateCodesBtn.addEventListener("click", async function () {
+        const originalText = generateCodesBtn.textContent;
+        generateCodesBtn.disabled = true;
+        generateCodesBtn.textContent = "Generating...";
+        try {
+          const result = await api("/api/attendance/codes/generate", {
+            method: "POST",
+          });
+          const count = (result && result.data && result.data.length) || 0;
+          notify("Generated attendance codes for " + count + " student(s)", "success");
+        } catch (err) {
+          notify(err.message || "Failed to generate attendance codes", "error");
+        } finally {
+          generateCodesBtn.disabled = false;
+          generateCodesBtn.textContent = originalText;
+        }
+      });
+    }
 
     studentSelect.addEventListener("change", async function () {
       try {

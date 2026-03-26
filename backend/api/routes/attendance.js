@@ -1,11 +1,87 @@
 const express = require('express');
 const Attendance = require('../models/Attendance');
+const AttendanceCode = require('../models/AttendanceCode');
 const User = require('../models/User');
 const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
+function getDateKey(input) {
+  const d = input ? new Date(input) : new Date();
+  if (Number.isNaN(d.getTime())) return null;
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function generateCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 router.use(authenticate);
+
+// POST /api/attendance/codes/generate
+router.post('/codes/generate', requireRole('admin'), async (req, res) => {
+  try {
+    const students = await User.find({ role: 'student' }).select('_id name email').lean();
+    if (!students.length) {
+      return res.status(200).json({ success: true, message: 'No students found', data: [] });
+    }
+
+    const dateKey = getDateKey(new Date());
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const generatedInBatch = new Set();
+    const savedCodes = [];
+
+    for (const student of students) {
+      let code = generateCode();
+      let guard = 0;
+      while (guard < 50) {
+        const alreadyInBatch = generatedInBatch.has(code);
+        const existingCode = await AttendanceCode.findOne({ code, dateKey }).select('_id').lean();
+        if (!alreadyInBatch && !existingCode) break;
+        code = generateCode();
+        guard += 1;
+      }
+
+      generatedInBatch.add(code);
+
+      const saved = await AttendanceCode.findOneAndUpdate(
+        { studentId: student._id, dateKey },
+        {
+          studentId: student._id,
+          code,
+          dateKey,
+          expiresAt,
+          isUsed: false,
+          usedAt: null,
+        },
+        { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
+      ).lean();
+
+      savedCodes.push({
+        student_id: student._id,
+        student_name: student.name,
+        student_email: student.email,
+        code: saved.code,
+        date: dateKey,
+        expires_at: saved.expiresAt,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Attendance codes generated successfully',
+      data: savedCodes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to generate attendance codes',
+    });
+  }
+});
 
 // GET /api/attendance/students
 router.get('/students', requireRole('admin'), async (req, res) => {
@@ -45,6 +121,67 @@ router.get('/student/:studentId', requireRole('admin'), async (req, res) => {
   }
 });
 
+// POST /api/attendance/submit-code
+router.post('/submit-code', requireRole('student'), async (req, res) => {
+  try {
+    const code = String(req.body && req.body.code ? req.body.code : '').trim().toUpperCase();
+    if (!code) {
+      return res.status(400).json({ success: false, message: 'Code is required' });
+    }
+
+    const now = new Date();
+    const dateKey = getDateKey(now);
+    const codeDoc = await AttendanceCode.findOne({ code, dateKey });
+
+    if (!codeDoc) {
+      return res.status(400).json({ success: false, message: 'Invalid Code' });
+    }
+
+    if (String(codeDoc.studentId) !== String(req.user.userId)) {
+      return res.status(403).json({ success: false, message: 'Not Assigned to You' });
+    }
+
+    if (codeDoc.expiresAt && new Date(codeDoc.expiresAt).getTime() < now.getTime()) {
+      return res.status(400).json({ success: false, message: 'Code Expired' });
+    }
+
+    if (codeDoc.isUsed) {
+      return res.status(409).json({ success: false, message: 'Already Used' });
+    }
+
+    const existingAttendance = await Attendance.findOne({ studentId: req.user.userId, dateKey });
+    if (existingAttendance) {
+      return res.status(409).json({ success: false, message: 'Already Used' });
+    }
+
+    const attendance = await Attendance.create({
+      studentId: req.user.userId,
+      date: now,
+      dateKey,
+      status: 'present',
+    });
+
+    codeDoc.isUsed = true;
+    codeDoc.usedAt = now;
+    await codeDoc.save();
+
+    return res.status(201).json({
+      success: true,
+      message: 'Attendance marked successfully',
+      data: attendance,
+    });
+  } catch (error) {
+    if (error && error.code === 11000) {
+      return res.status(409).json({ success: false, message: 'Already Used' });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to submit attendance code',
+    });
+  }
+});
+
 // POST /api/attendance
 router.post('/', requireRole('admin'), async (req, res) => {
   try {
@@ -73,24 +210,21 @@ router.post('/', requireRole('admin'), async (req, res) => {
     }
 
     const targetDate = date ? new Date(date) : new Date();
-    if (Number.isNaN(targetDate.getTime())) {
+    const dateKey = getDateKey(targetDate);
+    if (Number.isNaN(targetDate.getTime()) || !dateKey) {
       return res.status(400).json({
         success: false,
         message: 'Invalid date',
       });
     }
 
-    const start = new Date(targetDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(targetDate);
-    end.setHours(23, 59, 59, 999);
-
     const attendance = await Attendance.findOneAndUpdate({
       studentId,
-      date: { $gte: start, $lte: end },
+      dateKey,
     }, {
       studentId,
       date: targetDate,
+      dateKey,
       status: String(status).toLowerCase(),
     }, {
       new: true,

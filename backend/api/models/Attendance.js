@@ -12,6 +12,11 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
       default: Date.now,
     },
+    dateKey: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     status: {
       type: String,
       enum: ['present', 'absent'],
@@ -20,5 +25,7 @@ const attendanceSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+attendanceSchema.index({ studentId: 1, dateKey: 1 }, { unique: true });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);
