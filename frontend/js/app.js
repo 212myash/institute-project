@@ -2019,76 +2019,45 @@
     const role = normalizeRole(auth && auth.user ? auth.user.role : "");
 
     const markBtn = document.getElementById("markAttendanceBtn");
-    const generateCodeBtn = document.getElementById("generateAttendanceCodeBtn");
-    const studentCodePanel = document.getElementById("studentCodePanel");
-    const codeInput = document.getElementById("attendanceCodeInput");
-    const submitCodeBtn = document.getElementById("submitAttendanceCodeBtn");
     const overviewGrid = document.getElementById("attendanceOverviewGrid");
-    const panel = document.getElementById("adminAttendancePanel");
-    const tableView = document.getElementById("adminStudentsTableView");
-    const detailView = document.getElementById("adminStudentDetailView");
-    const studentsBody = document.getElementById("adminStudentsAttendanceBody");
-    const studentsEmpty = document.getElementById("adminStudentsEmpty");
-    const backBtn = document.getElementById("adminBackToStudentsBtn");
-    const detailStudentPhoto = document.getElementById("detailStudentPhoto");
-    const detailStudentName = document.getElementById("detailStudentName");
-    const detailStudentFather = document.getElementById("detailStudentFather");
-    const detailStudentPhone = document.getElementById("detailStudentPhone");
-    const detailHistoryBody = document.getElementById("detailAttendanceHistoryBody");
-    const detailCalendarTitle = document.getElementById("detailCalendarTitle");
-    const detailCalendarGrid = document.getElementById("detailCalendarGrid");
-    const detailAttendancePercent = document.getElementById("detailAttendancePercent");
-    const detailAttendanceRank = document.getElementById("detailAttendanceRank");
-    const dailyCodeModal = document.getElementById("dailyCodeModal");
-    const dailyCodeText = document.getElementById("dailyCodeText");
-    const dailyCodeExpiry = document.getElementById("dailyCodeExpiry");
-    const dailyCodeModalClose = document.getElementById("dailyCodeModalClose");
+    const mainWrap = document.querySelector("main .max-w-7xl");
+    const existingAdminRuntime = document.getElementById("adminAttendanceRuntime");
 
-    if (!markBtn) {
+    if (!markBtn || !mainWrap) {
       return;
     }
 
     if (role === "student") {
-      if (generateCodeBtn) generateCodeBtn.classList.add("hidden");
-      if (studentCodePanel) studentCodePanel.classList.add("hidden");
-      if (panel) panel.classList.add("hidden");
       if (overviewGrid) overviewGrid.classList.remove("hidden");
+      if (existingAdminRuntime) existingAdminRuntime.classList.add("hidden");
 
       markBtn.classList.remove("hidden");
-      markBtn.textContent = "Mark Attendance";
+      markBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">check_circle</span>Mark Attendance';
 
       if (markBtn.dataset.bound !== "true") {
         markBtn.dataset.bound = "true";
-        markBtn.addEventListener("click", function () {
-          if (!studentCodePanel) return;
-          studentCodePanel.classList.remove("hidden");
-        });
-      }
-
-      if (submitCodeBtn && codeInput && submitCodeBtn.dataset.bound !== "true") {
-        submitCodeBtn.dataset.bound = "true";
-        submitCodeBtn.addEventListener("click", async function () {
-          const code = String(codeInput.value || "").trim().toUpperCase();
+        markBtn.addEventListener("click", async function () {
+          const code = String(window.prompt("Enter Attendance Code") || "").trim().toUpperCase();
           if (!code) {
-            notify("Please enter attendance code", "error");
             return;
           }
 
-          const originalText = submitCodeBtn.textContent;
-          submitCodeBtn.disabled = true;
-          submitCodeBtn.textContent = "Submitting...";
+          const originalHtml = markBtn.innerHTML;
+          markBtn.disabled = true;
+          markBtn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">autorenew</span>Submitting...';
           try {
             await api("/api/attendance/verify-code", {
               method: "POST",
               body: { code: code },
             });
             notify("Attendance marked successfully", "success");
-            codeInput.value = "";
           } catch (err) {
             notify(err.message || "Failed to submit code", "error");
           } finally {
-            submitCodeBtn.disabled = false;
-            submitCodeBtn.textContent = originalText;
+            markBtn.disabled = false;
+            markBtn.innerHTML = originalHtml;
           }
         });
       }
@@ -2100,23 +2069,77 @@
       return;
     }
 
-    if (!panel || !tableView || !detailView || !studentsBody || !studentsEmpty || !backBtn) {
-      return;
-    }
-
-    if (!detailStudentPhoto || !detailStudentName || !detailStudentFather || !detailStudentPhone || !detailHistoryBody || !detailCalendarTitle || !detailCalendarGrid || !detailAttendancePercent || !detailAttendanceRank || !dailyCodeModal || !dailyCodeText || !dailyCodeExpiry || !dailyCodeModalClose) {
-      return;
-    }
-
     if (overviewGrid) overviewGrid.classList.add("hidden");
-    if (studentCodePanel) studentCodePanel.classList.add("hidden");
-    panel.classList.remove("hidden");
+    markBtn.classList.remove("hidden");
+    markBtn.innerHTML =
+      '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">key</span>Generate Attendance Code';
 
-    markBtn.classList.add("hidden");
-    tableView.classList.remove("hidden");
-    detailView.classList.add("hidden");
+    let adminRuntime = existingAdminRuntime;
+    if (!adminRuntime) {
+      adminRuntime = document.createElement("section");
+      adminRuntime.id = "adminAttendanceRuntime";
+      adminRuntime.className = "bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50 space-y-6";
+      adminRuntime.innerHTML =
+        '<div id="adminAttendanceTableView" class="space-y-4">' +
+        '<div class="overflow-auto">' +
+        '<table class="w-full text-left">' +
+        '<thead><tr class="text-xs uppercase tracking-widest text-on-surface-variant">' +
+        '<th class="py-2 px-3">Student Name</th><th class="py-2 px-3">Email</th><th class="py-2 px-3">Present Count</th><th class="py-2 px-3">Absent Count</th><th class="py-2 px-3">Attendance %</th>' +
+        "</tr></thead>" +
+        '<tbody id="adminAttendanceStudentsBody"></tbody>' +
+        "</table></div></div>" +
+        '<div id="adminAttendanceDetailView" class="hidden space-y-6">' +
+        '<div class="flex items-center justify-between gap-3">' +
+        '<button id="adminAttendanceBackBtn" class="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"><span class="material-symbols-outlined text-base">arrow_back</span>Back to Students</button>' +
+        '<h3 class="text-xl font-bold brand-font text-primary">Attendance Tracker</h3>' +
+        "</div>" +
+        '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">' +
+        '<div class="lg:col-span-4 bg-surface-container-low rounded-3xl p-5 border border-surface-container">' +
+        '<div class="flex items-start gap-4">' +
+        '<img id="adminDetailPhoto" src="https://img.icons8.com/color/96/user.png" alt="Student" class="w-20 h-20 rounded-2xl object-cover border border-slate-200" />' +
+        '<div class="space-y-1">' +
+        '<h4 id="adminDetailName" class="text-lg font-extrabold brand-font text-primary">Student</h4>' +
+        '<p id="adminDetailFather" class="text-sm text-on-surface-variant">Father: -</p>' +
+        '<p id="adminDetailPhone" class="text-sm text-on-surface-variant">Phone: -</p>' +
+        "</div></div></div>" +
+        '<div class="lg:col-span-8 bg-surface-container-low rounded-3xl p-5 border border-surface-container space-y-4">' +
+        '<div class="flex items-center justify-between">' +
+        '<h4 id="adminDetailCalendarTitle" class="text-lg font-extrabold brand-font text-primary">Current Month</h4>' +
+        '<div class="flex gap-3 text-[11px] font-semibold">' +
+        '<span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Present</span>' +
+        '<span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Absent</span>' +
+        '<span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Holiday</span>' +
+        '<span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>No Data</span>' +
+        "</div></div>" +
+        '<div id="adminDetailCalendarGrid" class="grid grid-cols-7 gap-2"></div>' +
+        "</div></div>" +
+        '<div class="overflow-auto"><table class="w-full text-left"><thead><tr class="text-xs uppercase tracking-widest text-on-surface-variant"><th class="py-2 px-2">#</th><th class="py-2 px-2">Date</th><th class="py-2 px-2">Status</th></tr></thead><tbody id="adminDetailHistoryBody"></tbody></table></div>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">' +
+        '<div class="bg-primary text-white p-6 rounded-3xl shadow-lg"><p class="text-xs font-medium uppercase tracking-widest opacity-70">Attendance</p><h4 id="adminDetailAttendancePercent" class="text-4xl font-extrabold mt-1 brand-font">0%</h4></div>' +
+        '<div class="bg-surface-container-low p-6 rounded-3xl border border-surface-container shadow-sm"><p class="text-xs font-medium uppercase tracking-widest text-on-surface-variant">Rank</p><h4 id="adminDetailRank" class="text-4xl font-extrabold text-amber-700 brand-font">-</h4></div>' +
+        "</div></div>";
+      mainWrap.appendChild(adminRuntime);
+    } else {
+      adminRuntime.classList.remove("hidden");
+    }
 
-    if (generateCodeBtn) generateCodeBtn.classList.remove("hidden");
+    const tableView = document.getElementById("adminAttendanceTableView");
+    const detailView = document.getElementById("adminAttendanceDetailView");
+    const studentsBody = document.getElementById("adminAttendanceStudentsBody");
+    const backBtn = document.getElementById("adminAttendanceBackBtn");
+    const detailPhoto = document.getElementById("adminDetailPhoto");
+    const detailName = document.getElementById("adminDetailName");
+    const detailFather = document.getElementById("adminDetailFather");
+    const detailPhone = document.getElementById("adminDetailPhone");
+    const detailCalendarTitle = document.getElementById("adminDetailCalendarTitle");
+    const detailCalendarGrid = document.getElementById("adminDetailCalendarGrid");
+    const detailHistoryBody = document.getElementById("adminDetailHistoryBody");
+    const detailAttendancePercent = document.getElementById("adminDetailAttendancePercent");
+    const detailRank = document.getElementById("adminDetailRank");
+
+    if (!tableView || !detailView || !studentsBody || !backBtn || !detailPhoto || !detailName || !detailFather || !detailPhone || !detailCalendarTitle || !detailCalendarGrid || !detailHistoryBody || !detailAttendancePercent || !detailRank) {
+      return;
+    }
 
     function renderCalendar(records) {
       const now = new Date();
@@ -2125,7 +2148,7 @@
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const firstWeekDay = new Date(year, month, 1).getDay();
       const monthLabel = now.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
-      calendarTitle.textContent = monthLabel;
+      detailCalendarTitle.textContent = monthLabel;
 
       const statusByDay = {};
       (records || []).forEach(function (rec) {
@@ -2164,7 +2187,7 @@
         );
       }
 
-      calendarGrid.innerHTML = items.join("");
+      detailCalendarGrid.innerHTML = items.join("");
     }
 
     function renderHistory(records) {
@@ -2200,7 +2223,6 @@
     function openDetailView() {
       tableView.classList.add("hidden");
       detailView.classList.remove("hidden");
-      studentsEmpty.classList.add("hidden");
     }
 
     function openTableView() {
@@ -2224,15 +2246,15 @@
       const total = present + absent;
       const pct = total > 0 ? Math.round((present / total) * 100) : 0;
 
-      detailStudentPhoto.src = student.photo_url || "https://img.icons8.com/color/96/user.png";
-      detailStudentName.textContent = student.full_name || student.name || "Student";
-      detailStudentFather.textContent = "Father: " + (student.father_name || "-");
-      detailStudentPhone.textContent = "Phone: " + (student.mobile || "-");
+      detailPhoto.src = student.photo_url || "https://img.icons8.com/color/96/user.png";
+      detailName.textContent = student.full_name || student.name || "Student";
+      detailFather.textContent = "Father: " + (student.father_name || "-");
+      detailPhone.textContent = "Phone: " + (student.mobile || "-");
       renderHistory(records);
       renderCalendar(records);
       detailAttendancePercent.textContent = pct + "%";
       const rank = rankByStudentId[String(studentId)] || "-";
-      detailAttendanceRank.textContent = String(rank);
+      detailRank.textContent = String(rank);
       openDetailView();
     }
 
@@ -2243,11 +2265,9 @@
       if (!students.length) {
         studentsBody.innerHTML =
           '<tr><td colspan="5" class="py-3 px-3 text-sm text-slate-500">No students found.</td></tr>';
-        studentsEmpty.classList.remove("hidden");
         return [];
       }
 
-      studentsEmpty.classList.add("hidden");
       studentsBody.innerHTML = students
         .map(function (s) {
           const rowRank = rankByStudentId[String(s._id || "")] || "-";
@@ -2321,19 +2341,39 @@
       });
     }
 
-    if (dailyCodeModalClose.dataset.bound !== "true") {
-      dailyCodeModalClose.dataset.bound = "true";
-      dailyCodeModalClose.addEventListener("click", function () {
-        dailyCodeModal.classList.add("hidden");
+    if (!document.getElementById("adminDailyCodeModal")) {
+      const modal = document.createElement("div");
+      modal.id = "adminDailyCodeModal";
+      modal.className = "hidden fixed inset-0 z-50 bg-slate-900/45 p-4 md:p-6 flex items-center justify-center";
+      modal.innerHTML =
+        '<div class="w-full max-w-md bg-surface-container-lowest rounded-3xl p-6 shadow-2xl border border-surface-container">' +
+        '<div class="flex items-start justify-between gap-4">' +
+        '<div><h3 class="text-xl font-extrabold brand-font text-primary">Today\'s Code</h3>' +
+        '<p id="adminDailyCodeValue" class="mt-3 text-3xl tracking-[0.18em] font-extrabold text-primary">------</p>' +
+        '<p id="adminDailyCodeExpiry" class="mt-2 text-sm text-on-surface-variant">Expiry: -</p></div>' +
+        '<button id="adminDailyCodeClose" class="h-10 w-10 rounded-full bg-surface-container-low text-slate-700 hover:bg-slate-200 flex items-center justify-center"><span class="material-symbols-outlined">close</span></button>' +
+        "</div></div>";
+      document.body.appendChild(modal);
+    }
+
+    const codeModal = document.getElementById("adminDailyCodeModal");
+    const codeValue = document.getElementById("adminDailyCodeValue");
+    const codeExpiry = document.getElementById("adminDailyCodeExpiry");
+    const codeClose = document.getElementById("adminDailyCodeClose");
+
+    if (codeModal && codeClose && codeClose.dataset.bound !== "true") {
+      codeClose.dataset.bound = "true";
+      codeClose.addEventListener("click", function () {
+        codeModal.classList.add("hidden");
       });
     }
 
-    if (generateCodeBtn && generateCodeBtn.dataset.bound !== "true") {
-      generateCodeBtn.dataset.bound = "true";
-      generateCodeBtn.addEventListener("click", async function () {
-        const originalContent = generateCodeBtn.innerHTML;
-        generateCodeBtn.disabled = true;
-        generateCodeBtn.innerHTML =
+    if (markBtn.dataset.adminBound !== "true") {
+      markBtn.dataset.adminBound = "true";
+      markBtn.addEventListener("click", async function () {
+        const originalContent = markBtn.innerHTML;
+        markBtn.disabled = true;
+        markBtn.innerHTML =
           '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">autorenew</span>Generating...';
         try {
           const result = await api("/api/attendance/generate-code", {
@@ -2341,17 +2381,19 @@
           });
 
           const payload = (result && result.data) || {};
-          dailyCodeText.textContent = payload.code || "------";
-          dailyCodeExpiry.textContent =
-            "Expiry: " +
-            (payload.expires_at ? new Date(payload.expires_at).toLocaleString("en-IN") : "-");
-          dailyCodeModal.classList.remove("hidden");
+          if (codeValue) codeValue.textContent = payload.code || "------";
+          if (codeExpiry) {
+            codeExpiry.textContent =
+              "Expiry: " +
+              (payload.expires_at ? new Date(payload.expires_at).toLocaleString("en-IN") : "-");
+          }
+          if (codeModal) codeModal.classList.remove("hidden");
           notify("Attendance code generated", "success");
         } catch (err) {
           notify(err.message || "Failed to generate attendance code", "error");
         } finally {
-          generateCodeBtn.disabled = false;
-          generateCodeBtn.innerHTML = originalContent;
+          markBtn.disabled = false;
+          markBtn.innerHTML = originalContent;
         }
       });
     }
