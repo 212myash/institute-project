@@ -2017,6 +2017,10 @@
 
     const auth = getAuth();
     const role = normalizeRole(auth && auth.user ? auth.user.role : "");
+    const attendanceAside = document.querySelector("aside");
+    const attendanceNav = attendanceAside ? attendanceAside.querySelector("nav") : null;
+    const headerUserText = document.querySelector("header .text-sm.font-semibold.text-on-surface-variant");
+    const headerLogoutBtn = document.querySelector("header [data-logout]");
 
     const markBtn = document.getElementById("markAttendanceBtn");
     const overviewGrid = document.getElementById("attendanceOverviewGrid");
@@ -2025,6 +2029,44 @@
 
     if (!markBtn || !mainWrap) {
       return;
+    }
+
+    function applyAdminAttendanceShell() {
+      if (headerUserText) {
+        headerUserText.innerHTML = 'Admin: <span data-user-name>Admin</span>';
+      }
+
+      if (headerLogoutBtn && !document.getElementById("attendanceAdminAvatarBtn")) {
+        const avatarBtn = document.createElement("button");
+        avatarBtn.id = "attendanceAdminAvatarBtn";
+        avatarBtn.className = "p-1 border-2 border-primary rounded-full";
+        avatarBtn.innerHTML =
+          '<img data-user-avatar alt="Admin" class="w-8 h-8 rounded-full object-cover" src="https://img.icons8.com/color/96/user.png"/>';
+        headerLogoutBtn.replaceWith(avatarBtn);
+      }
+
+      if (attendanceNav) {
+        attendanceNav.innerHTML =
+          '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./admin-dashboard.html" data-route="./admin-dashboard.html"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>' +
+          '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">school</span>Courses Management</a>' +
+          '<a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">event_available</span>Attendance</a>' +
+          '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./services.html" data-route="./services.html"><span class="material-symbols-outlined">build</span>Services Management</a>';
+      }
+
+      if (attendanceAside && !attendanceAside.querySelector("[data-attendance-admin-footer]")) {
+        const footer = document.createElement("div");
+        footer.setAttribute("data-attendance-admin-footer", "true");
+        footer.className = "mt-auto pt-6 border-t border-slate-200 space-y-1";
+        footer.innerHTML =
+          '<a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-help-open><span class="material-symbols-outlined">help</span>Help Center</a>' +
+          '<a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-logout><span class="material-symbols-outlined">logout</span>Logout</a>';
+        attendanceAside.appendChild(footer);
+      }
+
+      applyUserName();
+      bindLogout();
+      initHelpCenter();
+      updateShellNavState();
     }
 
     if (role === "student") {
@@ -2068,6 +2110,8 @@
     if (role !== "admin") {
       return;
     }
+
+    applyAdminAttendanceShell();
 
     if (overviewGrid) overviewGrid.classList.add("hidden");
     markBtn.classList.remove("hidden");
@@ -2320,12 +2364,17 @@
     }
 
     async function initialLoad() {
-      const rankingsRes = await api("/api/attendance/rankings");
-      const rankings = (rankingsRes && rankingsRes.data) || [];
       const rankByStudentId = {};
-      rankings.forEach(function (item) {
-        rankByStudentId[String(item.student_id || "")] = item.rank || "-";
-      });
+
+      try {
+        const rankingsRes = await api("/api/attendance/rankings");
+        const rankings = (rankingsRes && rankingsRes.data) || [];
+        rankings.forEach(function (item) {
+          rankByStudentId[String(item.student_id || "")] = item.rank || "-";
+        });
+      } catch (err) {
+        // Keep loading student table even when rankings endpoint fails.
+      }
 
       await loadStudentsTable(rankByStudentId);
     }
