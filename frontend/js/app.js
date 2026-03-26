@@ -764,6 +764,8 @@
         "marks",
         "percentage",
         "course_selected",
+        "attendance_start_time",
+        "attendance_end_time",
       ];
 
       for (const id of requiredIds) {

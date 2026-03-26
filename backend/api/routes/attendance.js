@@ -1,8 +1,8 @@
 const express = require('express');
 const Attendance = require('../models/Attendance');
 const DailyCode = require('../models/DailyCode');
-const User = require('../models/User');
 const StudentProfile = require('../models/StudentProfile');
+const User = require('../models/User');
 const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
@@ -249,7 +249,51 @@ async function verifyDailyCodeHandler(req, res) {
       return res.status(400).json({ success: false, message: 'Code is required' });
     }
 
+    function parseTimeToMinutes(value) {
+      const str = String(value || '').trim();
+      if (!str) return null;
+      const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(str);
+      if (!match) return null;
+      const hours = Number(match[1]);
+      const minutes = Number(match[2]);
+      return hours * 60 + minutes;
+    }
+
+    function getLocalNowMinutes(d) {
+      return d.getHours() * 60 + d.getMinutes();
+    }
+
     const now = new Date();
+
+    // Enforce per-student attendance window (if configured)
+    const profile = await StudentProfile.findOne({ user: req.user.userId })
+      .select('attendance_start_time attendance_end_time')
+      .lean();
+
+    const startMinutes = parseTimeToMinutes(profile && profile.attendance_start_time);
+    const endMinutes = parseTimeToMinutes(profile && profile.attendance_end_time);
+    if (startMinutes === null || endMinutes === null) {
+      return res.status(400).json({
+        success: false,
+        message: 'Attendance time window not configured. Please submit/update your admission form.',
+      });
+    }
+
+    if (endMinutes <= startMinutes) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid attendance time window. End time must be after start time.',
+      });
+    }
+
+    const nowMinutes = getLocalNowMinutes(now);
+    if (nowMinutes < startMinutes) {
+      return res.status(403).json({ success: false, message: 'Attendance not started yet' });
+    }
+    if (nowMinutes > endMinutes) {
+      return res.status(403).json({ success: false, message: 'Time expired' });
+    }
+
     const dateKey = getDateKey(now);
     const codeDoc = await DailyCode.findOne({ dateKey }).lean();
 

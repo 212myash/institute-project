@@ -39,6 +39,10 @@ const studentProfileSchema = new mongoose.Schema(
     },
     photo_url: { type: String, default: '' },
     signature_url: { type: String, default: '' },
+
+    // Per-student attendance time window (local institute time, HH:MM 24h)
+    attendance_start_time: { type: String, default: '', trim: true },
+    attendance_end_time: { type: String, default: '', trim: true },
   },
   { timestamps: true }
 );
