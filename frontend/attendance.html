@@ -70,7 +70,7 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
       </div>
     </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div id="attendanceOverviewGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div class="lg:col-span-8 bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50">
         <div class="flex items-center justify-between mb-8">
           <h3 class="text-xl font-bold brand-font">October 2023</h3>
@@ -99,37 +99,63 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
       </div>
     </div>
 
-    <section id="adminAttendancePanel" class="hidden bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50 space-y-5">
-      <div class="flex flex-col md:flex-row md:items-end gap-4">
-        <div class="flex-1 min-w-[220px]">
-          <label for="attendanceStudentSelect" class="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">Student</label>
-          <select id="attendanceStudentSelect" class="mt-2 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"></select>
-        </div>
-        <div>
-          <label for="attendanceDateInput" class="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">Date</label>
-          <input id="attendanceDateInput" type="date" class="mt-2 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />
-        </div>
-        <div>
-          <label for="attendanceStatusSelect" class="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">Status</label>
-          <select id="attendanceStatusSelect" class="mt-2 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm">
-            <option value="present">Present</option>
-            <option value="absent">Absent</option>
-          </select>
-        </div>
-        <button id="saveAttendanceBtn" class="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold">Save Attendance</button>
-      </div>
-      <div id="attendanceAdminStats" class="text-sm text-on-surface-variant font-medium">Select a student to view attendance.</div>
+    <section id="adminAttendancePanel" class="hidden bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50 space-y-6">
       <div class="overflow-auto">
         <table class="w-full text-left">
           <thead>
             <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
-              <th class="py-2 px-2">#</th>
-              <th class="py-2 px-2">Date</th>
-              <th class="py-2 px-2">Status</th>
+              <th class="py-2 px-3">Student Name</th>
+              <th class="py-2 px-3">Email</th>
+              <th class="py-2 px-3">Total Present</th>
+              <th class="py-2 px-3">Total Absent</th>
+              <th class="py-2 px-3">Attendance %</th>
             </tr>
           </thead>
-          <tbody id="attendanceAdminTableBody"></tbody>
+          <tbody id="adminStudentAttendanceTableBody"></tbody>
         </table>
+      </div>
+
+      <div id="adminStudentAttendanceDetail" class="hidden space-y-5 border-t border-surface-container pt-5">
+        <div class="flex items-center justify-between">
+          <h3 id="adminStudentAttendanceTitle" class="text-xl font-bold brand-font text-primary">Student Attendance Detail</h3>
+          <span id="adminStudentAttendanceStats" class="text-sm text-on-surface-variant font-semibold"></span>
+        </div>
+
+        <div class="overflow-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
+                <th class="py-2 px-2">#</th>
+                <th class="py-2 px-2">Date</th>
+                <th class="py-2 px-2">Status</th>
+              </tr>
+            </thead>
+            <tbody id="adminStudentAttendanceHistoryBody"></tbody>
+          </table>
+        </div>
+
+        <div>
+          <h4 id="adminAttendanceCalendarTitle" class="text-base font-bold text-primary mb-3">Current Month Calendar</h4>
+          <div id="adminAttendanceCalendar" class="grid grid-cols-7 gap-2"></div>
+        </div>
+      </div>
+
+      <div class="border-t border-surface-container pt-5 space-y-4">
+        <h3 class="text-xl font-bold brand-font text-primary">Generated Attendance Codes</h3>
+        <div id="adminAttendanceCodesEmpty" class="text-sm text-on-surface-variant">No attendance codes generated yet.</div>
+        <div id="adminAttendanceCodesWrap" class="hidden overflow-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
+                <th class="py-2 px-3">Student Name</th>
+                <th class="py-2 px-3">Code</th>
+                <th class="py-2 px-3">Date</th>
+                <th class="py-2 px-3">Expiry</th>
+              </tr>
+            </thead>
+            <tbody id="adminAttendanceCodesBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
   </div>

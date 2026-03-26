@@ -21,8 +21,7 @@ function generateCode() {
 
 router.use(authenticate);
 
-// POST /api/attendance/codes/generate
-router.post('/codes/generate', requireRole('admin'), async (req, res) => {
+async function generateAttendanceCodesHandler(req, res) {
   try {
     const students = await User.find({ role: 'student' }).select('_id name email').lean();
     if (!students.length) {
@@ -81,6 +80,46 @@ router.post('/codes/generate', requireRole('admin'), async (req, res) => {
       message: error.message || 'Failed to generate attendance codes',
     });
   }
+}
+
+// POST /api/attendance/codes/generate
+router.post('/codes/generate', requireRole('admin'), generateAttendanceCodesHandler);
+
+// POST /api/attendance/generate-codes
+router.post('/generate-codes', requireRole('admin'), generateAttendanceCodesHandler);
+
+// GET /api/attendance/attendance-codes
+router.get('/attendance-codes', requireRole('admin'), async (req, res) => {
+  try {
+    const dateKey = getDateKey(req.query.date || new Date());
+    if (!dateKey) {
+      return res.status(400).json({ success: false, message: 'Invalid date' });
+    }
+
+    const codes = await AttendanceCode.find({ dateKey })
+      .sort({ createdAt: -1 })
+      .populate('studentId', 'name email')
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      data: codes.map((item) => ({
+        id: item._id,
+        student_id: item.studentId && item.studentId._id ? item.studentId._id : item.studentId,
+        student_name: item.studentId && item.studentId.name ? item.studentId.name : 'Student',
+        student_email: item.studentId && item.studentId.email ? item.studentId.email : '',
+        code: item.code,
+        date: item.dateKey,
+        expires_at: item.expiresAt,
+        is_used: Boolean(item.isUsed),
+      })),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch attendance codes',
+    });
+  }
 });
 
 // GET /api/attendance/students
@@ -88,11 +127,50 @@ router.get('/students', requireRole('admin'), async (req, res) => {
   try {
     const students = await User.find({ role: 'student' })
       .select('name email')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const studentIds = students.map((s) => s._id);
+    const aggregateRows = await Attendance.aggregate([
+      {
+        $match: {
+          studentId: { $in: studentIds },
+        },
+      },
+      {
+        $group: {
+          _id: { studentId: '$studentId', status: '$status' },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const countByStudent = {};
+    aggregateRows.forEach((row) => {
+      const sid = String(row._id.studentId);
+      if (!countByStudent[sid]) {
+        countByStudent[sid] = { present: 0, absent: 0 };
+      }
+      const key = String(row._id.status || '').toLowerCase() === 'present' ? 'present' : 'absent';
+      countByStudent[sid][key] = row.count;
+    });
+
+    const data = students.map((student) => {
+      const sid = String(student._id);
+      const counts = countByStudent[sid] || { present: 0, absent: 0 };
+      const total = counts.present + counts.absent;
+      const percentage = total > 0 ? Math.round((counts.present / total) * 100) : 0;
+      return {
+        ...student,
+        totalPresent: counts.present,
+        totalAbsent: counts.absent,
+        attendancePercentage: percentage,
+      };
+    });
 
     return res.status(200).json({
       success: true,
-      data: students,
+      data,
     });
   } catch (error) {
     return res.status(500).json({
@@ -102,12 +180,12 @@ router.get('/students', requireRole('admin'), async (req, res) => {
   }
 });
 
-// GET /api/attendance/student/:studentId
-router.get('/student/:studentId', requireRole('admin'), async (req, res) => {
+async function getStudentAttendanceHistory(req, res) {
   try {
     const records = await Attendance.find({ studentId: req.params.studentId })
       .sort({ date: -1 })
-      .limit(60);
+      .limit(365)
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -119,7 +197,13 @@ router.get('/student/:studentId', requireRole('admin'), async (req, res) => {
       message: error.message || 'Failed to fetch attendance records',
     });
   }
-});
+}
+
+// GET /api/attendance/student/:studentId
+router.get('/student/:studentId', requireRole('admin'), getStudentAttendanceHistory);
+
+// GET /api/attendance/attendance/:studentId
+router.get('/attendance/:studentId', requireRole('admin'), getStudentAttendanceHistory);
 
 // POST /api/attendance/submit-code
 router.post('/submit-code', requireRole('student'), async (req, res) => {

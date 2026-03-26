@@ -2023,13 +2023,8 @@
     const studentCodePanel = document.getElementById("studentCodePanel");
     const codeInput = document.getElementById("attendanceCodeInput");
     const submitCodeBtn = document.getElementById("submitAttendanceCodeBtn");
+    const overviewGrid = document.getElementById("attendanceOverviewGrid");
     const panel = document.getElementById("adminAttendancePanel");
-    const studentSelect = document.getElementById("attendanceStudentSelect");
-    const dateInput = document.getElementById("attendanceDateInput");
-    const statusSelect = document.getElementById("attendanceStatusSelect");
-    const saveBtn = document.getElementById("saveAttendanceBtn");
-    const tableBody = document.getElementById("attendanceAdminTableBody");
-    const statsEl = document.getElementById("attendanceAdminStats");
 
     if (!markBtn) {
       return;
@@ -2039,6 +2034,10 @@
       if (generateCodesBtn) generateCodesBtn.classList.add("hidden");
       if (studentCodePanel) studentCodePanel.classList.add("hidden");
       if (panel) panel.classList.add("hidden");
+      if (overviewGrid) overviewGrid.classList.remove("hidden");
+
+      markBtn.classList.remove("hidden");
+      markBtn.textContent = "Mark Attendance";
 
       markBtn.addEventListener("click", function () {
         if (!studentCodePanel) return;
@@ -2079,55 +2078,102 @@
       return;
     }
 
-    if (!panel || !studentSelect || !dateInput || !statusSelect || !saveBtn || !tableBody || !statsEl) {
+    if (!panel) {
       return;
     }
 
+    const studentsBody = document.getElementById("adminStudentAttendanceTableBody");
+    const detailWrap = document.getElementById("adminStudentAttendanceDetail");
+    const detailTitle = document.getElementById("adminStudentAttendanceTitle");
+    const detailStats = document.getElementById("adminStudentAttendanceStats");
+    const historyBody = document.getElementById("adminStudentAttendanceHistoryBody");
+    const calendarTitle = document.getElementById("adminAttendanceCalendarTitle");
+    const calendarGrid = document.getElementById("adminAttendanceCalendar");
+    const codesWrap = document.getElementById("adminAttendanceCodesWrap");
+    const codesEmpty = document.getElementById("adminAttendanceCodesEmpty");
+    const codesBody = document.getElementById("adminAttendanceCodesBody");
+
+    if (!studentsBody || !detailWrap || !detailTitle || !detailStats || !historyBody || !calendarTitle || !calendarGrid || !codesWrap || !codesEmpty || !codesBody) {
+      return;
+    }
+
+    if (overviewGrid) overviewGrid.classList.add("hidden");
     if (studentCodePanel) studentCodePanel.classList.add("hidden");
-    if (generateCodesBtn) generateCodesBtn.classList.remove("hidden");
+    panel.classList.remove("hidden");
 
-    markBtn.textContent = "View Student Attendance";
-    markBtn.dataset.loaded = markBtn.dataset.loaded || "false";
+    markBtn.classList.add("hidden");
+    if (studentCodePanel) studentCodePanel.classList.add("hidden");
+    if (generateCodesBtn) {
+      generateCodesBtn.classList.remove("hidden");
+      generateCodesBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">key</span>Generate Attendance Codes';
+    }
 
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    dateInput.value = yyyy + "-" + mm + "-" + dd;
+    function renderCalendar(records) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstWeekDay = new Date(year, month, 1).getDay();
+      const monthLabel = now.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+      calendarTitle.textContent = monthLabel;
 
-    function renderRecords(records) {
+      const statusByDay = {};
+      (records || []).forEach(function (rec) {
+        const d = new Date(rec.date || 0);
+        if (Number.isNaN(d.getTime())) return;
+        if (d.getFullYear() !== year || d.getMonth() !== month) return;
+        const day = d.getDate();
+        statusByDay[day] = String(rec.status || "").toLowerCase();
+      });
+
+      const items = [];
+      for (let i = 0; i < firstWeekDay; i += 1) {
+        items.push('<div class="h-12 rounded-xl bg-slate-100/50"></div>');
+      }
+
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const status = statusByDay[day];
+        const dateRef = new Date(year, month, day);
+        const isHoliday = dateRef.getDay() === 0;
+        let cls = "bg-slate-50 text-slate-700 border border-slate-200";
+
+        if (status === "present") {
+          cls = "bg-emerald-50 text-emerald-800 border border-emerald-200";
+        } else if (status === "absent") {
+          cls = "bg-rose-50 text-rose-800 border border-rose-200";
+        } else if (isHoliday) {
+          cls = "bg-amber-50 text-amber-800 border border-amber-200";
+        }
+
+        items.push(
+          '<div class="h-12 rounded-xl text-xs font-bold flex items-center justify-center ' + cls + '">' +
+            day +
+            "</div>"
+        );
+      }
+
+      calendarGrid.innerHTML = items.join("");
+    }
+
+    function renderHistory(records) {
       if (!records || !records.length) {
-        tableBody.innerHTML =
-          '<tr><td colspan="3" class="py-3 px-2 text-sm text-slate-500">No attendance records found.</td></tr>';
-        statsEl.textContent = "Present: 0 | Absent: 0";
+        historyBody.innerHTML =
+          '<tr><td colspan="3" class="py-2 px-2 text-sm text-slate-500">No attendance records available.</td></tr>';
         return;
       }
 
-      let present = 0;
-      let absent = 0;
-      records.forEach(function (r) {
-        const s = String((r && r.status) || "").toLowerCase();
-        if (s === "present") {
-          present += 1;
-        } else if (s === "absent") {
-          absent += 1;
-        }
-      });
-
-      statsEl.textContent = "Present: " + present + " | Absent: " + absent;
-
-      tableBody.innerHTML = records
+      historyBody.innerHTML = records
         .map(function (rec, index) {
-          const status = String((rec && rec.status) || "").toLowerCase();
+          const status = String(rec.status || "").toLowerCase();
           const badgeClass = status === "present" ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100";
-          const dateText = formatShortDate(rec.date);
           return (
             '<tr class="border-t border-surface-variant/40">' +
             '<td class="py-2 px-2 text-sm font-semibold">' +
             (index + 1) +
             "</td>" +
             '<td class="py-2 px-2 text-sm">' +
-            dateText +
+            formatShortDate(rec.date) +
             "</td>" +
             '<td class="py-2 px-2 text-sm"><span class="px-2 py-1 rounded-full text-xs font-bold uppercase ' +
             badgeClass +
@@ -2140,106 +2186,156 @@
         .join("");
     }
 
-    async function loadStudents() {
+    async function loadStudentDetail(student) {
+      const studentId = student && (student._id || student.id);
+      if (!studentId) return;
+
+      const historyRes = await api("/api/attendance/attendance/" + studentId);
+      const records = (historyRes && historyRes.data) || [];
+
+      const present = records.filter(function (r) {
+        return String(r.status || "").toLowerCase() === "present";
+      }).length;
+      const absent = records.filter(function (r) {
+        return String(r.status || "").toLowerCase() === "absent";
+      }).length;
+      const total = present + absent;
+      const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+
+      detailTitle.textContent = (student.name || "Student") + " - Attendance Detail";
+      detailStats.textContent = "Present: " + present + " | Absent: " + absent + " | Attendance: " + pct + "%";
+      renderHistory(records);
+      renderCalendar(records);
+      detailWrap.classList.remove("hidden");
+    }
+
+    async function loadStudentsTable() {
       const studentsRes = await api("/api/attendance/students");
       const students = (studentsRes && studentsRes.data) || [];
 
       if (!students.length) {
-        studentSelect.innerHTML = '<option value="">No students found</option>';
-        renderRecords([]);
+        studentsBody.innerHTML =
+          '<tr><td colspan="5" class="py-3 px-3 text-sm text-slate-500">No students found.</td></tr>';
+        detailWrap.classList.add("hidden");
+        return [];
+      }
+
+      studentsBody.innerHTML = students
+        .map(function (s) {
+          return (
+            '<tr class="border-t border-surface-variant/40 cursor-pointer hover:bg-slate-50" data-student-row data-student-id="' +
+            (s._id || "") +
+            '">' +
+            '<td class="py-3 px-3 text-sm font-semibold">' +
+            (s.name || "Student") +
+            "</td>" +
+            '<td class="py-3 px-3 text-sm">' +
+            (s.email || "") +
+            "</td>" +
+            '<td class="py-3 px-3 text-sm font-semibold text-emerald-700">' +
+            Number(s.totalPresent || 0) +
+            "</td>" +
+            '<td class="py-3 px-3 text-sm font-semibold text-rose-700">' +
+            Number(s.totalAbsent || 0) +
+            "</td>" +
+            '<td class="py-3 px-3 text-sm font-bold text-primary">' +
+            Number(s.attendancePercentage || 0) +
+            "%</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+
+      const byId = {};
+      students.forEach(function (s) {
+        byId[String(s._id || "")] = s;
+      });
+
+      const rowEls = studentsBody.querySelectorAll("[data-student-row]");
+      rowEls.forEach(function (row) {
+        row.addEventListener("click", async function () {
+          const sid = row.getAttribute("data-student-id") || "";
+          const student = byId[sid];
+          if (!student) return;
+          try {
+            await loadStudentDetail(student);
+          } catch (err) {
+            notify(err.message || "Failed to load student attendance", "error");
+          }
+        });
+      });
+
+      return students;
+    }
+
+    async function loadGeneratedCodes() {
+      const codesRes = await api("/api/attendance/attendance-codes");
+      const codes = (codesRes && codesRes.data) || [];
+
+      if (!codes.length) {
+        codesWrap.classList.add("hidden");
+        codesEmpty.classList.remove("hidden");
+        codesBody.innerHTML = "";
         return;
       }
 
-      studentSelect.innerHTML = students
-        .map(function (s) {
-          return '<option value="' +
-            (s._id || "") +
-            '">' +
-            (s.name || "Student") +
-            ' - ' +
-            (s.email || "") +
-            "</option>";
+      codesEmpty.classList.add("hidden");
+      codesWrap.classList.remove("hidden");
+      codesBody.innerHTML = codes
+        .map(function (item) {
+          const expiry = item.expires_at ? new Date(item.expires_at).toLocaleString("en-IN") : "-";
+          return (
+            '<tr class="border-t border-surface-variant/40">' +
+            '<td class="py-2 px-3 text-sm font-semibold">' +
+            (item.student_name || "Student") +
+            "</td>" +
+            '<td class="py-2 px-3 text-sm font-bold tracking-wider">' +
+            (item.code || "") +
+            "</td>" +
+            '<td class="py-2 px-3 text-sm">' +
+            (item.date || "") +
+            "</td>" +
+            '<td class="py-2 px-3 text-sm">' +
+            expiry +
+            "</td>" +
+            "</tr>"
+          );
         })
         .join("");
     }
 
-    async function loadStudentRecords(studentId) {
-      if (!studentId) {
-        renderRecords([]);
-        return;
+    async function initialLoad() {
+      const students = await loadStudentsTable();
+      await loadGeneratedCodes();
+      if (students.length) {
+        await loadStudentDetail(students[0]);
       }
-      const recordsRes = await api("/api/attendance/student/" + studentId);
-      renderRecords((recordsRes && recordsRes.data) || []);
     }
 
-    markBtn.addEventListener("click", async function () {
-      panel.classList.remove("hidden");
-      if (markBtn.dataset.loaded !== "true") {
-        try {
-          await loadStudents();
-          await loadStudentRecords(studentSelect.value);
-          markBtn.dataset.loaded = "true";
-        } catch (err) {
-          notify(err.message || "Failed to load students", "error");
-        }
-      }
+    initialLoad().catch(function (err) {
+      notify(err.message || "Failed to load attendance dashboard", "error");
     });
 
     if (generateCodesBtn) {
       generateCodesBtn.addEventListener("click", async function () {
-        const originalText = generateCodesBtn.textContent;
+        const originalContent = generateCodesBtn.innerHTML;
         generateCodesBtn.disabled = true;
-        generateCodesBtn.textContent = "Generating...";
+        generateCodesBtn.innerHTML =
+          '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">autorenew</span>Generating...';
         try {
-          const result = await api("/api/attendance/codes/generate", {
+          await api("/api/attendance/generate-codes", {
             method: "POST",
           });
-          const count = (result && result.data && result.data.length) || 0;
-          notify("Generated attendance codes for " + count + " student(s)", "success");
+          await loadGeneratedCodes();
+          notify("Attendance codes generated", "success");
         } catch (err) {
           notify(err.message || "Failed to generate attendance codes", "error");
         } finally {
           generateCodesBtn.disabled = false;
-          generateCodesBtn.textContent = originalText;
+          generateCodesBtn.innerHTML = originalContent;
         }
       });
     }
-
-    studentSelect.addEventListener("change", async function () {
-      try {
-        await loadStudentRecords(studentSelect.value);
-      } catch (err) {
-        notify(err.message || "Failed to load attendance", "error");
-      }
-    });
-
-    saveBtn.addEventListener("click", async function () {
-      const studentId = studentSelect.value;
-      const date = dateInput.value;
-      const status = statusSelect.value;
-
-      if (!studentId || !date || !status) {
-        notify("Please select student, date and status", "error");
-        return;
-      }
-
-      const originalText = saveBtn.textContent;
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Saving...";
-      try {
-        await api("/api/attendance", {
-          method: "POST",
-          body: { studentId: studentId, date: date, status: status },
-        });
-        notify("Attendance saved", "success");
-        await loadStudentRecords(studentId);
-      } catch (err) {
-        notify(err.message || "Failed to save attendance", "error");
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = originalText;
-      }
-    });
   }
 
   function initRouteRedirects() {
