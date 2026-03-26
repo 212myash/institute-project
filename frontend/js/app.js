@@ -1713,6 +1713,61 @@
       "</svg>";
   }
 
+  function renderRequestsStatusGraph(contacts) {
+    const graph = document.getElementById("requestsStatusGraph");
+    if (!graph) return;
+
+    if (!contacts || !contacts.length) {
+      graph.innerHTML = '<p class="text-xs text-slate-500">No contact requests available.</p>';
+      return;
+    }
+
+    const counts = { new: 0, pending: 0, resolved: 0 };
+    contacts.forEach(function (c) {
+      const status = String((c && c.status) || "new").trim().toLowerCase();
+      if (status === "resolved") {
+        counts.resolved += 1;
+      } else if (status === "pending") {
+        counts.pending += 1;
+      } else {
+        counts.new += 1;
+      }
+    });
+
+    const total = Math.max(1, contacts.length);
+
+    function row(label, key, colorClass) {
+      const value = counts[key] || 0;
+      const widthPct = ((value / total) * 100).toFixed(1);
+      return (
+        '<div class="space-y-1">' +
+        '<div class="flex items-center justify-between text-xs text-slate-600">' +
+        '<span class="font-semibold">' +
+        label +
+        '</span>' +
+        '<span class="font-bold">' +
+        value +
+        "</span>" +
+        "</div>" +
+        '<div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">' +
+        '<div class="h-full ' +
+        colorClass +
+        '" style="width:' +
+        widthPct +
+        '%"></div>' +
+        "</div>" +
+        "</div>"
+      );
+    }
+
+    graph.innerHTML =
+      '<div class="space-y-3">' +
+      row("New", "new", "bg-amber-500") +
+      row("Pending", "pending", "bg-red-500") +
+      row("Resolved", "resolved", "bg-green-600") +
+      "</div>";
+  }
+
   async function loadAdminData() {
     const usersBody = document.getElementById("usersTableBody");
     const requestsBody = document.getElementById("requestsTableBody");
@@ -1730,6 +1785,7 @@
       if (usersStat) usersStat.textContent = String(users.length);
       if (requestsStat) requestsStat.textContent = String(contacts.length);
       renderUsersCreatedGraph(users);
+      renderRequestsStatusGraph(contacts);
 
       usersBody.innerHTML = renderAdminTableRows(users, function (u, i) {
         return (
@@ -1826,6 +1882,13 @@
         const mobileFromMessage = mobileMatch ? String(mobileMatch[1] || "").trim() : "";
         const mobile = mobileFromField || mobileFromMessage || "-";
         const cleanedMessage = rawMessage.replace(/(?:^|\n)\s*Mobile\s*:\s*[^\n]+/i, "").trim() || "-";
+        const requestStatus = String(c.status || "new").trim().toLowerCase();
+        const statusLabelClass =
+          requestStatus === "resolved"
+            ? "text-green-700 bg-green-100"
+            : requestStatus === "pending"
+            ? "text-red-700 bg-red-100"
+            : "text-amber-700 bg-amber-100";
 
         return (
           '<tr class="border-t border-surface-variant/40">' +
@@ -1844,11 +1907,72 @@
           '<td class="py-3 px-4 text-sm line-clamp-1 max-w-[220px]">' +
           cleanedMessage +
           "</td>" +
-          '<td class="py-3 px-4 text-sm uppercase font-semibold">' +
-          (c.status || "new") +
+          '<td class="py-3 px-4 text-sm">' +
+          '<div class="flex items-center gap-2">' +
+          '<span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase ' +
+          statusLabelClass +
+          '">' +
+          requestStatus +
+          "</span>" +
+          '<select data-request-status-select data-request-id="' +
+          (c._id || "") +
+          '" class="border border-slate-300 rounded-lg px-2 py-1 text-xs font-semibold">' +
+          '<option value="new" ' +
+          (requestStatus === "new" ? "selected" : "") +
+          ">New</option>" +
+          '<option value="pending" ' +
+          (requestStatus === "pending" ? "selected" : "") +
+          ">Pending</option>" +
+          '<option value="resolved" ' +
+          (requestStatus === "resolved" ? "selected" : "") +
+          ">Resolved</option>" +
+          "</select>" +
+          '<button data-request-status-save data-request-id="' +
+          (c._id || "") +
+          '" class="px-2 py-1 rounded-lg bg-slate-900 text-white text-xs font-semibold">Update</button>' +
+          "</div>" +
           "</td>" +
           "</tr>"
         );
+      });
+
+      const requestStatusSaveButtons = requestsBody.querySelectorAll("[data-request-status-save]");
+      requestStatusSaveButtons.forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          const requestId = btn.getAttribute("data-request-id");
+          if (!requestId) return;
+
+          const select = requestsBody.querySelector('[data-request-status-select][data-request-id="' + requestId + '"]');
+          if (!select) return;
+
+          const nextStatus = String(select.value || "").trim().toLowerCase();
+          btn.disabled = true;
+          const originalText = btn.textContent;
+          btn.textContent = "Saving...";
+
+          try {
+            await api("/api/admin/requests/" + requestId + "/status", {
+              method: "PUT",
+              body: { status: nextStatus },
+            });
+
+            const targetRequest = contacts.find(function (item) {
+              return String(item._id) === String(requestId);
+            });
+            if (targetRequest) {
+              targetRequest.status = nextStatus;
+            }
+
+            notify("Contact request status updated", "success");
+            renderRequestsStatusGraph(contacts);
+            await loadAdminData();
+          } catch (statusErr) {
+            notify(statusErr.message || "Failed to update request status", "error");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        });
       });
     } catch (err) {
       notify(err.message || "Admin data fetch failed", "error");

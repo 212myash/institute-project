@@ -55,6 +55,43 @@ router.get('/requests', async (req, res) => {
   }
 });
 
+// PUT /api/admin/requests/:id/status
+router.put('/requests/:id/status', authenticate, requireRole('admin'), async (req, res) => {
+  try {
+    const status = String(req.body && req.body.status ? req.body.status : '').trim().toLowerCase();
+    if (!['new', 'pending', 'resolved'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'status must be new, pending or resolved',
+      });
+    }
+
+    const updated = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact request not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Contact request status updated successfully',
+      data: updated,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to update contact request status',
+    });
+  }
+});
+
 // PUT /api/admin/users/:id/role
 router.put('/users/:id/role', authenticate, requireRole('admin'), async (req, res) => {
   try {
