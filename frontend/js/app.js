@@ -2019,19 +2019,37 @@
     const role = normalizeRole(auth && auth.user ? auth.user.role : "");
 
     const markBtn = document.getElementById("markAttendanceBtn");
-    const generateCodesBtn = document.getElementById("generateAttendanceCodesBtn");
+    const generateCodeBtn = document.getElementById("generateAttendanceCodeBtn");
     const studentCodePanel = document.getElementById("studentCodePanel");
     const codeInput = document.getElementById("attendanceCodeInput");
     const submitCodeBtn = document.getElementById("submitAttendanceCodeBtn");
     const overviewGrid = document.getElementById("attendanceOverviewGrid");
     const panel = document.getElementById("adminAttendancePanel");
+    const tableView = document.getElementById("adminStudentsTableView");
+    const detailView = document.getElementById("adminStudentDetailView");
+    const studentsBody = document.getElementById("adminStudentsAttendanceBody");
+    const studentsEmpty = document.getElementById("adminStudentsEmpty");
+    const backBtn = document.getElementById("adminBackToStudentsBtn");
+    const detailStudentPhoto = document.getElementById("detailStudentPhoto");
+    const detailStudentName = document.getElementById("detailStudentName");
+    const detailStudentFather = document.getElementById("detailStudentFather");
+    const detailStudentPhone = document.getElementById("detailStudentPhone");
+    const detailHistoryBody = document.getElementById("detailAttendanceHistoryBody");
+    const detailCalendarTitle = document.getElementById("detailCalendarTitle");
+    const detailCalendarGrid = document.getElementById("detailCalendarGrid");
+    const detailAttendancePercent = document.getElementById("detailAttendancePercent");
+    const detailAttendanceRank = document.getElementById("detailAttendanceRank");
+    const dailyCodeModal = document.getElementById("dailyCodeModal");
+    const dailyCodeText = document.getElementById("dailyCodeText");
+    const dailyCodeExpiry = document.getElementById("dailyCodeExpiry");
+    const dailyCodeModalClose = document.getElementById("dailyCodeModalClose");
 
     if (!markBtn) {
       return;
     }
 
     if (role === "student") {
-      if (generateCodesBtn) generateCodesBtn.classList.add("hidden");
+      if (generateCodeBtn) generateCodeBtn.classList.add("hidden");
       if (studentCodePanel) studentCodePanel.classList.add("hidden");
       if (panel) panel.classList.add("hidden");
       if (overviewGrid) overviewGrid.classList.remove("hidden");
@@ -2039,12 +2057,16 @@
       markBtn.classList.remove("hidden");
       markBtn.textContent = "Mark Attendance";
 
-      markBtn.addEventListener("click", function () {
-        if (!studentCodePanel) return;
-        studentCodePanel.classList.remove("hidden");
-      });
+      if (markBtn.dataset.bound !== "true") {
+        markBtn.dataset.bound = "true";
+        markBtn.addEventListener("click", function () {
+          if (!studentCodePanel) return;
+          studentCodePanel.classList.remove("hidden");
+        });
+      }
 
-      if (submitCodeBtn && codeInput) {
+      if (submitCodeBtn && codeInput && submitCodeBtn.dataset.bound !== "true") {
+        submitCodeBtn.dataset.bound = "true";
         submitCodeBtn.addEventListener("click", async function () {
           const code = String(codeInput.value || "").trim().toUpperCase();
           if (!code) {
@@ -2056,7 +2078,7 @@
           submitCodeBtn.disabled = true;
           submitCodeBtn.textContent = "Submitting...";
           try {
-            await api("/api/attendance/submit-code", {
+            await api("/api/attendance/verify-code", {
               method: "POST",
               body: { code: code },
             });
@@ -2078,22 +2100,11 @@
       return;
     }
 
-    if (!panel) {
+    if (!panel || !tableView || !detailView || !studentsBody || !studentsEmpty || !backBtn) {
       return;
     }
 
-    const studentsBody = document.getElementById("adminStudentAttendanceTableBody");
-    const detailWrap = document.getElementById("adminStudentAttendanceDetail");
-    const detailTitle = document.getElementById("adminStudentAttendanceTitle");
-    const detailStats = document.getElementById("adminStudentAttendanceStats");
-    const historyBody = document.getElementById("adminStudentAttendanceHistoryBody");
-    const calendarTitle = document.getElementById("adminAttendanceCalendarTitle");
-    const calendarGrid = document.getElementById("adminAttendanceCalendar");
-    const codesWrap = document.getElementById("adminAttendanceCodesWrap");
-    const codesEmpty = document.getElementById("adminAttendanceCodesEmpty");
-    const codesBody = document.getElementById("adminAttendanceCodesBody");
-
-    if (!studentsBody || !detailWrap || !detailTitle || !detailStats || !historyBody || !calendarTitle || !calendarGrid || !codesWrap || !codesEmpty || !codesBody) {
+    if (!detailStudentPhoto || !detailStudentName || !detailStudentFather || !detailStudentPhone || !detailHistoryBody || !detailCalendarTitle || !detailCalendarGrid || !detailAttendancePercent || !detailAttendanceRank || !dailyCodeModal || !dailyCodeText || !dailyCodeExpiry || !dailyCodeModalClose) {
       return;
     }
 
@@ -2102,12 +2113,10 @@
     panel.classList.remove("hidden");
 
     markBtn.classList.add("hidden");
-    if (studentCodePanel) studentCodePanel.classList.add("hidden");
-    if (generateCodesBtn) {
-      generateCodesBtn.classList.remove("hidden");
-      generateCodesBtn.innerHTML =
-        '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">key</span>Generate Attendance Codes';
-    }
+    tableView.classList.remove("hidden");
+    detailView.classList.add("hidden");
+
+    if (generateCodeBtn) generateCodeBtn.classList.remove("hidden");
 
     function renderCalendar(records) {
       const now = new Date();
@@ -2144,6 +2153,8 @@
           cls = "bg-rose-50 text-rose-800 border border-rose-200";
         } else if (isHoliday) {
           cls = "bg-amber-50 text-amber-800 border border-amber-200";
+        } else {
+          cls = "bg-slate-100 text-slate-700 border border-slate-200";
         }
 
         items.push(
@@ -2158,12 +2169,12 @@
 
     function renderHistory(records) {
       if (!records || !records.length) {
-        historyBody.innerHTML =
+        detailHistoryBody.innerHTML =
           '<tr><td colspan="3" class="py-2 px-2 text-sm text-slate-500">No attendance records available.</td></tr>';
         return;
       }
 
-      historyBody.innerHTML = records
+      detailHistoryBody.innerHTML = records
         .map(function (rec, index) {
           const status = String(rec.status || "").toLowerCase();
           const badgeClass = status === "present" ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100";
@@ -2186,7 +2197,18 @@
         .join("");
     }
 
-    async function loadStudentDetail(student) {
+    function openDetailView() {
+      tableView.classList.add("hidden");
+      detailView.classList.remove("hidden");
+      studentsEmpty.classList.add("hidden");
+    }
+
+    function openTableView() {
+      detailView.classList.add("hidden");
+      tableView.classList.remove("hidden");
+    }
+
+    async function loadStudentDetail(student, rankByStudentId) {
       const studentId = student && (student._id || student.id);
       if (!studentId) return;
 
@@ -2202,26 +2224,33 @@
       const total = present + absent;
       const pct = total > 0 ? Math.round((present / total) * 100) : 0;
 
-      detailTitle.textContent = (student.name || "Student") + " - Attendance Detail";
-      detailStats.textContent = "Present: " + present + " | Absent: " + absent + " | Attendance: " + pct + "%";
+      detailStudentPhoto.src = student.photo_url || "https://img.icons8.com/color/96/user.png";
+      detailStudentName.textContent = student.full_name || student.name || "Student";
+      detailStudentFather.textContent = "Father: " + (student.father_name || "-");
+      detailStudentPhone.textContent = "Phone: " + (student.mobile || "-");
       renderHistory(records);
       renderCalendar(records);
-      detailWrap.classList.remove("hidden");
+      detailAttendancePercent.textContent = pct + "%";
+      const rank = rankByStudentId[String(studentId)] || "-";
+      detailAttendanceRank.textContent = String(rank);
+      openDetailView();
     }
 
-    async function loadStudentsTable() {
+    async function loadStudentsTable(rankByStudentId) {
       const studentsRes = await api("/api/attendance/students");
       const students = (studentsRes && studentsRes.data) || [];
 
       if (!students.length) {
         studentsBody.innerHTML =
           '<tr><td colspan="5" class="py-3 px-3 text-sm text-slate-500">No students found.</td></tr>';
-        detailWrap.classList.add("hidden");
+        studentsEmpty.classList.remove("hidden");
         return [];
       }
 
+      studentsEmpty.classList.add("hidden");
       studentsBody.innerHTML = students
         .map(function (s) {
+          const rowRank = rankByStudentId[String(s._id || "")] || "-";
           return (
             '<tr class="border-t border-surface-variant/40 cursor-pointer hover:bg-slate-50" data-student-row data-student-id="' +
             (s._id || "") +
@@ -2240,7 +2269,9 @@
             "</td>" +
             '<td class="py-3 px-3 text-sm font-bold text-primary">' +
             Number(s.attendancePercentage || 0) +
-            "%</td>" +
+            '% <span class="text-on-surface-variant font-semibold ml-2">#' +
+            rowRank +
+            "</span></td>" +
             "</tr>"
           );
         })
@@ -2258,7 +2289,7 @@
           const student = byId[sid];
           if (!student) return;
           try {
-            await loadStudentDetail(student);
+            await loadStudentDetail(student, rankByStudentId);
           } catch (err) {
             notify(err.message || "Failed to load student attendance", "error");
           }
@@ -2268,71 +2299,59 @@
       return students;
     }
 
-    async function loadGeneratedCodes() {
-      const codesRes = await api("/api/attendance/attendance-codes");
-      const codes = (codesRes && codesRes.data) || [];
-
-      if (!codes.length) {
-        codesWrap.classList.add("hidden");
-        codesEmpty.classList.remove("hidden");
-        codesBody.innerHTML = "";
-        return;
-      }
-
-      codesEmpty.classList.add("hidden");
-      codesWrap.classList.remove("hidden");
-      codesBody.innerHTML = codes
-        .map(function (item) {
-          const expiry = item.expires_at ? new Date(item.expires_at).toLocaleString("en-IN") : "-";
-          return (
-            '<tr class="border-t border-surface-variant/40">' +
-            '<td class="py-2 px-3 text-sm font-semibold">' +
-            (item.student_name || "Student") +
-            "</td>" +
-            '<td class="py-2 px-3 text-sm font-bold tracking-wider">' +
-            (item.code || "") +
-            "</td>" +
-            '<td class="py-2 px-3 text-sm">' +
-            (item.date || "") +
-            "</td>" +
-            '<td class="py-2 px-3 text-sm">' +
-            expiry +
-            "</td>" +
-            "</tr>"
-          );
-        })
-        .join("");
-    }
-
     async function initialLoad() {
-      const students = await loadStudentsTable();
-      await loadGeneratedCodes();
-      if (students.length) {
-        await loadStudentDetail(students[0]);
-      }
+      const rankingsRes = await api("/api/attendance/rankings");
+      const rankings = (rankingsRes && rankingsRes.data) || [];
+      const rankByStudentId = {};
+      rankings.forEach(function (item) {
+        rankByStudentId[String(item.student_id || "")] = item.rank || "-";
+      });
+
+      await loadStudentsTable(rankByStudentId);
     }
 
     initialLoad().catch(function (err) {
       notify(err.message || "Failed to load attendance dashboard", "error");
     });
 
-    if (generateCodesBtn) {
-      generateCodesBtn.addEventListener("click", async function () {
-        const originalContent = generateCodesBtn.innerHTML;
-        generateCodesBtn.disabled = true;
-        generateCodesBtn.innerHTML =
+    if (backBtn.dataset.bound !== "true") {
+      backBtn.dataset.bound = "true";
+      backBtn.addEventListener("click", function () {
+        openTableView();
+      });
+    }
+
+    if (dailyCodeModalClose.dataset.bound !== "true") {
+      dailyCodeModalClose.dataset.bound = "true";
+      dailyCodeModalClose.addEventListener("click", function () {
+        dailyCodeModal.classList.add("hidden");
+      });
+    }
+
+    if (generateCodeBtn && generateCodeBtn.dataset.bound !== "true") {
+      generateCodeBtn.dataset.bound = "true";
+      generateCodeBtn.addEventListener("click", async function () {
+        const originalContent = generateCodeBtn.innerHTML;
+        generateCodeBtn.disabled = true;
+        generateCodeBtn.innerHTML =
           '<span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">autorenew</span>Generating...';
         try {
-          await api("/api/attendance/generate-codes", {
+          const result = await api("/api/attendance/generate-code", {
             method: "POST",
           });
-          await loadGeneratedCodes();
-          notify("Attendance codes generated", "success");
+
+          const payload = (result && result.data) || {};
+          dailyCodeText.textContent = payload.code || "------";
+          dailyCodeExpiry.textContent =
+            "Expiry: " +
+            (payload.expires_at ? new Date(payload.expires_at).toLocaleString("en-IN") : "-");
+          dailyCodeModal.classList.remove("hidden");
+          notify("Attendance code generated", "success");
         } catch (err) {
-          notify(err.message || "Failed to generate attendance codes", "error");
+          notify(err.message || "Failed to generate attendance code", "error");
         } finally {
-          generateCodesBtn.disabled = false;
-          generateCodesBtn.innerHTML = originalContent;
+          generateCodeBtn.disabled = false;
+          generateCodeBtn.innerHTML = originalContent;
         }
       });
     }

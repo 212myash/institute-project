@@ -1,7 +1,8 @@
 const express = require('express');
 const Attendance = require('../models/Attendance');
-const AttendanceCode = require('../models/AttendanceCode');
+const DailyCode = require('../models/DailyCode');
 const User = require('../models/User');
+const StudentProfile = require('../models/StudentProfile');
 const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
@@ -19,74 +20,78 @@ function generateCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+async function getAttendanceCountByStudent(studentIds) {
+  const aggregateRows = await Attendance.aggregate([
+    {
+      $match: {
+        studentId: { $in: studentIds },
+      },
+    },
+    {
+      $group: {
+        _id: { studentId: '$studentId', status: '$status' },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return aggregateRows.reduce((acc, row) => {
+    const sid = String(row._id.studentId);
+    if (!acc[sid]) {
+      acc[sid] = { present: 0, absent: 0 };
+    }
+    const key = String(row._id.status || '').toLowerCase() === 'present' ? 'present' : 'absent';
+    acc[sid][key] = row.count;
+    return acc;
+  }, {});
+}
+
 router.use(authenticate);
 
-async function generateAttendanceCodesHandler(req, res) {
+async function generateDailyCodeHandler(req, res) {
   try {
-    const students = await User.find({ role: 'student' }).select('_id name email').lean();
-    if (!students.length) {
-      return res.status(200).json({ success: true, message: 'No students found', data: [] });
-    }
-
     const dateKey = getDateKey(new Date());
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    const generatedInBatch = new Set();
-    const savedCodes = [];
 
-    for (const student of students) {
-      let code = generateCode();
-      let guard = 0;
-      while (guard < 50) {
-        const alreadyInBatch = generatedInBatch.has(code);
-        const existingCode = await AttendanceCode.findOne({ code, dateKey }).select('_id').lean();
-        if (!alreadyInBatch && !existingCode) break;
-        code = generateCode();
-        guard += 1;
+    const saved = await DailyCode.findOneAndUpdate(
+      { dateKey },
+      {
+        code: generateCode(),
+        dateKey,
+        expiresAt,
+      },
+      {
+        upsert: true,
+        new: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
       }
-
-      generatedInBatch.add(code);
-
-      const saved = await AttendanceCode.findOneAndUpdate(
-        { studentId: student._id, dateKey },
-        {
-          studentId: student._id,
-          code,
-          dateKey,
-          expiresAt,
-          isUsed: false,
-          usedAt: null,
-        },
-        { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
-      ).lean();
-
-      savedCodes.push({
-        student_id: student._id,
-        student_name: student.name,
-        student_email: student.email,
-        code: saved.code,
-        date: dateKey,
-        expires_at: saved.expiresAt,
-      });
-    }
+    ).lean();
 
     return res.status(200).json({
       success: true,
-      message: 'Attendance codes generated successfully',
-      data: savedCodes,
+      message: 'Attendance code generated successfully',
+      data: {
+        id: saved._id,
+        code: saved.code,
+        date: saved.dateKey,
+        expires_at: saved.expiresAt,
+      },
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: error.message || 'Failed to generate attendance codes',
+      message: error.message || 'Failed to generate attendance code',
     });
   }
 }
 
-// POST /api/attendance/codes/generate
-router.post('/codes/generate', requireRole('admin'), generateAttendanceCodesHandler);
+// POST /api/attendance/generate-code
+router.post('/generate-code', requireRole('admin'), generateDailyCodeHandler);
 
-// POST /api/attendance/generate-codes
-router.post('/generate-codes', requireRole('admin'), generateAttendanceCodesHandler);
+// Backward compatibility aliases
+router.post('/generate-codes', requireRole('admin'), generateDailyCodeHandler);
+router.post('/codes/generate', requireRole('admin'), generateDailyCodeHandler);
 
 // GET /api/attendance/attendance-codes
 router.get('/attendance-codes', requireRole('admin'), async (req, res) => {
@@ -96,23 +101,20 @@ router.get('/attendance-codes', requireRole('admin'), async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid date' });
     }
 
-    const codes = await AttendanceCode.find({ dateKey })
-      .sort({ createdAt: -1 })
-      .populate('studentId', 'name email')
-      .lean();
+    const codeDoc = await DailyCode.findOne({ dateKey }).lean();
 
     return res.status(200).json({
       success: true,
-      data: codes.map((item) => ({
-        id: item._id,
-        student_id: item.studentId && item.studentId._id ? item.studentId._id : item.studentId,
-        student_name: item.studentId && item.studentId.name ? item.studentId.name : 'Student',
-        student_email: item.studentId && item.studentId.email ? item.studentId.email : '',
-        code: item.code,
-        date: item.dateKey,
-        expires_at: item.expiresAt,
-        is_used: Boolean(item.isUsed),
-      })),
+      data: codeDoc
+        ? [
+            {
+              id: codeDoc._id,
+              code: codeDoc.code,
+              date: codeDoc.dateKey,
+              expires_at: codeDoc.expiresAt,
+            },
+          ]
+        : [],
     });
   } catch (error) {
     return res.status(500).json({
@@ -130,41 +132,35 @@ router.get('/students', requireRole('admin'), async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    const studentIds = students.map((s) => s._id);
-    const aggregateRows = await Attendance.aggregate([
-      {
-        $match: {
-          studentId: { $in: studentIds },
-        },
-      },
-      {
-        $group: {
-          _id: { studentId: '$studentId', status: '$status' },
-          count: { $sum: 1 },
-        },
-      },
-    ]);
+    const studentIds = students.map((s) => s._id).filter(Boolean);
 
-    const countByStudent = {};
-    aggregateRows.forEach((row) => {
-      const sid = String(row._id.studentId);
-      if (!countByStudent[sid]) {
-        countByStudent[sid] = { present: 0, absent: 0 };
-      }
-      const key = String(row._id.status || '').toLowerCase() === 'present' ? 'present' : 'absent';
-      countByStudent[sid][key] = row.count;
-    });
+    const profiles = await StudentProfile.find({ user: { $in: studentIds } })
+      .select('user father_name mobile photo_url full_name')
+      .lean();
+
+    const profileByUserId = profiles.reduce((acc, profile) => {
+      acc[String(profile.user)] = profile;
+      return acc;
+    }, {});
+
+    const countByStudent = await getAttendanceCountByStudent(studentIds);
 
     const data = students.map((student) => {
       const sid = String(student._id);
       const counts = countByStudent[sid] || { present: 0, absent: 0 };
       const total = counts.present + counts.absent;
       const percentage = total > 0 ? Math.round((counts.present / total) * 100) : 0;
+      const profile = profileByUserId[sid] || {};
+
       return {
         ...student,
         totalPresent: counts.present,
         totalAbsent: counts.absent,
         attendancePercentage: percentage,
+        father_name: profile.father_name || '',
+        mobile: profile.mobile || '',
+        photo_url: profile.photo_url || '',
+        full_name: profile.full_name || student.name,
       };
     });
 
@@ -199,14 +195,54 @@ async function getStudentAttendanceHistory(req, res) {
   }
 }
 
-// GET /api/attendance/student/:studentId
-router.get('/student/:studentId', requireRole('admin'), getStudentAttendanceHistory);
-
 // GET /api/attendance/attendance/:studentId
 router.get('/attendance/:studentId', requireRole('admin'), getStudentAttendanceHistory);
 
-// POST /api/attendance/submit-code
-router.post('/submit-code', requireRole('student'), async (req, res) => {
+// Backward compatibility alias
+router.get('/student/:studentId', requireRole('admin'), getStudentAttendanceHistory);
+
+// GET /api/attendance/rankings
+router.get('/rankings', requireRole('admin'), async (req, res) => {
+  try {
+    const studentsRes = await User.find({ role: 'student' })
+      .select('name email')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const studentIds = studentsRes.map((s) => s._id).filter(Boolean);
+    const countByStudent = await getAttendanceCountByStudent(studentIds);
+
+    const ranked = studentsRes
+      .map((student) => {
+        const sid = String(student._id);
+        const counts = countByStudent[sid] || { present: 0, absent: 0 };
+        const total = counts.present + counts.absent;
+        const percentage = total > 0 ? (counts.present / total) * 100 : 0;
+        return {
+          student_id: sid,
+          name: student.name,
+          email: student.email,
+          totalPresent: counts.present,
+          totalAbsent: counts.absent,
+          attendancePercentage: Number(percentage.toFixed(2)),
+        };
+      })
+      .sort((a, b) => b.attendancePercentage - a.attendancePercentage)
+      .map((item, index) => ({
+        ...item,
+        rank: index + 1,
+      }));
+
+    return res.status(200).json({ success: true, data: ranked });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch rankings',
+    });
+  }
+});
+
+async function verifyDailyCodeHandler(req, res) {
   try {
     const code = String(req.body && req.body.code ? req.body.code : '').trim().toUpperCase();
     if (!code) {
@@ -215,25 +251,17 @@ router.post('/submit-code', requireRole('student'), async (req, res) => {
 
     const now = new Date();
     const dateKey = getDateKey(now);
-    const codeDoc = await AttendanceCode.findOne({ code, dateKey });
+    const codeDoc = await DailyCode.findOne({ dateKey }).lean();
 
-    if (!codeDoc) {
+    if (!codeDoc || String(codeDoc.code || '').toUpperCase() !== code) {
       return res.status(400).json({ success: false, message: 'Invalid Code' });
-    }
-
-    if (String(codeDoc.studentId) !== String(req.user.userId)) {
-      return res.status(403).json({ success: false, message: 'Not Assigned to You' });
     }
 
     if (codeDoc.expiresAt && new Date(codeDoc.expiresAt).getTime() < now.getTime()) {
       return res.status(400).json({ success: false, message: 'Code Expired' });
     }
 
-    if (codeDoc.isUsed) {
-      return res.status(409).json({ success: false, message: 'Already Used' });
-    }
-
-    const existingAttendance = await Attendance.findOne({ studentId: req.user.userId, dateKey });
+    const existingAttendance = await Attendance.findOne({ studentId: req.user.userId, dateKey }).lean();
     if (existingAttendance) {
       return res.status(409).json({ success: false, message: 'Already Used' });
     }
@@ -244,10 +272,6 @@ router.post('/submit-code', requireRole('student'), async (req, res) => {
       dateKey,
       status: 'present',
     });
-
-    codeDoc.isUsed = true;
-    codeDoc.usedAt = now;
-    await codeDoc.save();
 
     return res.status(201).json({
       success: true,
@@ -264,9 +288,15 @@ router.post('/submit-code', requireRole('student'), async (req, res) => {
       message: error.message || 'Failed to submit attendance code',
     });
   }
-});
+}
 
-// POST /api/attendance
+// POST /api/attendance/verify-code
+router.post('/verify-code', requireRole('student'), verifyDailyCodeHandler);
+
+// Backward compatibility alias
+router.post('/submit-code', requireRole('student'), verifyDailyCodeHandler);
+
+// POST /api/attendance (manual admin override)
 router.post('/', requireRole('admin'), async (req, res) => {
   try {
     const { studentId, date, status } = req.body;
@@ -285,7 +315,7 @@ router.post('/', requireRole('admin'), async (req, res) => {
       });
     }
 
-    const student = await User.findById(studentId).select('role');
+    const student = await User.findById(studentId).select('role').lean();
     if (!student || String(student.role || '').toLowerCase() !== 'student') {
       return res.status(400).json({
         success: false,
@@ -302,27 +332,31 @@ router.post('/', requireRole('admin'), async (req, res) => {
       });
     }
 
-    const attendance = await Attendance.findOneAndUpdate({
-      studentId,
-      dateKey,
-    }, {
-      studentId,
-      date: targetDate,
-      dateKey,
-      status: String(status).toLowerCase(),
-    }, {
-      new: true,
-      upsert: true,
-      setDefaultsOnInsert: true,
-    });
+    const attendance = await Attendance.findOneAndUpdate(
+      {
+        studentId,
+        dateKey,
+      },
+      {
+        studentId,
+        date: targetDate,
+        dateKey,
+        status: String(status).toLowerCase(),
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Attendance marked successfully',
       data: attendance,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message || 'Failed to mark attendance',
     });

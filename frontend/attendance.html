@@ -58,7 +58,7 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
       </div>
       <div class="flex items-center gap-3">
         <button id="markAttendanceBtn" class="bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>Mark Attendance</button>
-        <button id="generateAttendanceCodesBtn" class="hidden bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">key</span>Generate Attendance Codes</button>
+        <button id="generateAttendanceCodeBtn" class="hidden bg-gradient-to-br from-primary to-slate-800 text-white px-8 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">key</span>Generate Attendance Code</button>
       </div>
     </section>
 
@@ -100,25 +100,53 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
     </div>
 
     <section id="adminAttendancePanel" class="hidden bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container/50 space-y-6">
-      <div class="overflow-auto">
-        <table class="w-full text-left">
-          <thead>
-            <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
-              <th class="py-2 px-3">Student Name</th>
-              <th class="py-2 px-3">Email</th>
-              <th class="py-2 px-3">Total Present</th>
-              <th class="py-2 px-3">Total Absent</th>
-              <th class="py-2 px-3">Attendance %</th>
-            </tr>
-          </thead>
-          <tbody id="adminStudentAttendanceTableBody"></tbody>
-        </table>
+      <div id="adminStudentsTableView" class="space-y-4">
+        <div class="overflow-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
+                <th class="py-2 px-3">Student Name</th>
+                <th class="py-2 px-3">Email</th>
+                <th class="py-2 px-3">Present Count</th>
+                <th class="py-2 px-3">Absent Count</th>
+                <th class="py-2 px-3">Attendance %</th>
+              </tr>
+            </thead>
+            <tbody id="adminStudentsAttendanceBody"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div id="adminStudentAttendanceDetail" class="hidden space-y-5 border-t border-surface-container pt-5">
-        <div class="flex items-center justify-between">
-          <h3 id="adminStudentAttendanceTitle" class="text-xl font-bold brand-font text-primary">Student Attendance Detail</h3>
-          <span id="adminStudentAttendanceStats" class="text-sm text-on-surface-variant font-semibold"></span>
+      <div id="adminStudentDetailView" class="hidden space-y-6">
+        <div class="flex items-center justify-between gap-3">
+          <button id="adminBackToStudentsBtn" class="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"><span class="material-symbols-outlined text-base">arrow_back</span>Back to Students</button>
+          <h3 class="text-xl font-bold brand-font text-primary">Attendance Tracker</h3>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 bg-surface-container-low rounded-3xl p-5 border border-surface-container">
+            <div class="flex items-start gap-4">
+              <img id="detailStudentPhoto" src="https://img.icons8.com/color/96/user.png" alt="Student" class="w-20 h-20 rounded-2xl object-cover border border-slate-200" />
+              <div class="space-y-1">
+                <h4 id="detailStudentName" class="text-lg font-extrabold brand-font text-primary">Student</h4>
+                <p id="detailStudentFather" class="text-sm text-on-surface-variant">Father: -</p>
+                <p id="detailStudentPhone" class="text-sm text-on-surface-variant">Phone: -</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 bg-surface-container-low rounded-3xl p-5 border border-surface-container space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 id="detailCalendarTitle" class="text-lg font-extrabold brand-font text-primary">Current Month</h4>
+              <div class="flex gap-3 text-[11px] font-semibold">
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Present</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Absent</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Holiday</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>No Data</span>
+              </div>
+            </div>
+            <div id="detailCalendarGrid" class="grid grid-cols-7 gap-2"></div>
+          </div>
         </div>
 
         <div class="overflow-auto">
@@ -130,35 +158,39 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
                 <th class="py-2 px-2">Status</th>
               </tr>
             </thead>
-            <tbody id="adminStudentAttendanceHistoryBody"></tbody>
+            <tbody id="detailAttendanceHistoryBody"></tbody>
           </table>
         </div>
 
-        <div>
-          <h4 id="adminAttendanceCalendarTitle" class="text-base font-bold text-primary mb-3">Current Month Calendar</h4>
-          <div id="adminAttendanceCalendar" class="grid grid-cols-7 gap-2"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-primary text-white p-6 rounded-3xl shadow-lg">
+            <p class="text-xs font-medium uppercase tracking-widest opacity-70">Attendance</p>
+            <h4 id="detailAttendancePercent" class="text-4xl font-extrabold mt-1 brand-font">0%</h4>
+          </div>
+          <div class="bg-surface-container-low p-6 rounded-3xl border border-surface-container shadow-sm">
+            <p class="text-xs font-medium uppercase tracking-widest text-on-surface-variant">Rank</p>
+            <h4 id="detailAttendanceRank" class="text-4xl font-extrabold text-amber-700 brand-font">-</h4>
+          </div>
         </div>
       </div>
 
-      <div class="border-t border-surface-container pt-5 space-y-4">
-        <h3 class="text-xl font-bold brand-font text-primary">Generated Attendance Codes</h3>
-        <div id="adminAttendanceCodesEmpty" class="text-sm text-on-surface-variant">No attendance codes generated yet.</div>
-        <div id="adminAttendanceCodesWrap" class="hidden overflow-auto">
-          <table class="w-full text-left">
-            <thead>
-              <tr class="text-xs uppercase tracking-widest text-on-surface-variant">
-                <th class="py-2 px-3">Student Name</th>
-                <th class="py-2 px-3">Code</th>
-                <th class="py-2 px-3">Date</th>
-                <th class="py-2 px-3">Expiry</th>
-              </tr>
-            </thead>
-            <tbody id="adminAttendanceCodesBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div id="adminStudentsEmpty" class="hidden text-sm text-on-surface-variant">No students found.</div>
+
     </section>
   </div>
 </main>
+
+<div id="dailyCodeModal" class="hidden fixed inset-0 z-50 bg-slate-900/45 p-4 md:p-6 flex items-center justify-center">
+  <div class="w-full max-w-md bg-surface-container-lowest rounded-3xl p-6 shadow-2xl border border-surface-container">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-xl font-extrabold brand-font text-primary">Today's Attendance Code</h3>
+        <p id="dailyCodeText" class="mt-3 text-3xl tracking-[0.18em] font-extrabold text-primary">------</p>
+        <p id="dailyCodeExpiry" class="mt-2 text-sm text-on-surface-variant">Expiry: -</p>
+      </div>
+      <button id="dailyCodeModalClose" class="h-10 w-10 rounded-full bg-surface-container-low text-slate-700 hover:bg-slate-200 flex items-center justify-center"><span class="material-symbols-outlined">close</span></button>
+    </div>
+  </div>
+</div>
 <script src="./js/app.js"></script>
 </body></html>
