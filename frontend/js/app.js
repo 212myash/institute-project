@@ -134,6 +134,10 @@
     return "other";
   }
 
+  function normalizeRole(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
   function getEffectiveGender() {
     const auth = getAuth();
     const fromAuth = normalizeGender(auth && auth.user ? auth.user.gender : "");
@@ -280,12 +284,14 @@
       return;
     }
 
-    if (user.role === "admin") {
+    const role = normalizeRole(user.role);
+
+    if (role === "admin") {
       window.location.href = "./admin-dashboard.html";
       return;
     }
 
-    if (user.role === "student" && !user.isProfileCompleted) {
+    if (role === "student" && !user.isProfileCompleted) {
       window.location.href = "./student-form.html";
       return;
     }
@@ -383,7 +389,7 @@
       (PAGE === "admin-dashboard" || PAGE === "services" || SERVICE_DETAIL_PAGES.indexOf(PAGE) !== -1) &&
       auth &&
       auth.user &&
-      auth.user.role !== "admin"
+      normalizeRole(auth.user.role) !== "admin"
     ) {
       window.location.href = "./student-dashboard.html";
       return;
@@ -392,15 +398,16 @@
     if (!auth || !auth.user) return;
 
     const user = auth.user;
+    const role = normalizeRole(user.role);
     const studentLockedPages = ["student-dashboard", "courses", "attendance", "student-settings"];
 
-    if (user.role === "student" && !user.isProfileCompleted && studentLockedPages.indexOf(PAGE) !== -1) {
+    if (role === "student" && !user.isProfileCompleted && studentLockedPages.indexOf(PAGE) !== -1) {
       window.location.href = "./student-form.html";
       return;
     }
 
     if (PAGE === "student-form") {
-      if (user.role !== "student") {
+      if (role !== "student") {
         window.location.href = "./admin-dashboard.html";
         return;
       }
@@ -424,7 +431,7 @@
 
   function getHelpRole() {
     const auth = getAuth();
-    if (auth && auth.user && auth.user.role === "admin") return "admin";
+    if (auth && auth.user && normalizeRole(auth.user.role) === "admin") return "admin";
     return "student";
   }
 
@@ -618,7 +625,7 @@
           body: { email: email, password: password },
         });
 
-        if (!data.user || (selectedRole && data.user.role !== selectedRole)) {
+        if (!data.user || (selectedRole && normalizeRole(data.user.role) !== normalizeRole(selectedRole))) {
           notify("Role mismatch. Please select correct role.", "error");
           return;
         }
@@ -668,16 +675,40 @@
     });
   }
 
-  function initStudentForm() {
+  async function initStudentForm() {
     if (PAGE !== "student-form") return;
 
     const form = document.getElementById("studentOnboardingForm");
     if (!form) return;
 
     const auth = getAuth();
-    if (!auth || !auth.user || auth.user.role !== "student") {
+    if (!auth || !auth.user || normalizeRole(auth.user.role) !== "student") {
       window.location.href = "./login.html";
       return;
+    }
+
+    try {
+      const existingProfile = await api("/api/student/profile");
+      if (existingProfile && existingProfile.data) {
+        const updatedAuth = getAuth();
+        if (updatedAuth && updatedAuth.user) {
+          updatedAuth.user.isProfileCompleted = true;
+          setAuth(updatedAuth);
+        }
+
+        const serverGender = existingProfile.data.gender;
+        if (serverGender) {
+          localStorage.setItem(PROFILE_GENDER_KEY, normalizeGender(serverGender));
+        }
+
+        window.location.href = "./student-dashboard.html";
+        return;
+      }
+    } catch (err) {
+      const message = String((err && err.message) || "").toLowerCase();
+      if (message && !message.includes("profile not found") && !message.includes("404")) {
+        notify("Unable to verify existing admission form. You can submit now.", "error");
+      }
     }
 
     const fullName = document.getElementById("full_name");
@@ -1769,7 +1800,7 @@
             const auth = getAuth();
             const authUserId = String((auth && auth.user && (auth.user.id || auth.user._id)) || "");
             if (auth && auth.user && authUserId && authUserId === String(userId)) {
-              auth.user.role = nextRole;
+              auth.user.role = normalizeRole(nextRole);
               auth.user.isProfileCompleted = false;
               setAuth(auth);
               notify("Your role was updated. Redirecting...", "success");
