@@ -2065,8 +2065,12 @@
           '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./services.html" data-route="./services.html"><span class="material-symbols-outlined">build</span>Services Management</a>';
       }
 
-      if (attendanceAside && !attendanceAside.querySelector("[data-attendance-admin-footer]")) {
-        const footer = document.createElement("div");
+      // Remove any existing footer (from admin-dashboard sidebar) to prevent duplicates
+      if (attendanceAside) {
+        var existingFooters = attendanceAside.querySelectorAll(".mt-auto");
+        existingFooters.forEach(function (el) { el.remove(); });
+
+        var footer = document.createElement("div");
         footer.setAttribute("data-attendance-admin-footer", "true");
         footer.className = "mt-auto pt-6 border-t border-slate-200 space-y-1";
         footer.innerHTML =
