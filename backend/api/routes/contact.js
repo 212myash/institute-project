@@ -15,7 +15,19 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const contact = await Contact.create({ name, email, message });
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address',
+      });
+    }
+
+    const contact = await Contact.create({
+      name: String(name).trim(),
+      email: String(email).trim().toLowerCase(),
+      message: String(message).trim(),
+    });
 
     res.status(201).json({
       success: true,

@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./db');
 
 // Import routes
@@ -30,19 +31,43 @@ function ensureDbConnection() {
   return dbReadyPromise;
 }
 
-// Middleware
+// ─── CORS: restrict to configured origins (no more origin: '*') ───
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: '*',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (server-to-server, curl, mobile apps)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   })
 );
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
-// Basic request logger for debugging in development
+// ─── Global rate limiter (100 req / 15 min per IP) ───
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please try again later' },
+});
+app.use(globalLimiter);
+
+// ─── Request logger (development only) ───
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
@@ -50,6 +75,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── Lazy DB connection middleware (skip health endpoints) ───
 app.use(async (req, res, next) => {
   if (req.path === '/' || req.path === '/api/health' || req.path === '/api/test') {
     return next();
@@ -66,7 +92,7 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Health check endpoint
+// ─── Health check endpoints ───
 app.get('/', (req, res) => {
   res.status(200).send('API Running');
 });
@@ -86,16 +112,24 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
+// ─── Auth rate limiter (stricter: 20 req / 15 min per IP) ───
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many auth attempts, please try again later' },
+});
+
+// ─── Routes ───
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/courses', courseRoutes);
-app.use('/courses', courseRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/student', studentRoutes);
 
-// 404 handler
+// ─── 404 handler ───
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -103,8 +137,8 @@ app.use((req, res) => {
   });
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
+// ─── Global error handler ───
+app.use((err, req, res, _next) => {
   console.error('Error:', err);
   res.status(err.status || 500).json({
     success: false,

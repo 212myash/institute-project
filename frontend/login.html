@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="description" content="Login to Shivam Computer Institute student and admin portal. Access courses, attendance, and institute services." />
 <title>Login - Shivam Computer Institute</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
@@ -72,7 +73,7 @@
         <div class="space-y-2">
           <div class="flex justify-between items-center ml-1">
             <label class="block text-sm font-semibold text-on-surface" for="password">Password</label>
-            <a class="text-xs font-bold text-on-tertiary-container hover:underline" href="#">Forgot password?</a>
+            <a class="text-xs font-bold text-on-tertiary-container hover:underline" href="#" onclick="event.preventDefault();var e=prompt('Enter your email address for password reset:');if(e){fetch((localStorage.getItem('sci_api_base')||'http://localhost:5000')+'/api/auth/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e})}).then(function(r){return r.json()}).then(function(d){alert(d.message||'Check your email.')}).catch(function(){alert('Unable to connect. Try again later.')})}">Forgot password?</a>
           </div>
           <div class="relative group">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant"><span class="material-symbols-outlined">lock</span></span>
@@ -101,7 +102,7 @@
 <footer class="w-full py-8 bg-slate-50 border-t border-slate-200 mt-auto">
   <div class="flex flex-col md:flex-row justify-between items-center px-8 w-full max-w-7xl mx-auto gap-4">
     <div class="text-lg font-bold text-slate-800">Shivam Computer Institute</div>
-    <p class="text-sm text-slate-500 text-center">© 2024 Shivam Computer Institute. Empowering Academic Excellence.</p>
+    <p class="text-sm text-slate-500 text-center">&copy; <script>document.write(new Date().getFullYear())</script> Shivam Computer Institute. Empowering Academic Excellence.</p>
     <div class="flex gap-6">
       <a class="text-sm text-slate-500 hover:text-slate-900 underline transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
       <a class="text-sm text-slate-500 hover:text-slate-900 underline transition-opacity opacity-80 hover:opacity-100" href="#">Terms of Service</a>

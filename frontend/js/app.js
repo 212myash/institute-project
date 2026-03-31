@@ -1,4 +1,14 @@
 (function () {
+  "use strict";
+
+  // ─── Global error handlers ───
+  window.addEventListener("error", function (e) {
+    console.error("[Global Error]", e.message, e.filename, e.lineno);
+  });
+  window.addEventListener("unhandledrejection", function (e) {
+    console.error("[Unhandled Rejection]", e.reason);
+  });
+
   const DEPLOYED_API_ORIGIN = "https://institute-project-mu.vercel.app";
   const API_BASE_STORAGE_KEY = "sci_api_base";
   const AUTH_KEY = "sci_auth";
@@ -152,42 +162,39 @@
   }
 
   function renderCatalogLists() {
-    const certList = document.getElementById("certificationList");
-    const serviceList = document.getElementById("servicesList");
+    var certList = document.getElementById("certificationList");
+    var serviceList = document.getElementById("servicesList");
     if (!certList || !serviceList) return;
 
-    const settings = getCatalogSettings();
-    certList.innerHTML = settings.certifications
-      .map(function (item) {
-        return (
-          '<li class="flex items-center gap-3"><span class="check-chip material-symbols-outlined">check</span>' +
-          item +
-          "</li>"
-        );
-      })
-      .join("");
+    var settings = getCatalogSettings();
 
-    serviceList.innerHTML = settings.services
-      .map(function (item) {
-        return (
-          '<li class="flex items-center gap-3"><span class="check-chip material-symbols-outlined">check</span>' +
-          item +
-          "</li>"
-        );
-      })
-      .join("");
+    function buildList(container, items) {
+      container.innerHTML = "";
+      items.forEach(function (item) {
+        var li = document.createElement("li");
+        li.className = "flex items-center gap-3";
+        var span = document.createElement("span");
+        span.className = "check-chip material-symbols-outlined";
+        span.textContent = "check";
+        li.appendChild(span);
+        li.appendChild(document.createTextNode(item));
+        container.appendChild(li);
+      });
+    }
+
+    buildList(certList, settings.certifications);
+    buildList(serviceList, settings.services);
   }
 
+  // SECURITY: Use textContent to prevent XSS via user-controlled messages
   function notify(message, type) {
-    const wrap = document.createElement("div");
+    var wrap = document.createElement("div");
     wrap.className = "fixed top-24 right-6 z-[100]";
-    const bg = type === "error" ? "bg-red-600" : "bg-primary";
-    wrap.innerHTML =
-      '<div class="' +
-      bg +
-      ' text-white px-4 py-3 rounded-xl shadow-xl text-sm font-semibold">' +
-      message +
-      "</div>";
+    var inner = document.createElement("div");
+    var bg = type === "error" ? "bg-red-600" : "bg-primary";
+    inner.className = bg + " text-white px-4 py-3 rounded-xl shadow-xl text-sm font-semibold";
+    inner.textContent = message;
+    wrap.appendChild(inner);
     document.body.appendChild(wrap);
     setTimeout(function () {
       wrap.remove();
@@ -616,13 +623,16 @@
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+      var email = document.getElementById("email").value.trim();
+      var password = document.getElementById("password").value;
+      // Support "Remember me" — sends flag to backend for longer JWT expiry
+      var rememberEl = document.getElementById("remember-me");
+      var rememberMe = rememberEl ? rememberEl.checked : false;
 
       try {
-        const data = await api("/api/auth/login", {
+        var data = await api("/api/auth/login", {
           method: "POST",
-          body: { email: email, password: password },
+          body: { email: email, password: password, rememberMe: rememberMe },
         });
 
         if (!data.user || (selectedRole && normalizeRole(data.user.role) !== normalizeRole(selectedRole))) {
@@ -645,18 +655,18 @@
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+      var name = document.getElementById("name").value.trim();
+      var email = document.getElementById("email").value.trim();
+      var password = document.getElementById("password").value;
 
       try {
-        const data = await api("/api/auth/register", {
+        // SECURITY: Do NOT send role from frontend — server enforces role='student'
+        var data = await api("/api/auth/register", {
           method: "POST",
           body: {
             name: name,
             email: email,
             password: password,
-            role: "student",
           },
         });
 

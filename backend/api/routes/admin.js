@@ -6,6 +6,10 @@ const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
+// SECURITY: All admin routes now require authentication + admin role
+router.use(authenticate);
+router.use(requireRole('admin'));
+
 // GET /api/admin/users
 router.get('/users', async (req, res) => {
   try {
@@ -56,7 +60,7 @@ router.get('/requests', async (req, res) => {
 });
 
 // PUT /api/admin/requests/:id/status
-router.put('/requests/:id/status', authenticate, requireRole('admin'), async (req, res) => {
+router.put('/requests/:id/status', async (req, res) => {
   try {
     const status = String(req.body && req.body.status ? req.body.status : '').trim().toLowerCase();
     if (!['new', 'pending', 'resolved'].includes(status)) {
@@ -93,7 +97,7 @@ router.put('/requests/:id/status', authenticate, requireRole('admin'), async (re
 });
 
 // PUT /api/admin/users/:id/role
-router.put('/users/:id/role', authenticate, requireRole('admin'), async (req, res) => {
+router.put('/users/:id/role', async (req, res) => {
   try {
     const role = String(req.body && req.body.role ? req.body.role : '').trim().toLowerCase();
     if (!['student', 'admin'].includes(role)) {

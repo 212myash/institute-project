@@ -7,8 +7,20 @@ const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
+// ─── IST timezone offset (UTC+5:30 = 330 minutes) ───
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+/**
+ * Get a Date object shifted to IST so that getFullYear/getMonth/getDate
+ * return IST values regardless of the server's timezone.
+ */
+function toIST(date) {
+  const d = date ? new Date(date) : new Date();
+  return new Date(d.getTime() + IST_OFFSET_MS + d.getTimezoneOffset() * 60 * 1000);
+}
+
 function getDateKey(input) {
-  const d = input ? new Date(input) : new Date();
+  const d = toIST(input ? new Date(input) : new Date());
   if (Number.isNaN(d.getTime())) return null;
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -260,7 +272,8 @@ async function verifyDailyCodeHandler(req, res) {
     }
 
     function getLocalNowMinutes(d) {
-      return d.getHours() * 60 + d.getMinutes();
+      const ist = toIST(d);
+      return ist.getHours() * 60 + ist.getMinutes();
     }
 
     const now = new Date();
