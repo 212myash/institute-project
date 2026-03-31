@@ -42,12 +42,20 @@ h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
 </header>
 
 <aside class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 py-8 px-4 space-y-2 z-40">
-  <div class="mb-10 px-4"><h1 class="text-lg font-bold text-slate-900 brand-font">Academic Atelier</h1><p class="text-xs text-on-surface-variant">Premium Learning</p></div>
+  <div class="px-4 mb-8">
+    <h2 class="text-lg font-bold text-slate-900 font-headline">Academic Atelier</h2>
+    <p class="text-xs text-on-surface-variant font-medium">Premium Learning</p>
+  </div>
   <nav class="flex-1 space-y-1">
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 font-semibold text-sm transition-colors duration-200" href="./student-dashboard.html" data-route="./student-dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
-    <a class="flex items-center gap-3 px-4 py-3 border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm transition-colors duration-200" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined">event_available</span><span>Attendance</span></a>
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 font-semibold text-sm transition-colors duration-200" href="./student-settings.html" data-route="./student-settings.html"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./student-dashboard.html" data-route="./student-dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">school</span><span>My Courses</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span><span>Attendance</span></a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./student-settings.html" data-route="./student-settings.html"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
   </nav>
+  <div class="mt-auto pt-6 border-t border-slate-200 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-help-open><span class="material-symbols-outlined">help</span>Help Center</a>
+    <a class="flex items-center gap-3 px-4 py-2 text-slate-600 text-sm font-semibold" href="#" data-logout><span class="material-symbols-outlined">logout</span>Logout</a>
+  </div>
 </aside>
 
 <main class="md:ml-64 pt-28 pb-24 md:pb-8 px-4 md:px-8">

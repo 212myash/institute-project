@@ -1345,9 +1345,8 @@
     const pageSubtitle = document.getElementById("coursesPageSubtitle");
 
     if (sidebar) {
-      if (isAdmin) {
-        sidebar.classList.remove("hidden");
-      } else {
+      if (!isAdmin) {
+        sidebar.classList.remove("md:flex");
         sidebar.classList.add("hidden");
       }
     }
@@ -2061,7 +2060,7 @@
         attendanceNav.innerHTML =
           '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./admin-dashboard.html" data-route="./admin-dashboard.html"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>' +
           '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./courses.html" data-route="./courses.html"><span class="material-symbols-outlined">school</span>Courses Management</a>' +
-          '<a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined" style="font-variation-settings: \"FILL\" 1;">event_available</span>Attendance</a>' +
+          '<a class="flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 border-amber-400 bg-amber-50 text-blue-900 font-semibold text-sm" href="./attendance.html" data-route="./attendance.html"><span class="material-symbols-outlined">calendar_month</span>Attendance</a>' +
           '<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 text-sm font-semibold" href="./services.html" data-route="./services.html"><span class="material-symbols-outlined">build</span>Services Management</a>';
       }
 
