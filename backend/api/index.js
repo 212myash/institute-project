@@ -42,6 +42,8 @@ app.use(
     origin: function (origin, callback) {
       // Allow requests with no origin (server-to-server, curl, mobile apps)
       if (!origin) return callback(null, true);
+      // If no origins are configured, allow all origins to avoid blocking deployment checks.
+      if (allowedOrigins.length === 0) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
