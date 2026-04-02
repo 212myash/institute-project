@@ -77,7 +77,8 @@ app.use((req, res, next) => {
 
 // ─── Lazy DB connection middleware (skip health endpoints) ───
 app.use(async (req, res, next) => {
-  if (req.path === '/' || req.path === '/api/health' || req.path === '/api/test') {
+  const skipDbPaths = ['/', '/api/health', '/health', '/api/test', '/test'];
+  if (skipDbPaths.includes(req.path)) {
     return next();
   }
 
@@ -104,7 +105,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Server is running',
+  });
+});
+
 app.get('/api/test', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'API working',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.get('/test', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'API working',
